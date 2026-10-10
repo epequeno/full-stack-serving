@@ -13,8 +13,8 @@ writes to `results/l1-k8s/`.
 | `l4-observability/` | L4 | OTel collector config, Phoenix wiring, span assertions |
 | `l5-multinode/` | L5 | IaC for the second node, LWS / disaggregation config |
 
-Nothing here yet — no level is built. See [`../docs/design.md`](../docs/design.md) for what each
-level must prove.
+L0 is defined here (`l0-local/`); the rest are empty until they are built. See
+[`../docs/design.md`](../docs/design.md) for what each level must prove.
 
 ## Conventions
 

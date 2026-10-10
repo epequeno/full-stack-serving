@@ -37,7 +37,7 @@ stays honest about where it stopped.
 
 | Level | What | Evidence it must produce | Status |
 |---|---|---|---|
-| **L0** | Container + vLLM + load generator | TTFT/ITL at 1/4/16/64 concurrency, committed as JSON | not started |
+| **L0** | Container + vLLM + load generator | TTFT/ITL at 1/4/16/64 concurrency, committed as JSON | harness built + mock-validated; GPU-host measurement pending |
 | **L1** | The same on `k3s`, GPU via device plugin | in-cluster numbers + an explicit **parity or regression** verdict vs L0 | not started |
 | **L2** | Gateway API Inference Extension / llm-d routing | cache hit rate, prefix-aware vs round-robin | not started |
 | **L3** | KEDA autoscaling on queue depth | replica-vs-depth trace, scale latency | not started |

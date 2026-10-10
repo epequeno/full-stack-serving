@@ -11,7 +11,9 @@ reasoning. Decisions the stack forced live in `adr/`.
 
 ## Status
 
-**Scaffolding only. No level is built.**
+**Instruments built; no level measured yet.** L0's container stack (`stack/l0-local/`), the
+shared client (`loadgen/`) and the harness (`measure/`) are implemented and validated against
+the ADR 0007 mock on the dev Mac; the committed numbers must come from the GPU host.
 
 ## Next action
 
@@ -27,8 +29,15 @@ Model: **Qwen2.5-1.5B-Instruct, bf16** — full-stack-serving ADR 0011, applying
 smallest model that still makes the behaviour under test visible. The project is about *how*,
 not *what*.
 
-What remains is building it: the engine ADR (vLLM) and container bring-up in `stack/l0-local/`,
-`loadgen/` itself, the ADR 0007 mock validation in `measure/`, then the 1/4/16/64 matrix.
+**On saturn (the Linux GPU host) — the runbook:**
+
+1. `git pull && make up LEVEL=l0-local` — vLLM container, pinned image + model revision; the
+   first run downloads ~2.9 GiB of weights into the `hf-cache` volume.
+2. `make validate-instrument` — ADR 0007 validation, run on the host whose numbers get
+   committed → `results/instrument/`.
+3. `make measure LEVEL=l0-local` — the 1/4/16/64 matrix → `results/l0-local/`.
+4. Commit `results/` and push. Then write ADR 0007's pass threshold down, with its derivation,
+   before calling the validation a pass.
 
 **Deferred to L0:** pin versions (vLLM, CUDA, driver, Python, aiohttp, container image digest)
 and put them in every result's `env`. Also confirm vLLM's per-chunk usage option for

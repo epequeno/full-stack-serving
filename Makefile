@@ -1,7 +1,8 @@
 # full-stack-serving — bring-up, measurement, teardown.
 #
-# Nothing is implemented yet (see README.md). `make doctor` and `make help` work today;
-# the rest fail loudly rather than pretending.
+# L0 is implemented: `up`/`down`/`measure`/`validate-instrument` work for LEVEL=l0-local
+# (uv syncs the Python env automatically on first use). L1+ targets fail loudly rather
+# than pretending.
 
 LEVEL ?= l0-local
 LEVELS := l0-local l1-k8s l2-routing l3-autoscaling l4-observability l5-multinode
@@ -9,8 +10,12 @@ LEVELS := l0-local l1-k8s l2-routing l3-autoscaling l4-observability l5-multinod
 INVENTORY_SRC ?= $(HOME)/code/ebpf-inference-observability/tools/host-inventory.sh
 INVENTORY_OUT ?= results/l0-local/host-inventory.md
 
+ENDPOINT ?= http://localhost:8000/v1/chat/completions
+MODEL ?= Qwen/Qwen2.5-1.5B-Instruct
+CONTINUOUS_USAGE_BODY ?= {"include_continuous_usage": true}
+
 .DEFAULT_GOAL := help
-.PHONY: help doctor doctor-check inventory up down measure verify clean status
+.PHONY: help doctor doctor-check inventory up down measure verify validate-instrument clean status
 
 help:
 	@echo "full-stack-serving"
@@ -21,8 +26,8 @@ help:
 	@echo "  make up   LEVEL=<l>      bring the stack up at level <l>"
 	@echo "  make down LEVEL=<l>      tear it down"
 	@echo "  make measure LEVEL=<l>   regenerate results/<l>/ from scratch"
-	@echo "  make verify  LEVEL=<l>   re-measure into scratch; fail if a committed finding changes"
-	@echo "  make clean               remove scratch (never touches results/)"
+	@echo "  make validate-instrument  validate loadgen against the mock server (ADR 0007) → results/instrument/"
+	@echo "  make verify  LEVEL=<l>   re-measure into scratch; fail if a committed finding changes (L1+)"
 	@echo "  make status              show what is currently built"
 	@echo ""
 	@echo "  levels: $(LEVELS)"
@@ -92,11 +97,34 @@ status:
 	  printf "  %-18s results/%-18s %s file(s)\n" "$$l" "$$l/" "$$n"; \
 	done
 
-# --- not implemented --------------------------------------------------------
+# --- level bring-up, measurement, teardown (l0-local; L1+ fails loudly) ----------------------
 
-up down measure verify:
-	@echo "make $@ LEVEL=$(LEVEL): not implemented yet." >&2
-	@echo "No level has been built. See README.md and AGENTS.md." >&2
+up:
+	@if [ "$(LEVEL)" != l0-local ]; then echo "make up LEVEL=$(LEVEL): not implemented yet (L1+)." >&2; exit 1; fi
+	@docker compose -f stack/$(LEVEL)/docker-compose.yaml up -d
+	@sleep 2
+	@docker inspect --format 'up: {{.Config.Image}} (digest {{index .RepoDigests 0}})' l0-vllm 2>/dev/null \
+	  || echo "up: container l0-vllm not found yet — still starting; check: docker logs l0-vllm"
+
+down:
+	@if [ "$(LEVEL)" != l0-local ]; then echo "make down LEVEL=$(LEVEL): not implemented yet (L1+)." >&2; exit 1; fi
+	@docker compose -f stack/$(LEVEL)/docker-compose.yaml down
+
+# ADR 0007: run before any level's numbers are trusted, and again whenever loadgen/ or the
+# Python/aiohttp versions change. Committed under results/instrument/ with its environment.
+validate-instrument:
+	@uv run python -m measure.validate --out results/instrument
+
+measure:
+	@if [ "$(LEVEL)" != l0-local ]; then echo "make measure LEVEL=$(LEVEL): not implemented yet (L1+)." >&2; exit 1; fi
+	@uv run python -m measure.measure_l0 --endpoint $(ENDPOINT) --model $(MODEL) \
+	  --out-dir results/$(LEVEL) --continuous-usage-body '$(CONTINUOUS_USAGE_BODY)'
+
+# ADR 0008: the gate reproduces findings, and findings start existing at L1 (L0 is the
+# baseline and compares against nothing). Keep failing loudly until there is something to gate.
+verify:
+	@echo "make verify: nothing to verify yet — L0 is the baseline and commits no findings." >&2
+	@echo "The gate (findings.json, sign-flip rule over five repeats) starts at L1." >&2
 	@exit 1
 
 clean:

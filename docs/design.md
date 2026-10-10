@@ -17,7 +17,7 @@ finding, judged by a fixed rule (full-stack-serving ADR 0008).
 
 ### L0 — Bare metal to container
 
-**What:** vLLM (or llama.cpp) in a container on the Linux box, one open-weights model,
+**What:** vLLM (full-stack-serving ADR 0012) in a container on the Linux box, one open-weights model,
 OpenAI-compatible endpoint. A load generator that records TTFT, per-event ITL and TPOT as ground
 truth.
 
@@ -116,7 +116,7 @@ long-lived GPU instance idle over a weekend.
 ## Methodology
 
 The measurement choices are decided in ADRs, all currently `proposed` until L0 has tested their
-assumptions, except 0001, 0002 and 0011:
+assumptions, except 0001, 0002, 0011 and 0012:
 
 | ADR | Decision |
 |---|---|
@@ -130,6 +130,7 @@ assumptions, except 0001, 0002 and 0011:
 | 0009 | L4 findings: tracing overhead and the span-to-client TTFT gap |
 | 0010 | k3s for L1 |
 | 0011 | Model: Qwen2.5-1.5B-Instruct, bf16, unquantized |
+| 0012 | Engine: vLLM (official image, tag pinned) |
 
 `loadgen/` and `measure/` are shared across levels by design: the same measurement applied to each
 layer is what makes the levels comparable. The per-level directory layout is in
