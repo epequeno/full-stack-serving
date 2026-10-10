@@ -35,13 +35,14 @@ third-party text or dataset is used, so there is nothing to attribute or relicen
   on it is irrelevant here because output length is forced. Token counts are not claimed; L0
   measures them from the server's `usage`.
 
-## Not verified, to check at L0
+## Verified at L0 (2026-10-10; `results/l0-local/l0.json`)
 
-- **Token length against the chosen model's context window.** Words are not tokens, and rare words
-  split into several. Prompt tokens plus 128 output must fit, with the batch limits the engine is
-  configured with.
-- **`ignore_eos` is a vLLM request extension.** Another engine may name it differently or not
-  support it, in which case output length is no longer fixed and TPOT comparisons need care.
-- **Whether `distinct` really defeats prefix caching.** The bodies share no words in order, but
-  the check that the server's prefix-cache hit counter stays near zero on this set is an L0 result,
-  not an assumption.
+- **Token length vs the model's context window:** measured from the server's `usage`, not
+  estimated: prompt 1,305–1,325 tokens + 128 output ≈ 1,453 ≪ 4,096 (`--max-model-len`).
+- **`ignore_eos` on the pinned vLLM v0.23.0:** honored — `tokens_out` is exactly 128 on every
+  request, so output length is fixed and TPOT comparisons hold as designed.
+- **`distinct` defeats cross-prompt prefix caching:** cold-cache pass with counters scraped
+  around it: hits 4,080 / queries 340,614 = **1.2 %**, and the hits are the chat-template
+  prefix every request shares — matching the 2-word maximum shared prompt prefix in the data.
+  (After 20+ replays of the same prompts the same check reads 98.7 %: replay self-hits, not
+  cross-prompt sharing. It runs first, on a cold cache, for exactly that reason.)

@@ -5,9 +5,11 @@
 A complete LLM serving stack — container → Kubernetes → inference-aware routing → autoscaling →
 observability — in which every layer must produce a **number** rather than an assertion.
 
-**Status: scaffolding only.** Nothing is built yet. L0 (container + vLLM + load generator) comes
-first and is also the live serving stack the sibling eBPF observability project needs.
-Reasoning per level: [`docs/design.md`](docs/design.md). Decisions: [`adr/`](adr/).
+**Status: L0 is measured.** Container + vLLM + load generator ran on the GPU host on 2026-10-10:
+[`results/l0-local/`](results/l0-local/README.md) has TTFT/ITL/TPOT at 1/4/16/64 concurrency
+(zero errors), and [`results/instrument/`](results/instrument/) the ADR 0007 instrument
+validation. L1–L5 are not started. Reasoning per level: [`docs/design.md`](docs/design.md).
+Decisions: [`adr/`](adr/).
 
 ## Why this exists
 
@@ -37,7 +39,7 @@ stays honest about where it stopped.
 
 | Level | What | Evidence it must produce | Status |
 |---|---|---|---|
-| **L0** | Container + vLLM + load generator | TTFT/ITL at 1/4/16/64 concurrency, committed as JSON | harness built + mock-validated; GPU-host measurement pending |
+| **L0** | Container + vLLM + load generator | TTFT/ITL at 1/4/16/64 concurrency, committed as JSON | **measured 2026-10-10** — `results/l0-local/` |
 | **L1** | The same on `k3s`, GPU via device plugin | in-cluster numbers + an explicit **parity or regression** verdict vs L0 | not started |
 | **L2** | Gateway API Inference Extension / llm-d routing | cache hit rate, prefix-aware vs round-robin | not started |
 | **L3** | KEDA autoscaling on queue depth | replica-vs-depth trace, scale latency | not started |

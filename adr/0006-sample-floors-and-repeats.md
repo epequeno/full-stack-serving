@@ -1,6 +1,6 @@
 # 0006 — Report a percentile only when the sample supports it, and repeat every cell
 
-- **Status:** proposed
+- **Status:** accepted
 - **Date:** 2026-10-09
 
 ## Context

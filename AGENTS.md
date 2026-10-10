@@ -11,41 +11,28 @@ reasoning. Decisions the stack forced live in `adr/`.
 
 ## Status
 
-**Instruments built; no level measured yet.** L0's container stack (`stack/l0-local/`), the
-shared client (`loadgen/`) and the harness (`measure/`) are implemented and validated against
-the ADR 0007 mock on the dev Mac; the committed numbers must come from the GPU host.
+**L0 is measured.** The container stack (`stack/l0-local/`), shared client (`loadgen/`) and
+harness (`measure/`) ran on saturn (the Linux GPU host) on 2026-10-10: matrix in
+`results/l0-local/` (TTFT/ITL/TPOT at 1/4/16/64, 5 repeats, 0 errors), instrument validation in
+`results/instrument/` (ADR 0007; 0 count failures). The ADR 0007 pass threshold is fixed, with
+its derivation, in ADR 0007 itself. ADRs 0005/0006/0007 are accepted. The sibling eBPF
+observability project has its live serving stack (`make up LEVEL=l0-local`).
 
 ## Next action
 
-**L0** — container + vLLM + load generator, no Kubernetes. TTFT/ITL at four concurrency levels,
-committed to `results/l0-local/`.
+**L1** — the L0 workload on `k3s` (ADR 0010), GPU via the device plugin, numbers re-measured
+in-cluster with the **parity or regression verdict vs L0**. ADR 0008's gate starts here:
+`findings.json` committed by `make measure`, sign-flip rule over five repeats via `make verify`.
 
-L0 is also a shared prerequisite for the sibling eBPF observability project, which needs a live
-serving stack to attach probes to and has none. L1–L5 follow only after L0 produces its numbers.
+Prerequisites: `k3s` + `kubectl` are absent on saturn (`results/l0-local/host-inventory.md`) —
+install them, then `make down LEVEL=l0-local` before bringing up L1. One GPU, one owner at a
+time (ADR 0010).
 
-**Unblocked (2026-10-10):** the host inventory is committed
-(`results/l0-local/host-inventory.md` — RTX 4070 Ti SUPER, 16 376 MiB, GPU-in-container verified).
-Model: **Qwen2.5-1.5B-Instruct, bf16** — full-stack-serving ADR 0011, applying ADR 0002's rule:
-smallest model that still makes the behaviour under test visible. The project is about *how*,
-not *what*.
-
-**On saturn (the Linux GPU host) — the runbook:**
-
-1. `git pull && make up LEVEL=l0-local` — vLLM container, pinned image + model revision; the
-   first run downloads ~2.9 GiB of weights into the `hf-cache` volume.
-2. `make validate-instrument` — ADR 0007 validation, run on the host whose numbers get
-   committed → `results/instrument/`.
-3. `make measure LEVEL=l0-local` — the 1/4/16/64 matrix → `results/l0-local/`.
-4. Commit `results/` and push. Then write ADR 0007's pass threshold down, with its derivation,
-   before calling the validation a pass.
-
-**Deferred to L0:** pin versions (vLLM, CUDA, driver, Python, aiohttp, container image digest)
-and put them in every result's `env`. Also confirm vLLM's per-chunk usage option for
-full-stack-serving ADR 0005, and fix the validation threshold for ADR 0007 once L0 gives numbers.
-
-**Check at L0:** the items listed in `loadgen/fixtures/README.md` under "Not verified", plus
-ADR 0011's criterion 3: the harness-overhead measurement must show GPU time dominating, not the
-harness — if it does not, the model changes (ADR 0002); it does not get excused.
+The L0 runbook is done (bring-up → validate-instrument → measure → commit) and its deferred
+items are closed: pins are in every result's `env`, the per-chunk usage option is
+`stream_options.continuous_usage_stats` (vLLM ignores unknown top-level fields silently), and
+the validation threshold is fixed. The fixtures' "Not verified" items are answered in
+`loadgen/fixtures/README.md`; ADR 0011's criterion 3 (GPU time dominating) holds.
 
 ## Rules
 

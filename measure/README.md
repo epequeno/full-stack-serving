@@ -5,11 +5,12 @@
 | piece | what |
 |---|---|
 | `measure/mock_sse.py` | the ADR 0007 reference: OpenAI-shaped mock SSE server on a configured schedule, logging the monotonic time of every actual write. Separate process from the client, same host. |
-| `measure/validate.py` | orchestrates mock + client at each concurrency plus one CPU-loaded run; reports per-event error vs the mock's logged writes, the mock's own jitter, and count checks. `make validate-instrument` → `results/instrument/`. The pass threshold stays undefined until L0's numbers fix it (ADR 0007). |
+| `measure/validate.py` | orchestrates mock + client at each concurrency plus one CPU-loaded run; reports per-event error vs the mock's logged writes, the mock's own jitter, and count checks. `make validate-instrument` → `results/instrument/`. Pass criterion fixed from L0's numbers (ADR 0007): a finding is claimable only above 10 × the instrument's p99 error for its cell (5.3–53.9 ms, c=1→64). |
 | `measure/measure_l0.py` | the L0 experiment: warmup pass (discarded, counted), the seeded interleaved 5-repeat × 1/4/16/64 matrix, the continuous-usage overhead pair (ADR 0005), the prefix-cache fixture check, GPU clock/temp and server-counter capture, env.md. → `results/l0-local/`. |
 
-Charts (contract item 4) wait until the numbers exist: the raw JSON is the artifact, and
-`results/l0-local/README.md` will say which chart the data warrants once there is data.
+The raw JSON is the artifact; [`results/l0-local/README.md`](../results/l0-local/README.md)
+renders the committed matrix as tables. Four cells don't warrant a chart — the JSON is the
+data, and the tables are its view.
 `make verify` (ADR 0008) starts at L1 — L0 is the baseline and commits no findings.
 
 `make measure LEVEL=<l>` regenerates everything under `results/<l>/` from scratch. Nothing in

@@ -1,6 +1,7 @@
 # Design — `full-stack-serving`
 
-Status: **design only; no level is built.** Last revised 2026-10-10.
+Status: **L0 measured** (2026-10-10; `results/l0-local/`). L1–L5 are design only. Last revised
+2026-10-10.
 
 The [`README`](../README.md) owns the pitch, the anti-tutorial test, the level table, the gate and
 the constraints. This document owns the reasoning behind each level, the non-goals, the risks and
@@ -115,8 +116,9 @@ long-lived GPU instance idle over a weekend.
 
 ## Methodology
 
-The measurement choices are decided in ADRs, all currently `proposed` until L0 has tested their
-assumptions, except 0001, 0002, 0011 and 0012:
+The measurement choices are decided in ADRs. L0 tested their assumptions, so 0005, 0006 and
+0007 are `accepted` alongside 0001, 0002, 0011 and 0012; 0003's `vllm bench serve` cross-check
+and 0004's open-loop half remain `proposed` until they run:
 
 | ADR | Decision |
 |---|---|

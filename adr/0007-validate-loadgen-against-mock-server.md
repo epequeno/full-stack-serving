@@ -1,6 +1,6 @@
 # 0007 — Validate the load generator against a mock server with a logged schedule
 
-- **Status:** proposed
+- **Status:** accepted
 - **Date:** 2026-10-09
 
 ## Context
@@ -51,10 +51,29 @@ level claims to detect. Concretely:
 > p99 absolute error ≤ one tenth of the smallest between-level difference this repo
 > reports as a finding.
 
-That difference is **not known yet**. It comes from L0, and until then no threshold is
-claimed. When L0 produces numbers, the threshold is written down as a number, with its derivation,
-before the validation result is called a pass. Setting it after seeing the error would be
-circular.
+**Fixed 2026-10-10**, after L0's numbers and the validation ran on the same host (saturn),
+from [`results/instrument/validation.json`](../results/instrument/validation.json) and
+[`results/l0-local/l0.json`](../results/l0-local/l0.json) — both committed before this
+paragraph was written. The instrument's p99 error per cell, and therefore the smallest
+between-level difference that cell can claim (10 × error):
+
+| cell | client-vs-mock err p99 | smallest claimable finding |
+|---|---|---|
+| c=1 | 0.53 ms | 5.3 ms |
+| c=4 | 1.37 ms | 13.7 ms |
+| c=16 | 1.84 ms | 18.4 ms |
+| c=64 | 5.39 ms | 53.9 ms |
+
+The CPU-loaded run stayed inside the envelope (err p99 5.30 ms, p50 0.73 ms). The mock's own
+jitter p99 reached 16.5 ms at c=64 — at that cell the reference was the noisier side, so the
+client's envelope is the binding number.
+
+Read against L0's committed medians: **TTFT findings are claimable at every cell** (bars
+5.3–53.9 ms against medians 14.9–105.1 ms — effects of ≳36–51 % of TTFT clear their bar).
+**ITL findings are claimable only at c=1** (bar 5.3 ms against a 5.86 ms median); at c≥4 the
+bar exceeds the entire median, so between-level ITL differences below the bar are **not
+claimed** with this instrument as-is. The 2026-10-10 validation therefore passes for
+TTFT-scale findings at every cell, with the ITL limit stated rather than excused.
 
 **When it runs:** before any level's numbers are trusted, and again whenever `loadgen/` or the
 Python/aiohttp versions change. The result is committed under `results/instrument/` with the
@@ -73,5 +92,5 @@ environment it ran in.
 - The mock is itself new code that needs to be right. Its write log is the reference, so a bug
   in the logging would invalidate every result. It gets its own simple test: a run with Δ large
   enough that jitter is negligible next to it, compared against a wall-clock stopwatch.
-- The pass threshold stays **undefined** until L0, so the validation cannot be called a pass
-  before L0 produces numbers.
+- The pass threshold was fixed 2026-10-10 from L0's committed numbers (Decision, above);
+  a validation run before that date could not have been called a pass.
