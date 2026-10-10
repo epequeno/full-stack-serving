@@ -1,0 +1,29 @@
+# L0 — vLLM in a container on the Linux GPU host.
+# Engine: full-stack-serving ADR 0012. Model: ADR 0011. Flags: see stack/l0-local/README.md.
+# Bring-up: `make up LEVEL=l0-local` (prints the resolved image digest).
+services:
+  vllm:
+    image: vllm/vllm-openai:v0.23.0
+    # Docker Hub, pushed 2026-06-13; linux/amd64 digest of this tag:
+    #   sha256:3a1e7f5904e1a1192a02aa0086ceaffc33985d7044c7bb25b3a43d61bdbe3ac0
+    # `make up` prints the digest actually pulled; measure_l0 records it in env.md.
+    container_name: l0-vllm
+    ports:
+      - "8000:8000"
+    volumes:
+      - hf-cache:/root/.cache/huggingface   # weights download once; survive `make down`
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    command: >
+      --model Qwen/Qwen2.5-1.5B-Instruct
+      --revision 989aa7980e4cf806f80c7fef2b1adb7bc71aa306
+      --dtype bfloat16
+      --max-model-len 4096
+      --gpu-memory-utilization 0.90
+volumes:
+  hf-cache:
