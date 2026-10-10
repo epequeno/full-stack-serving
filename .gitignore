@@ -1,0 +1,44 @@
+# --- python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# --- secrets / local env ---
+.env
+.env.*
+!.env.example
+*.local
+kubeconfig
+*.kubeconfig
+*.pem
+*.key
+.aws/
+hf_token
+.huggingface/
+
+# --- terraform / IaC (state and variable files are never committed) ---
+# NB: .terraform.lock.hcl SHOULD be committed (pins provider versions), so it is not ignored.
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+crash.log
+
+# --- model weights and caches (large, and fetched by tag/digest, not stored here) ---
+models/
+hf-cache/
+*.gguf
+*.safetensors
+
+# --- scratch ---
+tmp/
+.scratch/
+
+# --- os ---
+.DS_Store
+
+# --- private planning context (never publish; see AGENTS.md) ---
+docs/PRIVATE-context.md
