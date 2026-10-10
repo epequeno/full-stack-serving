@@ -91,5 +91,5 @@ model choice depends on (`PROBE_IMAGE=<local image>` adds a GPU-in-container che
 ## License
 
 Apache-2.0, see [`LICENSE`](LICENSE). `tools/host-inventory.sh` is vendored from the sibling
-`ebpf-inference-observability` project, which has no license of its own yet; the owner is the same
-author, but give that repo a compatible license before this one is published.
+[`ebpf-inference-observability`](https://github.com/epequeno/ebpf-inference-observability)
+project, which is Apache-2.0 as well.

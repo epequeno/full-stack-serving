@@ -60,7 +60,7 @@ must never be committed. History was squashed on 2026-10-09 to remove earlier co
 contained it. Before making the repo public, confirm with
 `git log --all -p -- docs/PRIVATE-context.md` (expect nothing) and
 `git grep -n -e 'build seq' -e 'job-search' $(git rev-list --all) -- . ':!AGENTS.md'` (expect
-nothing), and read the "License" note in the README about the vendored script.
+nothing).
 
 ## Conventions
 
