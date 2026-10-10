@@ -1,0 +1,139 @@
+{
+ "schema": "instrument-validation/1",
+ "generated": "2026-10-10T09:21:48-0500",
+ "tool": "python -m measure.validate",
+ "env": {
+  "host": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+  "machine": "x86_64",
+  "python": "3.13.16",
+  "aiohttp": "3.14.4",
+  "cpu_pinning": "client and 2 spinner(s) pinned to core 0"
+ },
+ "mock": {
+  "first_delay_ms": 100.0,
+  "delta_ms": 20.0,
+  "events_per_request": 32,
+  "tokens_per_event": 4
+ },
+ "runs": [
+  {
+   "label": "closed c=1",
+   "requests_ok": 128,
+   "requests_error": 0,
+   "events_paired": 4096,
+   "count_failures": [],
+   "client_minus_mock_write": {
+    "n": 4096,
+    "min_ms": 0.055,
+    "mean_ms": 0.386,
+    "p50_ms": 0.404,
+    "p99_ms": 0.527,
+    "max_ms": 2.801
+   },
+   "mock_jitter_actual_minus_intended": {
+    "n": 4096,
+    "min_ms": 0.178,
+    "mean_ms": 0.778,
+    "p50_ms": 0.782,
+    "p99_ms": 1.309,
+    "max_ms": 1.447
+   }
+  },
+  {
+   "label": "closed c=4",
+   "requests_ok": 128,
+   "requests_error": 0,
+   "events_paired": 4096,
+   "count_failures": [],
+   "client_minus_mock_write": {
+    "n": 4096,
+    "min_ms": 0.063,
+    "mean_ms": 0.419,
+    "p50_ms": 0.401,
+    "p99_ms": 1.368,
+    "max_ms": 15.863
+   },
+   "mock_jitter_actual_minus_intended": {
+    "n": 4096,
+    "min_ms": 0.039,
+    "mean_ms": 0.944,
+    "p50_ms": 0.93,
+    "p99_ms": 2.027,
+    "max_ms": 2.296
+   }
+  },
+  {
+   "label": "closed c=16",
+   "requests_ok": 128,
+   "requests_error": 0,
+   "events_paired": 4096,
+   "count_failures": [],
+   "client_minus_mock_write": {
+    "n": 4096,
+    "min_ms": 0.045,
+    "mean_ms": 0.321,
+    "p50_ms": 0.343,
+    "p99_ms": 1.841,
+    "max_ms": 14.411
+   },
+   "mock_jitter_actual_minus_intended": {
+    "n": 4096,
+    "min_ms": 0.034,
+    "mean_ms": 0.865,
+    "p50_ms": 0.772,
+    "p99_ms": 2.657,
+    "max_ms": 15.023
+   }
+  },
+  {
+   "label": "closed c=64",
+   "requests_ok": 128,
+   "requests_error": 0,
+   "events_paired": 4096,
+   "count_failures": [],
+   "client_minus_mock_write": {
+    "n": 4096,
+    "min_ms": 0.064,
+    "mean_ms": 0.439,
+    "p50_ms": 0.359,
+    "p99_ms": 5.393,
+    "max_ms": 15.309
+   },
+   "mock_jitter_actual_minus_intended": {
+    "n": 4096,
+    "min_ms": 0.036,
+    "mean_ms": 1.629,
+    "p50_ms": 1.261,
+    "p99_ms": 16.53,
+    "max_ms": 17.909
+   }
+  },
+  {
+   "label": "closed c=64 + 2 cpu spinner(s)",
+   "requests_ok": 128,
+   "requests_error": 0,
+   "events_paired": 4096,
+   "count_failures": [],
+   "client_minus_mock_write": {
+    "n": 4096,
+    "min_ms": 0.013,
+    "mean_ms": 1.006,
+    "p50_ms": 0.728,
+    "p99_ms": 5.297,
+    "max_ms": 8.669
+   },
+   "mock_jitter_actual_minus_intended": {
+    "n": 4096,
+    "min_ms": 0.007,
+    "mean_ms": 0.736,
+    "p50_ms": 0.72,
+    "p99_ms": 1.733,
+    "max_ms": 2.123
+   }
+  }
+ ],
+ "pass_threshold": null,
+ "note": "Pass threshold undefined until L0 reports its first between-level effect (ADR 0007). Counts must already match exactly; timing error is reported, not judged, here.",
+ "count_failures_total": 0,
+ "run_errors_total": 0
+}

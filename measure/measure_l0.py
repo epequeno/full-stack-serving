@@ -182,9 +182,12 @@ def main() -> int:
     ap.add_argument("--warmup-requests", type=int, default=32)
     ap.add_argument("--warmup-concurrency", type=int, default=4)
     ap.add_argument("--overhead-concurrency", type=int, default=16)
-    ap.add_argument("--continuous-usage-body", default='{"include_continuous_usage": true}',
+    ap.add_argument("--continuous-usage-body",
+                    default='{"stream_options": {"include_usage": true, "continuous_usage_stats": true}}',
                     help="the pinned vLLM's per-chunk usage request option (ADR 0005); "
-                         "confirm the exact name against the pinned version at bring-up")
+                         "confirmed against v0.23.0's served OpenAPI: "
+                         "stream_options.continuous_usage_stats, nested — unknown top-level "
+                         "fields are ignored, not rejected")
     ap.add_argument("--drop-caches", action="store_true",
                     help="attempt to drop page caches before the matrix (needs root)")
     cfg = ap.parse_args()
@@ -218,6 +221,14 @@ def main() -> int:
         except OSError as e:
             caches = f"attempted, failed: {e}"
 
+    # RepoDigests is an image-level field: `docker inspect` on the container has none
+    # (that lookup always failed and recorded "unknown"), so resolve the digest from the
+    # image the container runs, via its ref.
+    image_ref = sh(["docker", "inspect", "--format", "{{.Config.Image}}", "l0-vllm"])
+    image_digest = (sh(["docker", "image", "inspect", image_ref, "--format",
+                        "{{index .RepoDigests 0}}"]) if image_ref else "") \
+        or "unknown (image digest unavailable)"
+
     env = {
         "host": platform.platform(),
         "kernel": os.uname().release,
@@ -230,16 +241,31 @@ def main() -> int:
         "model": cfg.model,
         "model_revision": cfg.revision,
         "quantization": "none — bf16 weights as published (full-stack-serving ADR 0011)",
-        "image": sh(["docker", "inspect", "--format", "{{.Config.Image}}",
-                     "l0-vllm"]) or None,
-        "image_digest": sh(["docker", "inspect", "--format",
-                            "{{index .RepoDigests 0}}", "l0-vllm"]) or "unknown (container not found)",
+        "image": image_ref or None,
+        "image_digest": image_digest,
         "cuda_graphs": ("enabled (server log mentions CUDA graphs)"
                         if "cuda graph" in sh(["docker", "logs", "l0-vllm"], timeout=60).lower()
                         else "unknown (no CUDA-graph line found in server log)"),
         "caches_dropped": caches,
         "fixture": str(cfg.fixture),
         "seed": cfg.seed,
+    }
+
+    # --- fixture check: distinct must not hit the prefix cache (FIRST: cold cache) --------
+    m0 = parse_metrics(http_get(f"{endpoint_root}/metrics"))
+    run, rc = run_loadgen(endpoint=cfg.endpoint, model=cfg.model, fixture=cfg.fixture,
+                          concurrency=1, seed=cfg.seed,
+                          out=runs_dir / "prefixcheck.json", extra_body=None)
+    m1 = parse_metrics(http_get(f"{endpoint_root}/metrics"))
+    delta = {k: m1.get(k, 0) - m0.get(k, 0) for k in set(m0) | set(m1)}
+    hits = {k: v for k, v in delta.items() if "prefix_cache" in k}
+    fixture_check = {
+        "note": "one c=1 pass over the distinct fixture, run FIRST — before warmup — so the "
+                "prefix cache holds only earlier prompts, not this pass's own blocks. "
+                "Counter deltas must stay near zero (fixtures README, 'Not verified'); a "
+                "warm cache shows replay self-hits (L0 2026-10-10: 98.7% when run last).",
+        "requests": (run["summary"]["requests_ok"] if run else f"run failed (exit {rc})"),
+        "counter_deltas": hits or "no prefix_cache metrics found (names vary by vLLM version)",
     }
 
     # --- warmup: discarded, counted (ADR 0006) ---------------------------------------------
@@ -300,10 +326,22 @@ def main() -> int:
                               out=runs_dir / f"overhead_{label}.json", extra_body=body)
         pair[label] = ({"summary": run["summary"], "wall_s": run["wall_s"]} if run
                        else {"error": f"client exit {rc} or no output"})
-        if run is None and "with_continuous_usage" in label:
+        if "with_continuous_usage" not in label:
+            continue
+        if run is None:
             overhead["note"] += (" — NOTE: the continuous-usage run failed; if the server "
                                  "rejected the request option, its exact name for the pinned "
                                  "vLLM version must be corrected (ADR 0005).")
+            overhead["continuous_usage_honored"] = None
+        else:
+            evs = [e for r in run["requests"] for e in r["events"]]
+            nulls = sum(1 for e in evs if e.get("tokens") is None)
+            overhead["continuous_usage_honored"] = bool(evs) and nulls != len(evs)
+            if evs and nulls == len(evs):
+                overhead["note"] += (" — WARNING: every event in the continuous-usage run is "
+                                     "tokens == null, so the server ignored the request "
+                                     "option and the pair measures the same request twice; "
+                                     "the option name for the pinned vLLM is wrong (ADR 0005).")
     if all(isinstance(v, dict) and "summary" in v for v in pair.values()):
         a, b = pair["with_continuous_usage"]["summary"], pair["without"]["summary"]
         overhead["ttft_p50_delta_ms"] = round(
@@ -316,20 +354,6 @@ def main() -> int:
             and isinstance(b["itl_event_ms"]["p50"], float) else None
     overhead["pair"] = pair
 
-    # --- fixture check: distinct must not hit the prefix cache ----------------------------
-    m0 = parse_metrics(http_get(f"{endpoint_root}/metrics"))
-    run, rc = run_loadgen(endpoint=cfg.endpoint, model=cfg.model, fixture=cfg.fixture,
-                          concurrency=1, seed=cfg.seed,
-                          out=runs_dir / "prefixcheck.json", extra_body=None)
-    m1 = parse_metrics(http_get(f"{endpoint_root}/metrics"))
-    delta = {k: m1.get(k, 0) - m0.get(k, 0) for k in set(m0) | set(m1)}
-    hits = {k: v for k, v in delta.items() if "prefix_cache" in k}
-    fixture_check = {
-        "note": "one c=1 pass over the distinct fixture; prefix-cache counters must stay near "
-                "zero (fixtures README, 'Not verified')",
-        "requests": (run["summary"]["requests_ok"] if run else f"run failed (exit {rc})"),
-        "counter_deltas": hits or "no prefix_cache metrics found (names vary by vLLM version)",
-    }
 
     result = {
         "schema": "l0-results/1",

@@ -34,11 +34,13 @@ Two derived quantities, both reported and both labelled:
    `usage` field. This is the number to use when comparing with token-normalised figures from other tools.
 
 **Token counts per event.** The preferred source is the server's cumulative per-chunk
-`completion_tokens`, whose difference between consecutive events is `tokens`. As of 2026-10-09,
-vLLM's serving code contains an `include_continuous_usage` path that attaches cumulative
-`completion_tokens` to every streamed chunk; **the client-facing request option that
-enables it has not been verified.** Confirm the exact field against the pinned vLLM version when
-L0 is built. If it is unavailable, `tokens` is unknown per event. In that case the harness
+`completion_tokens`, whose difference between consecutive events is `tokens`. Confirmed
+2026-10-10 against the pinned vLLM v0.23.0 (served OpenAPI spec + a live probe): the option is
+**`stream_options.continuous_usage_stats`**, nested in `stream_options` — the internal
+`include_continuous_usage` code path is not the client-facing name, and this vLLM *ignores*
+unknown top-level fields rather than rejecting them, so a wrong name would fail silently.
+`measure_l0` detects the silent case: the overhead pair warns when the with-usage run records
+`tokens == null` on every event. If the option is unavailable, `tokens` is unknown per event. In that case the harness
 records `tokens: null`, reports only per-event ITL and TPOT, and the results state that
 token-per-event data was not available. It must not be estimated.
 

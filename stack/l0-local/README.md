@@ -33,11 +33,13 @@ hardware, but the first image pull is large.
 
 ## What bring-up must confirm (AGENTS.md, "deferred to L0")
 
-- **The per-chunk `usage` request option** (ADR 0005). The working assumption is
-  `include_continuous_usage`, wired via `make measure`'s `CONTINUOUS_USAGE_BODY`. A wrong name
-  makes the with-continual-usage overhead run fail loudly (the server rejects the request) —
-  it can never fail silently. If the pinned version names it differently, fix the Makefile
-  variable here and re-run.
+- **The per-chunk `usage` request option** (ADR 0005). Confirmed 2026-10-10 against the pinned
+  v0.23.0 (served OpenAPI spec + a live probe): the option is
+  **`stream_options.continuous_usage_stats`**, nested — not the top-level
+  `include_continuous_usage` guess. This vLLM *ignores* unknown top-level fields instead of
+  rejecting them, so a wrong name fails silently at the server; `measure_l0` therefore checks
+  the with-usage run for per-event tokens and warns when every event is `tokens == null`. Wired
+  via `make measure`'s `CONTINUOUS_USAGE_BODY`.
 - **Image digest**: printed by `make up`, recorded by `measure_l0` in
   `results/l0-local/env.md`.
 - **CUDA graphs**: recorded from the server log into env.md (enabled/unknown, never asserted).

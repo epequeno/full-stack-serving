@@ -12,7 +12,7 @@ INVENTORY_OUT ?= results/l0-local/host-inventory.md
 
 ENDPOINT ?= http://localhost:8000/v1/chat/completions
 MODEL ?= Qwen/Qwen2.5-1.5B-Instruct
-CONTINUOUS_USAGE_BODY ?= {"include_continuous_usage": true}
+CONTINUOUS_USAGE_BODY ?= {"stream_options": {"include_usage": true, "continuous_usage_stats": true}}
 
 .DEFAULT_GOAL := help
 .PHONY: help doctor doctor-check inventory up down measure verify validate-instrument clean status
@@ -103,8 +103,13 @@ up:
 	@if [ "$(LEVEL)" != l0-local ]; then echo "make up LEVEL=$(LEVEL): not implemented yet (L1+)." >&2; exit 1; fi
 	@docker compose -f stack/$(LEVEL)/docker-compose.yaml up -d
 	@sleep 2
-	@docker inspect --format 'up: {{.Config.Image}} (digest {{index .RepoDigests 0}})' l0-vllm 2>/dev/null \
-	  || echo "up: container l0-vllm not found yet — still starting; check: docker logs l0-vllm"
+	@img=$$(docker inspect --format '{{.Config.Image}}' l0-vllm 2>/dev/null); \
+	  if [ -n "$$img" ]; then \
+	    docker image inspect --format "up: $$img (digest {{index .RepoDigests 0}})" "$$img" \
+	      || echo "up: container l0-vllm is running on $$img (image digest unavailable)"; \
+	  else \
+	    echo "up: container l0-vllm not found yet — still starting; check: docker logs l0-vllm"; \
+	  fi
 
 down:
 	@if [ "$(LEVEL)" != l0-local ]; then echo "make down LEVEL=$(LEVEL): not implemented yet (L1+)." >&2; exit 1; fi

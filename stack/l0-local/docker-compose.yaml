@@ -4,8 +4,9 @@
 services:
   vllm:
     image: vllm/vllm-openai:v0.23.0
-    # Docker Hub, pushed 2026-06-13; linux/amd64 digest of this tag:
-    #   sha256:3a1e7f5904e1a1192a02aa0086ceaffc33985d7044c7bb25b3a43d61bdbe3ac0
+    # Docker Hub, pushed 2026-06-13. Tag→digest moves on a re-push; the linux/amd64
+    # digest verified by the 2026-10-10 pull on saturn:
+    #   sha256:6d8429e38e3747723ca07ee1b17972e09bb9c51c4032b266f24fb1cc3b22ed8f
     # `make up` prints the digest actually pulled; measure_l0 records it in env.md.
     container_name: l0-vllm
     ports:
