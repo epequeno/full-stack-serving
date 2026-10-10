@@ -1,6 +1,6 @@
 # Design — `full-stack-serving`
 
-Status: **design only; no level is built.** Last revised 2026-10-09.
+Status: **design only; no level is built.** Last revised 2026-10-10.
 
 The [`README`](../README.md) owns the pitch, the anti-tutorial test, the level table, the gate and
 the constraints. This document owns the reasoning behind each level, the non-goals, the risks and
@@ -28,8 +28,9 @@ requests (closed loop), committed as JSON. Model choice and quantization documen
 justification, following full-stack-serving ADR 0002 (the smallest model that still makes the
 behaviour under test visible).
 
-**Note:** model choice is **gated on the host inventory** (`make inventory`), which has not been
-run. Until then, model size and quantization are unknowns.
+**Note:** model choice was gated on the host inventory. The inventory is committed
+(`results/l0-local/host-inventory.md`); the choice it produced is full-stack-serving ADR 0011:
+Qwen2.5-1.5B-Instruct, bf16.
 
 ### L1 — Single-node Kubernetes
 
@@ -115,7 +116,7 @@ long-lived GPU instance idle over a weekend.
 ## Methodology
 
 The measurement choices are decided in ADRs, all currently `proposed` until L0 has tested their
-assumptions, except 0001 and 0002:
+assumptions, except 0001, 0002 and 0011:
 
 | ADR | Decision |
 |---|---|
@@ -128,6 +129,7 @@ assumptions, except 0001 and 0002:
 | 0008 | The gate reproduces findings; absolute numbers are a soft check |
 | 0009 | L4 findings: tracing overhead and the span-to-client TTFT gap |
 | 0010 | k3s for L1 |
+| 0011 | Model: Qwen2.5-1.5B-Instruct, bf16, unquantized |
 
 `loadgen/` and `measure/` are shared across levels by design: the same measurement applied to each
 layer is what makes the levels comparable. The per-level directory layout is in

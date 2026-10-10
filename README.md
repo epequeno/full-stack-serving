@@ -68,13 +68,16 @@ results/         committed evidence, one directory per level
 
 ## Prerequisites
 
-Not yet determined. Model size and quantization depend on the host GPU, which **has not been
-inventoried**. Expected: a Linux host with a usable GPU, a container runtime, `k3s`, and
-Python 3.
+Inventoried 2026-10-10 — see
+[`results/l0-local/host-inventory.md`](results/l0-local/host-inventory.md): **saturn**, RTX
+4070 Ti SUPER (16 376 MiB, compute 8.9), driver 595.99.02 / CUDA 13.2, Docker 29.1.3 with the
+NVIDIA container toolkit (GPU-in-container verified), Python 3.14.4. Model:
+**Qwen2.5-1.5B-Instruct, bf16** — [ADR 0011](adr/0011-qwen2.5-1.5b-instruct-bf16.md). Absent and
+needed later: `k3s` + `kubectl` (L1), `helm` (L2/L3), an IaC tool (L5).
 
-Run `make doctor` to print what is present. On the Linux GPU host, `make inventory` writes the
-same report to `results/l0-local/host-inventory.md` — the committed environment record that L0's
-model choice depends on (`PROBE_IMAGE=<local image>` adds a GPU-in-container check).
+`make doctor` prints what the current host has. On the Linux GPU host, `sudo make inventory`
+rewrites that report (`PROBE_IMAGE=<local image>` adds the GPU-in-container check). It is
+regenerated there, never hand-edited.
 
 ## Constraints worth knowing before you start
 

@@ -1,6 +1,6 @@
 # results — the evidence
 
-**Status: empty. No level has been built.**
+**Status: environment record only (`l0-local/host-inventory.md`). No measurement has run yet.**
 
 This directory is the reason the project exists. Everything else is setup; this is the output.
 

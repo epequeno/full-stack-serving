@@ -21,16 +21,22 @@ committed to `results/l0-local/`.
 L0 is also a shared prerequisite for the sibling eBPF observability project, which needs a live
 serving stack to attach probes to and has none. L1–L5 follow only after L0 produces its numbers.
 
-**Blocked on:** the host GPU inventory (`make inventory` on the Linux GPU host). Model size and
-quantization are unknown until it exists. When choosing, follow full-stack-serving ADR 0002:
-smallest model that still makes the behaviour under test visible — the project is about *how*,
+**Unblocked (2026-10-10):** the host inventory is committed
+(`results/l0-local/host-inventory.md` — RTX 4070 Ti SUPER, 16 376 MiB, GPU-in-container verified).
+Model: **Qwen2.5-1.5B-Instruct, bf16** — full-stack-serving ADR 0011, applying ADR 0002's rule:
+smallest model that still makes the behaviour under test visible. The project is about *how*,
 not *what*.
+
+What remains is building it: the engine ADR (vLLM) and container bring-up in `stack/l0-local/`,
+`loadgen/` itself, the ADR 0007 mock validation in `measure/`, then the 1/4/16/64 matrix.
 
 **Deferred to L0:** pin versions (vLLM, CUDA, driver, Python, aiohttp, container image digest)
 and put them in every result's `env`. Also confirm vLLM's per-chunk usage option for
 full-stack-serving ADR 0005, and fix the validation threshold for ADR 0007 once L0 gives numbers.
 
-**Check at L0:** the items listed in `loadgen/fixtures/README.md` under "Not verified".
+**Check at L0:** the items listed in `loadgen/fixtures/README.md` under "Not verified", plus
+ADR 0011's criterion 3: the harness-overhead measurement must show GPU time dominating, not the
+harness — if it does not, the model changes (ADR 0002); it does not get excused.
 
 ## Rules
 
