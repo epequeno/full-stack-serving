@@ -3,6 +3,6 @@
 # drift detectable instead of silent.
 canonical: /Users/<user>/code/ebpf-inference-observability/tools/host-inventory.sh
 repo:      github.com/epequeno/ebpf-inference-observability
-commit:    050c5b9
-synced:    2026-10-09
-sha256:    15004884c04fdff84bbec6494d8ed614a74f3509ee87f677e35b9d5c3ea6c176
+commit:    5c71c8b
+synced:    2026-10-10
+sha256:    38501827ac68c411b522dc25c027daa8914241972e0db1e309bb05b5813bee1b

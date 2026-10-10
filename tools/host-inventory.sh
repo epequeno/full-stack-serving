@@ -73,7 +73,8 @@ kv 'uname -r'      "$(uname -r 2>/dev/null)"
 kv 'uname -m'      "$(uname -m 2>/dev/null)"
 kv 'distro'        "$(. /etc/os-release 2>/dev/null && echo "${PRETTY_NAME:-unknown}")"
 kv 'uptime'        "$(uptime -p 2>/dev/null || uptime 2>/dev/null)"
-kv 'virtualisation' "$(systemd-detect-virt 2>/dev/null || echo 'not systemd / unknown')"
+virt="$(systemd-detect-virt 2>/dev/null)"
+kv 'virtualisation' "${virt:-not systemd / unknown}"
 kv 'secure boot'   "$(if have mokutil; then mokutil --sb-state 2>/dev/null || echo 'needs root'; else echo 'mokutil absent'; fi)"
 echo '> Bare metal or a VM matters: nested virtualisation can hide kernel features. Secure boot + kernel lockdown can block kprobes entirely.'
 
@@ -297,10 +298,13 @@ sec '10. Readiness verdict'
 btf=$([ -e /sys/kernel/btf/vmlinux ] && echo yes || echo no)
 tracefs=$([ -e /sys/kernel/tracing/kprobe_events ] && echo yes || echo no)
 lockdown="$(cat /sys/kernel/security/lockdown 2>/dev/null || echo unknown)"
+# The active lockdown mode is the bracketed token, e.g. "none [integrity] confidentiality".
+# The kernel exposes a space-separated list with the active mode in brackets.
+lockdown_active="$(printf '%s' "$lockdown" | grep -o '\[[^]]*\]' | tr -d '[]')"
 kv 'eBPF usable (BTF + kprobe_events)' "$([ "$btf" = yes ] && [ "$tracefs" = yes ] && echo 'YES' || echo 'NO — see section 2')"
-case "$lockdown" in
-  *"[none]"*|unknown) kv 'lockdown' "$lockdown (kprobes expected to work)" ;;
-  *) kv 'lockdown' "$lockdown — **kprobes may be blocked**" ;;
+case "${lockdown_active:-unknown}" in
+  none|unknown|"") kv 'lockdown' "$lockdown (kprobes expected to work)" ;;
+  *) kv 'lockdown' "$lockdown — kprobes **may** be blocked (verify empirically)" ;;
 esac
 kv 'bpftrace installed' "$(have bpftrace && echo yes || echo 'no — install with the distro package')"
 
