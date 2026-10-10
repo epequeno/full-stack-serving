@@ -1,9 +1,21 @@
 # measure — regenerating the evidence
 
-**Status: not implemented.**
+**Status: implemented for L0** (`make measure LEVEL=l0-local`).
+
+| piece | what |
+|---|---|
+| `measure/mock_sse.py` | the ADR 0007 reference: OpenAI-shaped mock SSE server on a configured schedule, logging the monotonic time of every actual write. Separate process from the client, same host. |
+| `measure/validate.py` | orchestrates mock + client at each concurrency plus one CPU-loaded run; reports per-event error vs the mock's logged writes, the mock's own jitter, and count checks. `make validate-instrument` → `results/instrument/`. The pass threshold stays undefined until L0's numbers fix it (ADR 0007). |
+| `measure/measure_l0.py` | the L0 experiment: warmup pass (discarded, counted), the seeded interleaved 5-repeat × 1/4/16/64 matrix, the continuous-usage overhead pair (ADR 0005), the prefix-cache fixture check, GPU clock/temp and server-counter capture, env.md. → `results/l0-local/`. |
+
+Charts (contract item 4) wait until the numbers exist: the raw JSON is the artifact, and
+`results/l0-local/README.md` will say which chart the data warrants once there is data.
+`make verify` (ADR 0008) starts at L1 — L0 is the baseline and commits no findings.
 
 `make measure LEVEL=<l>` regenerates everything under `results/<l>/` from scratch. Nothing in
-`results/` should be hand-edited, and nothing in it should be unreproducible.
+`results/` should be hand-edited, and nothing in it should be unreproducible. `measure_l0`
+overwrites only its own outputs (`l0.json`, `env.md`, `runs/`); it never touches
+`host-inventory.md`.
 
 ## Contract
 
@@ -26,13 +38,16 @@ Keeping them apart means the same instrument is applied to every layer, which is
 
 - **No screenshots.** If a claim needs a picture, the underlying data must also be committed.
 - **Record failed runs.** A run that was discarded because the machine was busy is information.
-  Log it rather than quietly re-running until the numbers look good.
+  Log it rather than quietly re-running until the numbers look good. (`measure_l0` records failed
+  runs in `l0.json` and exits non-zero; it never silently retries.)
 - **Measure the instrument.** Repeat a baseline run with the harness detached and report the
-  overhead. A measurement whose own cost is unmeasured is a confound.
+  overhead. A measurement whose own cost is unmeasured is a confound. (Two instruments for this:
+  the ADR 0007 error distribution, and the continuous-usage on/off pair ADR 0005 requires.)
 - **Validate the instrument against a known schedule** (full-stack-serving ADR 0007): a
   separate-process mock SSE server logs its own actual write times, and `loadgen/` is compared
   against that log under load. This runs before any level's numbers are trusted and after any
-  `loadgen/` change.
+  `loadgen/` or Python/aiohttp version change — i.e. on the GPU host, whose numbers get
+  committed.
 - **One directory per level**, named exactly as the level.
 - `make measure` must be safe to re-run. It overwrites its own outputs and touches nothing else.
 - **`make verify` never writes to `results/`.** It measures into scratch and compares against the
@@ -43,8 +58,8 @@ Keeping them apart means the same instrument is applied to every layer, which is
 
 - **Every cell runs 5 times**, interleaved in a recorded, seeded order. Warmup is discarded and counted.
 - **A percentile is reported only if its request count supports it:** p50 ≥ 30, p90 ≥ 100,
-  p99 ≥ 1000. Otherwise the cell shows `n/a (n=…)`. `n` is requests, never ITL events.
+  p99 ≥ 1000. Otherwise the cell shows `{"n/a (n)": n}`. `n` is requests, never ITL events.
 - **Report min / median / max across the 5 runs**, with the pooled figure beside it. No standard
   deviation or confidence interval from five points.
 - Record GPU clocks and temperature at run start and end, and whether the server restarted
-  between repeats.
+  between repeats (detected from the request counter going backwards, not assumed).
