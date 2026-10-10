@@ -1,6 +1,6 @@
 # Host inventory — saturn
 
-Collected: 2026-10-10T03:17:02Z  ·  via `tools/host-inventory.sh`  ·  root: no
+Collected: 2026-10-10T03:24:13Z  ·  via `tools/host-inventory.sh`  ·  root: yes
 
 ## 1. OS and kernel
 
@@ -10,7 +10,7 @@ Collected: 2026-10-10T03:17:02Z  ·  via `tools/host-inventory.sh`  ·  root: no
 | uname -r | 7.0.0-38-generic |
 | uname -m | x86_64 |
 | distro | Ubuntu 26.04.1 LTS |
-| uptime | up 11 minutes |
+| uptime | up 18 minutes |
 | virtualisation | none
 not systemd / unknown |
 | secure boot | SecureBoot enabled |
@@ -21,17 +21,17 @@ not systemd / unknown |
 | field | value |
 |---|---|
 | BTF /sys/kernel/btf/vmlinux | yes (7067009 bytes) |
-| /proc/kallsyms symbols | 351353 |
+| /proc/kallsyms symbols | 360532 |
 | tcp_sendmsg in kallsyms | 1 |
 | tcp_recvmsg in kallsyms | 1 |
 | tracefs mounted | yes |
-| debugfs tracing (root only) | no / not readable |
-| kprobe_events | no |
-| uprobe_events | no |
-| sched tracepoints | 0 |
-| net tracepoints | 0 |
-| kmem tracepoints | 0 |
-| syscalls tracepoints | 0 |
+| debugfs tracing (root only) | yes |
+| kprobe_events | yes |
+| uprobe_events | yes |
+| sched tracepoints | 32 |
+| net tracepoints | 18 |
+| kmem tracepoints | 16 |
+| syscalls tracepoints | 736 |
 | kernel.perf_event_paranoid | 4 |
 | kernel.unprivileged_bpf_disabled | 2 |
 | kernel lockdown | none [integrity] confidentiality |
@@ -63,8 +63,8 @@ CONFIG_DEBUG_INFO_BTF=y
 | go | absent |
 | rustc | absent |
 | python3 | Python 3.14.4 |
-| uv | uv 0.12.24 (x86_64-unknown-linux-gnu) |
-| docker | absent |
+| uv | absent |
+| docker | Docker version 29.1.3, build 29.1.3-0ubuntu4.1 |
 | headers | yes (/usr/src/linux-headers-7.0.0-38-generic) |
 
 ## 4. GPU
@@ -74,7 +74,7 @@ CONFIG_DEBUG_INFO_BTF=y
 | vendor | NVIDIA (nvidia-smi present) |
 
 ```
-Fri Oct  9 22:17:02 2026       
+Fri Oct  9 22:24:14 2026       
 +-----------------------------------------------------------------------------------------+
 | NVIDIA-SMI 595.99.02              Driver Version: 595.99.02      CUDA Version: 13.2     |
 +-----------------------------------------+------------------------+----------------------+
@@ -83,7 +83,7 @@ Fri Oct  9 22:17:02 2026
 |                                         |                        |               MIG M. |
 |=========================================+========================+======================|
 |   0  NVIDIA GeForce RTX 4070 ...    Off |   00000000:01:00.0  On |                  N/A |
-|  0%   34C    P8             15W /  285W |     301MiB /  16376MiB |     18%      Default |
+|  0%   36C    P8             16W /  285W |     211MiB /  16376MiB |     11%      Default |
 |                                         |                        |                  N/A |
 +-----------------------------------------+------------------------+----------------------+
 
@@ -94,7 +94,7 @@ Fri Oct  9 22:17:02 2026
 Full query (name, memory, compute capability, driver, CUDA):
 ```
 index, name, memory.total [MiB], memory.used [MiB], compute_cap, driver_version, vbios_version
-0, NVIDIA GeForce RTX 4070 Ti SUPER, 16376 MiB, 301 MiB, 8.9, 595.99.02, 95.03.45.80.07
+0, NVIDIA GeForce RTX 4070 Ti SUPER, 16376 MiB, 211 MiB, 8.9, 595.99.02, 95.03.45.80.07
 ```
 | field | value |
 |---|---|
@@ -159,13 +159,13 @@ All graphics devices (lspci):
 | RAM avail | 26Gi |
 | swap | 8.0Gi |
 | hugepages | HugePages_Total:       0 |
-| free in $HOME | 1682 GiB |
-| free in /var/lib/docker | n/a (no /var/lib/docker or not readable) |
+| free in $HOME | 1681 GiB |
+| free in /var/lib/docker | 1681 GiB |
 
 Filesystems (model storage matters):
 ```
 Filesystem      Size  Used Avail Use% Mounted on
-/dev/nvme0n1p2  1.8T   57G  1.7T   4% /
+/dev/nvme0n1p2  1.8T   58G  1.7T   4% /
 efivarfs        256K  131K  121K  53% /sys/firmware/efi/efivars
 /dev/nvme0n1p1  1.1G  6.4M  1.1G   1% /boot/efi
 ```
@@ -188,18 +188,18 @@ GGUF / safetensors files on disk (top 10 by size, KiB):
 
 Hugging Face hub cache (too deep for the find above):
 ```
-<none found in /home/<user>/.cache/huggingface/hub>
+<none found in /root/.cache/huggingface/hub>
 ```
 
 ## 7. Kubernetes and serving prerequisites
 
 | field | value |
 |---|---|
-| container runtime | docker absent |
-| docker daemon | docker absent |
-| docker runtimes | n/a |
+| container runtime | Docker version 29.1.3, build 29.1.3-0ubuntu4.1 |
+| docker daemon | reachable |
+| docker runtimes | io.containerd.runc.v2 nvidia runc (default: runc) |
 | user in docker group | no |
-| containerd | absent |
+| containerd | containerd github.com/containerd/containerd/v2 2.2.2  |
 | podman | absent |
 | kubectl | absent |
 | k3s | absent |
@@ -210,18 +210,21 @@ Hugging Face hub cache (too deep for the find above):
 | pulumi | absent |
 | argocd | absent |
 | aws cli | absent |
-| nvidia-container-toolkit | **absent — a GPU will not be visible inside containers** |
+| nvidia-container-toolkit | NVIDIA Container Toolkit CLI version 1.20.1 |
 | nvidia kernel module | loaded |
 | cgroup version | cgroup v2 |
 | swap | 8.0Gi  (kubelet wants swap off) |
 | br_netfilter | not loaded  (k8s prerequisite) |
-| overlay | not loaded  (k8s prerequisite) |
+| overlay | loaded  (k8s prerequisite) |
 | iptables | iptables v1.8.11 (nf_tables) |
-| firewall | — |
+| firewall | Status: inactive |
 | k8s API port 6443 | not listening |
 
 **GPU-in-container probe** (opt-in):
-_not run — set `PROBE_IMAGE=<image already present locally>` to start one short-lived container and run `nvidia-smi -L` in it. The image is never pulled._
+`docker run --rm --pull=never --gpus all nvidia/cuda:12.6.2-base-ubuntu22.04 nvidia-smi -L` → exit 0
+```
+GPU 0: NVIDIA GeForce RTX 4070 Ti SUPER (UUID: GPU-f29267c2-3243-bb2c-3c00-793582c01c8f)
+```
 > L0 needs a container runtime plus a GPU the driver can see. L1 needs k3s + kubectl.
 > L5 needs terraform (or equivalent) plus a second node. Fargate cannot host the GPU node.
 
@@ -229,23 +232,27 @@ _not run — set `PROBE_IMAGE=<image already present locally>` to start one shor
 
 | field | value |
 |---|---|
-| hostname -I | <private-ip>  |
+| hostname -I | <private-ip> <private-ip>  |
 | default route | default via <private-ip> dev <iface> proto dhcp src <private-ip> metric 600  |
 | huggingface.co | HTTP 200 |
 | ghcr.io | HTTP 401 |
 | nvcr.io | HTTP 401 |
 | docker hub | HTTP 401 |
-| listening ports | 127.0.0.53%lo:53 0.0.0.0:17500 127.0.0.54:53 127.0.0.1:17603 127.0.0.1:17600 127.0.0.1:631 [::1]:631  |
+| listening ports | 127.0.0.53%lo:53 0.0.0.0:17500 127.0.0.1:38249 127.0.0.54:53 127.0.0.1:17603 127.0.0.1:17600 127.0.0.1:631 [::1]:631  |
 
 ## 9. Root-only checks
 
-Not root — re-run with `sudo` for: lockdown state, tracefs contents, dmesg.
+| field | value |
+|---|---|
+| lockdown | none [integrity] confidentiality |
+| dmesg bpf lines | 5 |
+| tracefs contents | 64 entries |
 
 ## 10. Readiness verdict
 
 | field | value |
 |---|---|
-| eBPF usable (BTF + kprobe_events) | NO — see section 2 |
+| eBPF usable (BTF + kprobe_events) | YES |
 | lockdown | none [integrity] confidentiality — **kprobes may be blocked** |
 | bpftrace installed | yes |
 | GPU | NVIDIA GeForce RTX 4070 Ti SUPER (16376 MiB, compute 8.9) |
@@ -253,12 +260,12 @@ Not root — re-run with `sudo` for: lockdown state, tracefs contents, dmesg.
 | largest weights that fit, per GPU | FP16 ~6B · FP8/INT8 ~13B · 4-bit ~26B params (80% of 16376 MiB, before KV cache and activations — a ceiling, not a recommendation) |
 
 **Serving-stack readiness** (full-stack-serving levels):
-| L0 (container + engine) | **NO container runtime** |
+| L0 (container + engine) | ready |
 | L1 (k3s + kubectl) | no — k3s:no kubectl:no |
 | L2 (routing / Gateway API) | needs kubectl + helm |
 | L3 (autoscaling / KEDA) | needs helm |
 | L5 (cloud IaC) | no IaC tool found |
-| GPU in containers | **driver present, nvidia-container-toolkit missing — k8s will not see the GPU** |
+| GPU in containers | **verified** — the probe container saw the GPU |
 
 ---
 _Generated by tools/host-inventory.sh. Read-only: nothing on this host was modified._
