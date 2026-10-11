@@ -50,6 +50,9 @@ doctor:
 # on a dev laptop too, and a macOS report must never replace the GPU host's. Pass
 # PROBE_IMAGE=<local image> to include the GPU-in-container probe; `sudo make inventory`
 # adds the root-only checks. Written via a temp file so a failed run keeps the previous report.
+# The inventory is redacted before it is written: it is published, and RFC1918 addresses plus
+# the wireless interface name are host-identifying. The vendored script is left byte-identical
+# so that tools/HOST-INVENTORY.source's sha256 still detects real drift.
 inventory:
 	@if [ "$$(uname -s)" != Linux ] && [ -z "$(FORCE)" ]; then \
 	  echo "refusing: this host is $$(uname -s), not the Linux GPU host." >&2; \
@@ -58,7 +61,11 @@ inventory:
 	fi
 	@mkdir -p "$(dir $(INVENTORY_OUT))"
 	@tmp=$$(mktemp "$(INVENTORY_OUT).XXXXXX") || exit 1; \
-	if tools/host-inventory.sh > "$$tmp"; then \
+	if tools/host-inventory.sh \
+	  | sed -E \
+	      -e 's/(^|[^0-9])((192\.168|172\.(1[6-9]|2[0-9]|3[01]))(\.[0-9]{1,3}){2}|10(\.[0-9]{1,3}){3})/\1<private-ip>/g' \
+	      -e 's/dev wl[a-z0-9]*/dev <iface>/g' \
+	  > "$$tmp"; then \
 	  chmod 644 "$$tmp"; mv "$$tmp" "$(INVENTORY_OUT)"; \
 	  echo "wrote $(INVENTORY_OUT)"; \
 	else \

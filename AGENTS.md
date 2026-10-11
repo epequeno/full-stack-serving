@@ -35,12 +35,110 @@ proposed). The sibling eBPF observability project has its live serving stack
 
 ## Next action
 
-**L4 is measured and gated** (`make verify LEVEL=l4-otel` PASS, 2026-10-11, committed) —
-the spine is complete: container → Kubernetes → measured observability. **L2/L3/L5
-remain.** L2/L3 need >1 replica (one GPU — design.md's open dependency; re-check the
-Gateway API Inference Extension's GA status before L2); L5 needs a second node and a
-budget. Cut order if time runs short (design.md): L5 → L3 → L2. One GPU, one owner at a
-time: `make down LEVEL=l4-otel` (already down, verified).
+**The spine is complete** — container → Kubernetes → measured observability (L0, L1, L4, all
+committed and gated). **L2/L3/L5 are cut, not pending work.** L2/L3 need >1 replica and L5 needs
+a second node plus metered GPU; there is one GPU and no second system is being provisioned.
+`docs/design.md`'s risk mitigation already says to cut them in exactly this situation. The cut
+order (L5 → L3 → L2) now applies to the whole set. One GPU, one owner at a time:
+`make down LEVEL=l4-otel` (already down, verified).
+
+What remains is single-machine. In order:
+
+### 1. The ADR 0003 cross-check (do this first)
+
+**full-stack-serving ADR 0003** is `proposed` and its one deliverable has never been run: the
+custom client has never been compared against an independent instrument. Every number in this
+repo comes from `loadgen/`, so this is the validation the rest of the repo rests on. It needs one
+GPU, not a second machine. **It closes ADR 0003 to `accepted` when it has run and the
+disagreement is reported.**
+
+Protocol, exactly as ADR 0003 specifies it — do not tune the disagreement away:
+
+- Both tools, the **same fixture** (`loadgen/fixtures/distinct.jsonl`), the **same server** (L0's
+  endpoint), the **same concurrency** (1/4/16/64, matching the L0 matrix), the same `max_tokens`
+  and `ignore_eos`. Seeds recorded.
+- Report the **disagreement** in TTFT and ITL percentiles and throughput. Agreement is evidence
+  the client is sound; a systematic gap is a finding about *where* `vllm bench serve`'s timing
+  boundary costs accuracy — it timestamps after `json.loads()`, this client timestamps at the
+  socket read. Both outcomes are results.
+- `tokens_out` still comes from the server's `usage`, never from counting chunks (ADR 0003).
+
+Evidence to commit:
+
+- `results/instrument/crosscheck.json` — both tools' per-cell TTFT/ITL percentiles and throughput,
+  the deltas, and the exact commands and versions. Same treatment as `validation.json`.
+- Rendered in `results/l0-local/README.md` (which already cites `results/instrument/`) and listed
+  in `measure/README.md`'s table, so the instrument's two validations sit together.
+- Set ADR 0003 to `accepted`.
+
+Known risk, flag it rather than papering over it: `vllm bench serve` expects its own dataset
+format. Getting it to consume *our* fixture (custom dataset path, and matching the tokenizer and
+`ignore_eos`) is the one real implementation unknown. If the fixture cannot be matched exactly,
+say so in the result and report what was compared instead — a stated mismatch beats a silently
+different workload.
+
+### 2. Fix the framing seams a review found
+
+Four small doc fixes, all of them places where the prose is slightly stronger than the evidence:
+
+- **The pitch line.** `README.md` opens *"A complete LLM serving stack — container → Kubernetes →
+  inference-aware routing → autoscaling → observability"* while L2 and L3 are cut. The status
+  line says so; the pitch line reads as a description of the artifact. Soften it so the unbuilt
+  layers are not claimed in the first sentence a reviewer reads.
+- **Declare the aggregation.** `results/l1-k8s/README.md`'s matrix is **pooled across repeats**,
+  while `findings.json` and the verdicts use the **median of per-run medians**. At c=4 TTFT the
+  two differ by 1.2 ms — more than the declared soft tolerance. Label the table and note where
+  the methods diverge. Same for L4's gap column (12.37 pooled vs 19.67 median-of-run-medians at
+  c=64).
+- **L4's `client > span` sentence.** It says the prediction holds "everywhere" directly under a
+  table that reads `indistinguishable` at c=4/16/64. The basis is the per-request minimum gap,
+  which is sound — but the sentence reuses the verdict string. Say which of the two it means.
+- **L4's arm order.** Base ran first, tracing second, and the one separated overhead verdict
+  points the *wrong* way — so the two arms cannot separate tracing cost from drift, and the drift
+  direction favours the tracing arm. State that as a limitation of the overhead finding, not a
+  footnote.
+
+### 3. Make the gate auditable
+
+Every PASS (`make verify LEVEL=l1-k8s`, `LEVEL=l4-otel`) is asserted and never committed —
+`verify` writes to scratch by design. Commit the verify output for the levels that have been
+gated, so the repo's central claim is checkable from a checkout rather than trusted.
+
+### 4. Then, if there is appetite — ADR 0013, open loop at L0
+
+`adr/0013-open-loop-at-l0.md` (proposed) records the decision. The harness already implements
+open loop; no target runs it. It is single-machine and unblocked by L2/L3. It is a **new
+experiment**, not part of wrapping up — do not start it before the pre-public checklist below is
+done.
+
+### 5. Before publishing
+
+Run the two checks in the rules above (both currently pass — verified 2026-10-11):
+`git log --all -p -- docs/PRIVATE-context.md` and the `git grep` for `build seq` / `job-search`.
+History was squashed on 2026-10-09 for this reason; re-verify before flipping visibility.
+
+**Working-tree redactions (applied 2026-10-11).** Private IPv4 addresses and the wireless
+interface name are redacted in `results/l0-local/host-inventory.md`, and `make inventory` now
+redacts them at generation time — the vendored script is left byte-identical so
+`tools/HOST-INVENTORY.source`'s sha256 still detects real drift. The absolute host path is gone
+from `results/l1-k8s/l1.json` (`baseline.runs`, now repo-relative) and from
+`tools/HOST-INVENTORY.source`. No MACs, keys, tokens or serials were found anywhere in the tree.
+
+**Still in history, and the redactions do not fix it.** The host's LAN and gateway addresses
+(commit `086634b`) and the absolute `/home/<user>` path (commits `086634b`, `6fe8112`,
+`46616d5`) remain visible in `git log -p`.
+Redacting the working tree does not remove them, and a public repo exposes them through history.
+Two options:
+
+- **Rewrite history** with `git filter-repo` before flipping visibility. Cheap here — no doc in
+  this repo cites an internal commit SHA, so nothing breaks internally. Note that saturn's clone
+  must be re-cloned rather than pulled.
+- **Accept it.** RFC1918 addresses are not routable from the internet and the local username is
+  already public elsewhere. This is a defensible call.
+
+**Owner's decision, not a default.** Also note the sibling project (`ebpf-inference-observability`)
+is named in `tools/host-inventory.sh` and `tools/HOST-INVENTORY.source`; publishing reveals that
+connection, which is a separate choice.
 
 ## Rules
 

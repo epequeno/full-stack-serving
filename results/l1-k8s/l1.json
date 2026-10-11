@@ -19,7 +19,7 @@
  },
  "baseline": {
   "level": "l0-local",
-  "runs": "/home/<user>/code/full-stack-serving/results/l0-local/runs"
+  "runs": "results/l0-local/runs"
  },
  "env": {
   "host": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",

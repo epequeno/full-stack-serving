@@ -1,7 +1,7 @@
 # Provenance for tools/host-inventory.sh, which is vendored, not owned here.
 # The canonical copy lives in another repo on the same machine. This file makes
 # drift detectable instead of silent.
-canonical: /Users/<user>/code/ebpf-inference-observability/tools/host-inventory.sh
+canonical: ebpf-inference-observability/tools/host-inventory.sh
 repo:      github.com/epequeno/ebpf-inference-observability
 commit:    5c71c8b
 synced:    2026-10-10
