@@ -65,10 +65,15 @@ read-only by design (ADR 0008). `make gate-log` runs the same gate and commits i
 central claim becomes checkable from a checkout instead of trusted (ADR 0014).
 
     make down LEVEL=l4-otel           # one GPU — confirm nothing else is on it first
-    make gate-log LEVEL=l1-k8s        # re-runs the whole L1 matrix into tmp/verify-l1-k8s
-    make gate-log LEVEL=l4-otel       # re-runs both L4 arms, base then tracing
+    make up LEVEL=l1-k8s              # the L1 gate measures the live NodePort endpoint
+    make gate-log LEVEL=l1-k8s        # rolls the pod, re-runs the L1 matrix into tmp/verify-l1-k8s
+    make down LEVEL=l1-k8s            # release the GPU before the L4 arms
+    make gate-log LEVEL=l4-otel       # self-contained — measure_l4 composes each arm itself
     git add results/l1-k8s/gates results/l4-otel/gates
     git commit -m "gate: commit the verify output for L1 and L4"
+
+The L1 gate needs `make up`; the L4 gate does not. `measure_l1` measures the Service endpoint
+and only rolls the pod; `measure_l4` runs `docker compose up -d` and `down` per arm itself.
 
 **Accept:** each level has `results/<level>/gates/verify-<timestamp>.txt` whose last line is
 `result: PASS` and whose header names the commit it ran against. **Cost:** a full re-run of that
