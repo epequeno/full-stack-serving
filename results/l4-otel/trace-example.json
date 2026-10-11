@@ -1,0 +1,127 @@
+{
+ "note": "one matched pair, committed as the L4 example trace (ADR 0009); the raw span is vLLM's llm_request export",
+ "cell": [
+  1,
+  0
+ ],
+ "client": {
+  "id": 1,
+  "trace_id": "65adde9dba95133b588d930f981b1293",
+  "response_id": "chatcmpl-1",
+  "ttft_ms": 17.165616,
+  "e2e_ms": 756.554753,
+  "tokens_in": 1305,
+  "tokens_out": 128
+ },
+ "span": {
+  "name": "llm_request",
+  "traceId": "65adde9dba95133b588d930f981b1293",
+  "attributes": {
+   "gen_ai.latency.time_to_first_token": 0.0142364501953125,
+   "gen_ai.latency.e2e": 0.7538125514984131,
+   "gen_ai.latency.time_in_queue": 1.1287993402220309e-05,
+   "gen_ai.usage.prompt_tokens": "1305",
+   "gen_ai.usage.completion_tokens": "128",
+   "gen_ai.latency.time_in_model_prefill": 0.008739924000110477,
+   "gen_ai.latency.time_in_model_decode": 0.7397842339996714,
+   "gen_ai.latency.time_in_model_inference": 0.7485241579997819,
+   "gen_ai.request.id": "chatcmpl-1",
+   "gen_ai.request.top_p": 0.8,
+   "gen_ai.request.max_tokens": "128",
+   "gen_ai.request.temperature": 0.7,
+   "gen_ai.request.n": "1"
+  },
+  "span": {
+   "traceId": "65adde9dba95133b588d930f981b1293",
+   "spanId": "f7a4d06f1b4e0437",
+   "parentSpanId": "d89929338386fe3f",
+   "flags": 768,
+   "name": "llm_request",
+   "kind": 2,
+   "startTimeUnixNano": "1791724445423272448",
+   "endTimeUnixNano": "1791724446177234244",
+   "attributes": [
+    {
+     "key": "gen_ai.latency.time_to_first_token",
+     "value": {
+      "doubleValue": 0.0142364501953125
+     }
+    },
+    {
+     "key": "gen_ai.latency.e2e",
+     "value": {
+      "doubleValue": 0.7538125514984131
+     }
+    },
+    {
+     "key": "gen_ai.latency.time_in_queue",
+     "value": {
+      "doubleValue": 1.1287993402220309e-05
+     }
+    },
+    {
+     "key": "gen_ai.usage.prompt_tokens",
+     "value": {
+      "intValue": "1305"
+     }
+    },
+    {
+     "key": "gen_ai.usage.completion_tokens",
+     "value": {
+      "intValue": "128"
+     }
+    },
+    {
+     "key": "gen_ai.latency.time_in_model_prefill",
+     "value": {
+      "doubleValue": 0.008739924000110477
+     }
+    },
+    {
+     "key": "gen_ai.latency.time_in_model_decode",
+     "value": {
+      "doubleValue": 0.7397842339996714
+     }
+    },
+    {
+     "key": "gen_ai.latency.time_in_model_inference",
+     "value": {
+      "doubleValue": 0.7485241579997819
+     }
+    },
+    {
+     "key": "gen_ai.request.id",
+     "value": {
+      "stringValue": "chatcmpl-1"
+     }
+    },
+    {
+     "key": "gen_ai.request.top_p",
+     "value": {
+      "doubleValue": 0.8
+     }
+    },
+    {
+     "key": "gen_ai.request.max_tokens",
+     "value": {
+      "intValue": "128"
+     }
+    },
+    {
+     "key": "gen_ai.request.temperature",
+     "value": {
+      "doubleValue": 0.7
+     }
+    },
+    {
+     "key": "gen_ai.request.n",
+     "value": {
+      "intValue": "1"
+     }
+    }
+   ],
+   "status": {}
+  }
+ },
+ "gap_ms": 2.93
+}

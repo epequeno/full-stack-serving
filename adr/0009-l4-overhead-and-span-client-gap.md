@@ -1,6 +1,6 @@
 # 0009 — L4 produces two findings: tracing overhead, and the span-to-client TTFT gap
 
-- **Status:** proposed
+- **Status:** accepted
 - **Date:** 2026-10-09
 
 ## Context

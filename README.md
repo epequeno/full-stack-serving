@@ -45,7 +45,7 @@ stays honest about where it stopped.
 | **L1** | The same on `k3s`, GPU via device plugin | in-cluster numbers + an explicit **parity or regression** verdict vs L0 | **measured + gated 2026-10-10** — `results/l1-k8s/` (parity; nothing claimable) |
 | **L2** | Gateway API Inference Extension / llm-d routing | cache hit rate, prefix-aware vs round-robin | not started |
 | **L3** | KEDA autoscaling on queue depth | replica-vs-depth trace, scale latency | not started |
-| **L4** | OTel `gen_ai.*` → Arize Phoenix | tracing overhead (on vs off), the span-to-client TTFT gap, and a committed trace | not started |
+| **L4** | OTel `gen_ai.*` → Arize Phoenix | tracing overhead (on vs off), the span-to-client TTFT gap, and a committed trace | **measured 2026-10-11** — `results/l4-otel/` (no detectable overhead; gap grows with load) |
 | **L5** | Multi-node / P-D disaggregation | co-located vs disaggregated, plus **measured cost** | not started |
 
 **Cut order if time runs short:** L5 → L3 → L2. **Keep L0, L1, L4.** Container → Kubernetes →

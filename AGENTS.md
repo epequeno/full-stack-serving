@@ -11,37 +11,37 @@ reasoning. Decisions the stack forced live in `adr/`.
 
 ## Status
 
-**L0 and L1 are measured.** On saturn (the Linux GPU host), 2026-10-10:
+**L0, L1 and L4 are measured.** On saturn (the Linux GPU host):
 
-- **L0** (`results/l0-local/`): TTFT/ITL/TPOT at 1/4/16/64, 5 repeats, 0 errors; instrument
-  validation in `results/instrument/` (ADR 0007; 0 count failures, error bars fixed).
-- **L1** (`results/l1-k8s/`): the same workload on `k3s` v1.37.1+k3s1 (ADR 0010), GPU via the
-  device plugin (v0.20.1) and the `nvidia` runtime class, pod rolled fresh per measure
-  (verified). R=10. 12/12 verdicts vs the committed L0 baseline are `indistinguishable`, and
-  **no directional finding is claimable** — every measured effect is below its ADR 0007 bar
-  (10× the cell's instrument p99 error). The claimable finding: parity at the instrument's
-  resolution. The first gate run failed honestly (c=1 TTFT flip at a 0.012 ms margin); the
-  restatement (gate checks claimable findings, sub-bar flips are recorded information) is the
-  ADR 0007/0008 remedy, applied — see `results/l1-k8s/README.md`.
+- **L0** (`results/l0-local/`, 2026-10-10): TTFT/ITL/TPOT at 1/4/16/64, 5 repeats, 0 errors;
+  instrument validation in `results/instrument/` (ADR 0007; 0 count failures, bars fixed).
+- **L1** (`results/l1-k8s/`, 2026-10-10): the same workload on `k3s` v1.37.1+k3s1 (ADR 0010),
+  R=10. 12/12 verdicts vs the committed L0 baseline `indistinguishable`, **no directional
+  finding claimable** — parity at the instrument's resolution; the gate failed honestly once
+  (c=1 TTFT flip at a 0.012 ms margin), then the ADR 0007/0008 claimability restatement made
+  it PASS on a fresh run.
+- **L4** (`results/l4-otel/`, 2026-10-11): the two ADR 0009 findings over the identical
+  engine, two compose arms run sequentially (base = control, then tracing → collector →
+  Phoenix, all real). **Overhead:** none detectable at this resolution (every effect under
+  its ADR 0007 bar; one sub-bar `tracing<base` flip recorded as info). **Gap:** prediction
+  holds — `client > span` on every request (100% span coverage at every cell, 98% floor);
+  the gap **grows ~an order of magnitude from c=1 to c=64** (pooled p50 1.05 → 12.37 ms),
+  so the unspanned path (HTTP frontend, event loop, SSE) queues under load — recorded,
+  none of it claimable (all sub-bar). Committed pair in `results/l4-otel/trace-example.json`.
 
-ADRs 0005/0006/0007/0008/0010 are accepted. The sibling eBPF observability project has its
-live serving stack (`make up LEVEL=l0-local`).
+ADRs 0005–0010 and 0012 are accepted (0003's cross-check and 0004's open-loop half stay
+proposed). The sibling eBPF observability project has its live serving stack
+(`make up LEVEL=l0-local`).
 
 ## Next action
 
-**L4 — measured observability** (design.md's "prioritise if time is short"): OTel `gen_ai.*`
-spans from the pinned vLLM into Arize Phoenix, fed by the same `loadgen/`. Two findings
-(ADR 0009): tracing overhead (client-measured latency, tracing on vs off) and the
-span-to-client TTFT gap (engine span vs load generator, paired per request via the
-`traceparent` the client already sends), plus a committed trace and a conventions-stability
-note. L2/L3 need >1 replica (one GPU — design.md's open dependency); re-check the Gateway API
-Inference Extension's GA status before L2.
+**The gate for L4** — `make verify LEVEL=l4-otel`: both arms re-measured into scratch with
+the committed protocol, gated on the claimable set (ADR 0008 restricted by ADR 0007), then
+commit `results/l4-otel/`. After that: **L2/L3 are the remaining design-only levels**, both
+blocked on >1 replica (one GPU — design.md's open dependency); re-check the Gateway API
+Inference Extension's GA status before L2. One GPU, one owner at a time:
+`make down LEVEL=l4-otel` frees it.
 
-The L1 prerequisites are closed: k3s v1.37.1+k3s1 + kubectl installed on saturn (ADR 0010),
-nvidia runtime registered in k3s's containerd, `nvidia.com/gpu: 1` allocatable via the
-device plugin, `stack/l1-k8s/` manifests committed (Recreate strategy — RollingUpdate
-deadlocks a 1-GPU single replica), and `make up/down/measure/verify LEVEL=l1-k8s` live.
-One GPU, one owner at a time: `make down LEVEL=l1-k8s` before the next level's bring-up.
 
 ## Rules
 

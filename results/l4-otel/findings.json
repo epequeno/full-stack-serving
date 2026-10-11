@@ -1,0 +1,654 @@
+{
+ "schema": "l4-findings/1",
+ "generated": "2026-10-11T08:36:03-0500",
+ "level": "l4-otel",
+ "verdict_rule": "the ADR 0008 sign rule over per-run medians (min(a) > max(b) / max(a) < min(b)), whatever R each side ran; 'indistinguishable' never means 'equal'",
+ "claimability_rule": "ADR 0007: a finding is claimable only if |effect| >= 10x the cell's committed instrument p99 error (results/instrument/validation.json). Every verdict is still computed by the mechanical ADR 0008 sign rule; sub-bar verdicts sit at the instrument's resolution, flip between fresh runs by design (2026-10-10: L1 c=1 TTFT, 0.012 ms) and are recorded as information, never gated. L4: the bar applies to the overhead finding (tracing vs base latency medians) and to the gap finding (client vs span TTFT medians); throughput has no bar (the instrument errors are latency ms) and is information only. A gap cell with coverage < 98% is invalid \u2014 flagged, never gated.",
+ "coverage_per_cell": {
+  "1": {
+   "n_ok": 1280,
+   "matched": 1280,
+   "coverage": 1.0,
+   "valid": true
+  },
+  "4": {
+   "n_ok": 1280,
+   "matched": 1280,
+   "coverage": 1.0,
+   "valid": true
+  },
+  "16": {
+   "n_ok": 1280,
+   "matched": 1280,
+   "coverage": 1.0,
+   "valid": true
+  },
+  "64": {
+   "n_ok": 1280,
+   "matched": 1280,
+   "coverage": 1.0,
+   "valid": true
+  }
+ },
+ "claimable_findings": [],
+ "findings": [
+  {
+   "finding": "tracing_overhead",
+   "metric": "ttft_p50_ms",
+   "cell": 1,
+   "verdict": "tracing<base",
+   "effect": -0.367,
+   "bar": 5.3,
+   "claimable": false,
+   "conditions": {
+    "a": "l4-otel tracing arm (this run)",
+    "b": "l4-otel base arm (this run, same day, ran first)"
+   },
+   "tracing_values": [
+    14.139,
+    14.175,
+    14.172,
+    14.152,
+    14.14
+   ],
+   "base_values": [
+    14.302,
+    14.523,
+    14.519,
+    14.543,
+    14.195
+   ],
+   "units": "ms",
+   "reading": "tracing<base at the instrument's resolution \u2014 NOT claimable (|effect| 0.367 < bar 5.3 ms); recorded, flips between fresh runs by design",
+   "claimability_rule": "ADR 0007: a finding is claimable only if |effect| >= 10x the cell's committed instrument p99 error (results/instrument/validation.json). Every verdict is still computed by the mechanical ADR 0008 sign rule; sub-bar verdicts sit at the instrument's resolution, flip between fresh runs by design (2026-10-10: L1 c=1 TTFT, 0.012 ms) and are recorded as information, never gated. L4: the bar applies to the overhead finding (tracing vs base latency medians) and to the gap finding (client vs span TTFT medians); throughput has no bar (the instrument errors are latency ms) and is information only. A gap cell with coverage < 98% is invalid \u2014 flagged, never gated."
+  },
+  {
+   "finding": "tracing_overhead",
+   "metric": "itl_p50_ms",
+   "cell": 1,
+   "verdict": "indistinguishable",
+   "effect": -0.022,
+   "bar": 5.3,
+   "claimable": false,
+   "conditions": {
+    "a": "l4-otel tracing arm (this run)",
+    "b": "l4-otel base arm (this run, same day, ran first)"
+   },
+   "tracing_values": [
+    5.799,
+    5.799,
+    5.792,
+    5.794,
+    5.791
+   ],
+   "base_values": [
+    5.794,
+    5.848,
+    5.815,
+    5.824,
+    5.807
+   ],
+   "units": "ms",
+   "reading": "indistinguishable at the instrument's resolution \u2014 NOT claimable (|effect| 0.022 < bar 5.3 ms); recorded, flips between fresh runs by design",
+   "claimability_rule": "ADR 0007: a finding is claimable only if |effect| >= 10x the cell's committed instrument p99 error (results/instrument/validation.json). Every verdict is still computed by the mechanical ADR 0008 sign rule; sub-bar verdicts sit at the instrument's resolution, flip between fresh runs by design (2026-10-10: L1 c=1 TTFT, 0.012 ms) and are recorded as information, never gated. L4: the bar applies to the overhead finding (tracing vs base latency medians) and to the gap finding (client vs span TTFT medians); throughput has no bar (the instrument errors are latency ms) and is information only. A gap cell with coverage < 98% is invalid \u2014 flagged, never gated."
+  },
+  {
+   "finding": "tracing_overhead",
+   "metric": "tpot_p50_ms",
+   "cell": 1,
+   "verdict": "indistinguishable",
+   "effect": -0.08,
+   "bar": 5.3,
+   "claimable": false,
+   "conditions": {
+    "a": "l4-otel tracing arm (this run)",
+    "b": "l4-otel base arm (this run, same day, ran first)"
+   },
+   "tracing_values": [
+    5.797,
+    5.807,
+    5.794,
+    5.794,
+    5.794
+   ],
+   "base_values": [
+    5.797,
+    5.987,
+    5.875,
+    5.879,
+    5.803
+   ],
+   "units": "ms",
+   "reading": "indistinguishable at the instrument's resolution \u2014 NOT claimable (|effect| 0.08 < bar 5.3 ms); recorded, flips between fresh runs by design",
+   "claimability_rule": "ADR 0007: a finding is claimable only if |effect| >= 10x the cell's committed instrument p99 error (results/instrument/validation.json). Every verdict is still computed by the mechanical ADR 0008 sign rule; sub-bar verdicts sit at the instrument's resolution, flip between fresh runs by design (2026-10-10: L1 c=1 TTFT, 0.012 ms) and are recorded as information, never gated. L4: the bar applies to the overhead finding (tracing vs base latency medians) and to the gap finding (client vs span TTFT medians); throughput has no bar (the instrument errors are latency ms) and is information only. A gap cell with coverage < 98% is invalid \u2014 flagged, never gated."
+  },
+  {
+   "finding": "tracing_overhead",
+   "metric": "reqs_per_s",
+   "cell": 1,
+   "verdict": "indistinguishable",
+   "effect": 0.014,
+   "bar": null,
+   "claimable": false,
+   "conditions": {
+    "a": "l4-otel tracing arm (this run)",
+    "b": "l4-otel base arm (this run, same day, ran first)"
+   },
+   "tracing_values": [
+    1.322,
+    1.325,
+    1.333,
+    1.329,
+    1.333
+   ],
+   "base_values": [
+    1.327,
+    1.295,
+    1.315,
+    1.307,
+    1.32
+   ],
+   "units": "req/s",
+   "reading": "indistinguishable \u2014 information only: request throughput has no instrument bar (ADR 0007 bars are latency ms)",
+   "claimability_rule": "ADR 0007: a finding is claimable only if |effect| >= 10x the cell's committed instrument p99 error (results/instrument/validation.json). Every verdict is still computed by the mechanical ADR 0008 sign rule; sub-bar verdicts sit at the instrument's resolution, flip between fresh runs by design (2026-10-10: L1 c=1 TTFT, 0.012 ms) and are recorded as information, never gated. L4: the bar applies to the overhead finding (tracing vs base latency medians) and to the gap finding (client vs span TTFT medians); throughput has no bar (the instrument errors are latency ms) and is information only. A gap cell with coverage < 98% is invalid \u2014 flagged, never gated."
+  },
+  {
+   "finding": "tracing_overhead",
+   "metric": "ttft_p50_ms",
+   "cell": 4,
+   "verdict": "indistinguishable",
+   "effect": 1.989,
+   "bar": 13.7,
+   "claimable": false,
+   "conditions": {
+    "a": "l4-otel tracing arm (this run)",
+    "b": "l4-otel base arm (this run, same day, ran first)"
+   },
+   "tracing_values": [
+    24.735,
+    22.396,
+    24.722,
+    24.681,
+    24.653
+   ],
+   "base_values": [
+    22.097,
+    22.883,
+    22.691,
+    25.272,
+    22.055
+   ],
+   "units": "ms",
+   "reading": "indistinguishable at the instrument's resolution \u2014 NOT claimable (|effect| 1.989 < bar 13.7 ms); recorded, flips between fresh runs by design",
+   "claimability_rule": "ADR 0007: a finding is claimable only if |effect| >= 10x the cell's committed instrument p99 error (results/instrument/validation.json). Every verdict is still computed by the mechanical ADR 0008 sign rule; sub-bar verdicts sit at the instrument's resolution, flip between fresh runs by design (2026-10-10: L1 c=1 TTFT, 0.012 ms) and are recorded as information, never gated. L4: the bar applies to the overhead finding (tracing vs base latency medians) and to the gap finding (client vs span TTFT medians); throughput has no bar (the instrument errors are latency ms) and is information only. A gap cell with coverage < 98% is invalid \u2014 flagged, never gated."
+  },
+  {
+   "finding": "tracing_overhead",
+   "metric": "itl_p50_ms",
+   "cell": 4,
+   "verdict": "indistinguishable",
+   "effect": -0.037,
+   "bar": 13.7,
+   "claimable": false,
+   "conditions": {
+    "a": "l4-otel tracing arm (this run)",
+    "b": "l4-otel base arm (this run, same day, ran first)"
+   },
+   "tracing_values": [
+    6.469,
+    6.442,
+    6.466,
+    6.442,
+    6.44
+   ],
+   "base_values": [
+    6.479,
+    6.487,
+    6.464,
+    6.513,
+    6.442
+   ],
+   "units": "ms",
+   "reading": "indistinguishable at the instrument's resolution \u2014 NOT claimable (|effect| 0.037 < bar 13.7 ms); recorded, flips between fresh runs by design",
+   "claimability_rule": "ADR 0007: a finding is claimable only if |effect| >= 10x the cell's committed instrument p99 error (results/instrument/validation.json). Every verdict is still computed by the mechanical ADR 0008 sign rule; sub-bar verdicts sit at the instrument's resolution, flip between fresh runs by design (2026-10-10: L1 c=1 TTFT, 0.012 ms) and are recorded as information, never gated. L4: the bar applies to the overhead finding (tracing vs base latency medians) and to the gap finding (client vs span TTFT medians); throughput has no bar (the instrument errors are latency ms) and is information only. A gap cell with coverage < 98% is invalid \u2014 flagged, never gated."
+  },
+  {
+   "finding": "tracing_overhead",
+   "metric": "tpot_p50_ms",
+   "cell": 4,
+   "verdict": "indistinguishable",
+   "effect": -0.083,
+   "bar": 13.7,
+   "claimable": false,
+   "conditions": {
+    "a": "l4-otel tracing arm (this run)",
+    "b": "l4-otel base arm (this run, same day, ran first)"
+   },
+   "tracing_values": [
+    6.466,
+    6.444,
+    6.492,
+    6.451,
+    6.447
+   ],
+   "base_values": [
+    6.547,
+    6.534,
+    6.522,
+    6.541,
+    6.443
+   ],
+   "units": "ms",
+   "reading": "indistinguishable at the instrument's resolution \u2014 NOT claimable (|effect| 0.083 < bar 13.7 ms); recorded, flips between fresh runs by design",
+   "claimability_rule": "ADR 0007: a finding is claimable only if |effect| >= 10x the cell's committed instrument p99 error (results/instrument/validation.json). Every verdict is still computed by the mechanical ADR 0008 sign rule; sub-bar verdicts sit at the instrument's resolution, flip between fresh runs by design (2026-10-10: L1 c=1 TTFT, 0.012 ms) and are recorded as information, never gated. L4: the bar applies to the overhead finding (tracing vs base latency medians) and to the gap finding (client vs span TTFT medians); throughput has no bar (the instrument errors are latency ms) and is information only. A gap cell with coverage < 98% is invalid \u2014 flagged, never gated."
+  },
+  {
+   "finding": "tracing_overhead",
+   "metric": "reqs_per_s",
+   "cell": 4,
+   "verdict": "indistinguishable",
+   "effect": 0.062,
+   "bar": null,
+   "claimable": false,
+   "conditions": {
+    "a": "l4-otel tracing arm (this run)",
+    "b": "l4-otel base arm (this run, same day, ran first)"
+   },
+   "tracing_values": [
+    4.679,
+    4.75,
+    4.683,
+    4.725,
+    4.739
+   ],
+   "base_values": [
+    4.663,
+    4.663,
+    4.7,
+    4.623,
+    4.758
+   ],
+   "units": "req/s",
+   "reading": "indistinguishable \u2014 information only: request throughput has no instrument bar (ADR 0007 bars are latency ms)",
+   "claimability_rule": "ADR 0007: a finding is claimable only if |effect| >= 10x the cell's committed instrument p99 error (results/instrument/validation.json). Every verdict is still computed by the mechanical ADR 0008 sign rule; sub-bar verdicts sit at the instrument's resolution, flip between fresh runs by design (2026-10-10: L1 c=1 TTFT, 0.012 ms) and are recorded as information, never gated. L4: the bar applies to the overhead finding (tracing vs base latency medians) and to the gap finding (client vs span TTFT medians); throughput has no bar (the instrument errors are latency ms) and is information only. A gap cell with coverage < 98% is invalid \u2014 flagged, never gated."
+  },
+  {
+   "finding": "tracing_overhead",
+   "metric": "ttft_p50_ms",
+   "cell": 16,
+   "verdict": "indistinguishable",
+   "effect": 6.898,
+   "bar": 18.4,
+   "claimable": false,
+   "conditions": {
+    "a": "l4-otel tracing arm (this run)",
+    "b": "l4-otel base arm (this run, same day, ran first)"
+   },
+   "tracing_values": [
+    43.39,
+    37.247,
+    47.758,
+    47.78,
+    33.479
+   ],
+   "base_values": [
+    36.492,
+    42.134,
+    34.711,
+    47.347,
+    36.206
+   ],
+   "units": "ms",
+   "reading": "indistinguishable at the instrument's resolution \u2014 NOT claimable (|effect| 6.898 < bar 18.4 ms); recorded, flips between fresh runs by design",
+   "claimability_rule": "ADR 0007: a finding is claimable only if |effect| >= 10x the cell's committed instrument p99 error (results/instrument/validation.json). Every verdict is still computed by the mechanical ADR 0008 sign rule; sub-bar verdicts sit at the instrument's resolution, flip between fresh runs by design (2026-10-10: L1 c=1 TTFT, 0.012 ms) and are recorded as information, never gated. L4: the bar applies to the overhead finding (tracing vs base latency medians) and to the gap finding (client vs span TTFT medians); throughput has no bar (the instrument errors are latency ms) and is information only. A gap cell with coverage < 98% is invalid \u2014 flagged, never gated."
+  },
+  {
+   "finding": "tracing_overhead",
+   "metric": "itl_p50_ms",
+   "cell": 16,
+   "verdict": "indistinguishable",
+   "effect": -0.001,
+   "bar": 18.4,
+   "claimable": false,
+   "conditions": {
+    "a": "l4-otel tracing arm (this run)",
+    "b": "l4-otel base arm (this run, same day, ran first)"
+   },
+   "tracing_values": [
+    7.22,
+    7.257,
+    7.219,
+    7.235,
+    7.26
+   ],
+   "base_values": [
+    7.222,
+    7.235,
+    7.294,
+    7.288,
+    7.222
+   ],
+   "units": "ms",
+   "reading": "indistinguishable at the instrument's resolution \u2014 NOT claimable (|effect| 0.001 < bar 18.4 ms); recorded, flips between fresh runs by design",
+   "claimability_rule": "ADR 0007: a finding is claimable only if |effect| >= 10x the cell's committed instrument p99 error (results/instrument/validation.json). Every verdict is still computed by the mechanical ADR 0008 sign rule; sub-bar verdicts sit at the instrument's resolution, flip between fresh runs by design (2026-10-10: L1 c=1 TTFT, 0.012 ms) and are recorded as information, never gated. L4: the bar applies to the overhead finding (tracing vs base latency medians) and to the gap finding (client vs span TTFT medians); throughput has no bar (the instrument errors are latency ms) and is information only. A gap cell with coverage < 98% is invalid \u2014 flagged, never gated."
+  },
+  {
+   "finding": "tracing_overhead",
+   "metric": "tpot_p50_ms",
+   "cell": 16,
+   "verdict": "indistinguishable",
+   "effect": 0.001,
+   "bar": 18.4,
+   "claimable": false,
+   "conditions": {
+    "a": "l4-otel tracing arm (this run)",
+    "b": "l4-otel base arm (this run, same day, ran first)"
+   },
+   "tracing_values": [
+    7.239,
+    7.348,
+    7.245,
+    7.268,
+    7.264
+   ],
+   "base_values": [
+    7.245,
+    7.263,
+    7.37,
+    7.348,
+    7.245
+   ],
+   "units": "ms",
+   "reading": "indistinguishable at the instrument's resolution \u2014 NOT claimable (|effect| 0.001 < bar 18.4 ms); recorded, flips between fresh runs by design",
+   "claimability_rule": "ADR 0007: a finding is claimable only if |effect| >= 10x the cell's committed instrument p99 error (results/instrument/validation.json). Every verdict is still computed by the mechanical ADR 0008 sign rule; sub-bar verdicts sit at the instrument's resolution, flip between fresh runs by design (2026-10-10: L1 c=1 TTFT, 0.012 ms) and are recorded as information, never gated. L4: the bar applies to the overhead finding (tracing vs base latency medians) and to the gap finding (client vs span TTFT medians); throughput has no bar (the instrument errors are latency ms) and is information only. A gap cell with coverage < 98% is invalid \u2014 flagged, never gated."
+  },
+  {
+   "finding": "tracing_overhead",
+   "metric": "reqs_per_s",
+   "cell": 16,
+   "verdict": "indistinguishable",
+   "effect": 0.131,
+   "bar": null,
+   "claimable": false,
+   "conditions": {
+    "a": "l4-otel tracing arm (this run)",
+    "b": "l4-otel base arm (this run, same day, ran first)"
+   },
+   "tracing_values": [
+    16.281,
+    16.101,
+    16.54,
+    16.479,
+    16.586
+   ],
+   "base_values": [
+    16.348,
+    16.187,
+    16.434,
+    16.263,
+    16.72
+   ],
+   "units": "req/s",
+   "reading": "indistinguishable \u2014 information only: request throughput has no instrument bar (ADR 0007 bars are latency ms)",
+   "claimability_rule": "ADR 0007: a finding is claimable only if |effect| >= 10x the cell's committed instrument p99 error (results/instrument/validation.json). Every verdict is still computed by the mechanical ADR 0008 sign rule; sub-bar verdicts sit at the instrument's resolution, flip between fresh runs by design (2026-10-10: L1 c=1 TTFT, 0.012 ms) and are recorded as information, never gated. L4: the bar applies to the overhead finding (tracing vs base latency medians) and to the gap finding (client vs span TTFT medians); throughput has no bar (the instrument errors are latency ms) and is information only. A gap cell with coverage < 98% is invalid \u2014 flagged, never gated."
+  },
+  {
+   "finding": "tracing_overhead",
+   "metric": "ttft_p50_ms",
+   "cell": 64,
+   "verdict": "indistinguishable",
+   "effect": -10.243,
+   "bar": 53.9,
+   "claimable": false,
+   "conditions": {
+    "a": "l4-otel tracing arm (this run)",
+    "b": "l4-otel base arm (this run, same day, ran first)"
+   },
+   "tracing_values": [
+    363.852,
+    95.945,
+    103.597,
+    101.851,
+    95.961
+   ],
+   "base_values": [
+    364.418,
+    94.836,
+    112.208,
+    101.687,
+    112.094
+   ],
+   "units": "ms",
+   "reading": "indistinguishable at the instrument's resolution \u2014 NOT claimable (|effect| 10.243 < bar 53.9 ms); recorded, flips between fresh runs by design",
+   "claimability_rule": "ADR 0007: a finding is claimable only if |effect| >= 10x the cell's committed instrument p99 error (results/instrument/validation.json). Every verdict is still computed by the mechanical ADR 0008 sign rule; sub-bar verdicts sit at the instrument's resolution, flip between fresh runs by design (2026-10-10: L1 c=1 TTFT, 0.012 ms) and are recorded as information, never gated. L4: the bar applies to the overhead finding (tracing vs base latency medians) and to the gap finding (client vs span TTFT medians); throughput has no bar (the instrument errors are latency ms) and is information only. A gap cell with coverage < 98% is invalid \u2014 flagged, never gated."
+  },
+  {
+   "finding": "tracing_overhead",
+   "metric": "itl_p50_ms",
+   "cell": 64,
+   "verdict": "indistinguishable",
+   "effect": -0.064,
+   "bar": 53.9,
+   "claimable": false,
+   "conditions": {
+    "a": "l4-otel tracing arm (this run)",
+    "b": "l4-otel base arm (this run, same day, ran first)"
+   },
+   "tracing_values": [
+    12.542,
+    12.45,
+    12.528,
+    12.455,
+    12.438
+   ],
+   "base_values": [
+    12.542,
+    12.424,
+    12.419,
+    12.642,
+    12.519
+   ],
+   "units": "ms",
+   "reading": "indistinguishable at the instrument's resolution \u2014 NOT claimable (|effect| 0.064 < bar 53.9 ms); recorded, flips between fresh runs by design",
+   "claimability_rule": "ADR 0007: a finding is claimable only if |effect| >= 10x the cell's committed instrument p99 error (results/instrument/validation.json). Every verdict is still computed by the mechanical ADR 0008 sign rule; sub-bar verdicts sit at the instrument's resolution, flip between fresh runs by design (2026-10-10: L1 c=1 TTFT, 0.012 ms) and are recorded as information, never gated. L4: the bar applies to the overhead finding (tracing vs base latency medians) and to the gap finding (client vs span TTFT medians); throughput has no bar (the instrument errors are latency ms) and is information only. A gap cell with coverage < 98% is invalid \u2014 flagged, never gated."
+  },
+  {
+   "finding": "tracing_overhead",
+   "metric": "tpot_p50_ms",
+   "cell": 64,
+   "verdict": "indistinguishable",
+   "effect": -0.111,
+   "bar": 53.9,
+   "claimable": false,
+   "conditions": {
+    "a": "l4-otel tracing arm (this run)",
+    "b": "l4-otel base arm (this run, same day, ran first)"
+   },
+   "tracing_values": [
+    35.076,
+    12.5,
+    12.576,
+    12.485,
+    12.513
+   ],
+   "base_values": [
+    34.887,
+    12.532,
+    12.57,
+    12.633,
+    12.623
+   ],
+   "units": "ms",
+   "reading": "indistinguishable at the instrument's resolution \u2014 NOT claimable (|effect| 0.111 < bar 53.9 ms); recorded, flips between fresh runs by design",
+   "claimability_rule": "ADR 0007: a finding is claimable only if |effect| >= 10x the cell's committed instrument p99 error (results/instrument/validation.json). Every verdict is still computed by the mechanical ADR 0008 sign rule; sub-bar verdicts sit at the instrument's resolution, flip between fresh runs by design (2026-10-10: L1 c=1 TTFT, 0.012 ms) and are recorded as information, never gated. L4: the bar applies to the overhead finding (tracing vs base latency medians) and to the gap finding (client vs span TTFT medians); throughput has no bar (the instrument errors are latency ms) and is information only. A gap cell with coverage < 98% is invalid \u2014 flagged, never gated."
+  },
+  {
+   "finding": "tracing_overhead",
+   "metric": "reqs_per_s",
+   "cell": 64,
+   "verdict": "indistinguishable",
+   "effect": 0.432,
+   "bar": null,
+   "claimable": false,
+   "conditions": {
+    "a": "l4-otel tracing arm (this run)",
+    "b": "l4-otel base arm (this run, same day, ran first)"
+   },
+   "tracing_values": [
+    14.091,
+    37.504,
+    37.048,
+    37.416,
+    37.405
+   ],
+   "base_values": [
+    14.102,
+    37.57,
+    37.427,
+    36.904,
+    36.973
+   ],
+   "units": "req/s",
+   "reading": "indistinguishable \u2014 information only: request throughput has no instrument bar (ADR 0007 bars are latency ms)",
+   "claimability_rule": "ADR 0007: a finding is claimable only if |effect| >= 10x the cell's committed instrument p99 error (results/instrument/validation.json). Every verdict is still computed by the mechanical ADR 0008 sign rule; sub-bar verdicts sit at the instrument's resolution, flip between fresh runs by design (2026-10-10: L1 c=1 TTFT, 0.012 ms) and are recorded as information, never gated. L4: the bar applies to the overhead finding (tracing vs base latency medians) and to the gap finding (client vs span TTFT medians); throughput has no bar (the instrument errors are latency ms) and is information only. A gap cell with coverage < 98% is invalid \u2014 flagged, never gated."
+  },
+  {
+   "finding": "span_client_gap",
+   "metric": "gap_ttft_ms",
+   "cell": 1,
+   "verdict": "client>span",
+   "effect": 1.053,
+   "bar": 5.3,
+   "claimable": false,
+   "conditions": {
+    "a": "client TTFT (loadgen, ms)",
+    "b": "span gen_ai.latency.time_to_first_token (engine, ms)"
+   },
+   "pairing": "by trace id (join key); x-request-id checked for agreement (it is the fixture index, so it collides across runs)",
+   "n_ok": 1280,
+   "n_matched": 1280,
+   "coverage": 1.0,
+   "coverage_floor": 0.98,
+   "valid": true,
+   "duplicate_trace_ids": 0,
+   "rid_mismatch": 0,
+   "gap_ms": {
+    "p50": 1.0518544999999992,
+    "min": 0.916,
+    "max": 3.034
+   },
+   "prediction": "client > span for every cell (ADR 0009, declared before data): the client interval strictly contains the span's",
+   "prediction_holds": true,
+   "reading": "client>span at the instrument's resolution \u2014 NOT claimable (|effect| 1.053 < bar 5.3 ms); the paired gap series is still reported per cell below",
+   "claimability_rule": "ADR 0007: a finding is claimable only if |effect| >= 10x the cell's committed instrument p99 error (results/instrument/validation.json). Every verdict is still computed by the mechanical ADR 0008 sign rule; sub-bar verdicts sit at the instrument's resolution, flip between fresh runs by design (2026-10-10: L1 c=1 TTFT, 0.012 ms) and are recorded as information, never gated. L4: the bar applies to the overhead finding (tracing vs base latency medians) and to the gap finding (client vs span TTFT medians); throughput has no bar (the instrument errors are latency ms) and is information only. A gap cell with coverage < 98% is invalid \u2014 flagged, never gated."
+  },
+  {
+   "finding": "span_client_gap",
+   "metric": "gap_ttft_ms",
+   "cell": 4,
+   "verdict": "indistinguishable",
+   "effect": 1.709,
+   "bar": 13.7,
+   "claimable": false,
+   "conditions": {
+    "a": "client TTFT (loadgen, ms)",
+    "b": "span gen_ai.latency.time_to_first_token (engine, ms)"
+   },
+   "pairing": "by trace id (join key); x-request-id checked for agreement (it is the fixture index, so it collides across runs)",
+   "n_ok": 1280,
+   "n_matched": 1280,
+   "coverage": 1.0,
+   "coverage_floor": 0.98,
+   "valid": true,
+   "duplicate_trace_ids": 0,
+   "rid_mismatch": 0,
+   "gap_ms": {
+    "p50": 1.5657530000000008,
+    "min": 0.857,
+    "max": 4.561
+   },
+   "prediction": "client > span for every cell (ADR 0009, declared before data): the client interval strictly contains the span's",
+   "prediction_holds": true,
+   "reading": "indistinguishable at the instrument's resolution \u2014 NOT claimable (|effect| 1.709 < bar 13.7 ms); the paired gap series is still reported per cell below",
+   "claimability_rule": "ADR 0007: a finding is claimable only if |effect| >= 10x the cell's committed instrument p99 error (results/instrument/validation.json). Every verdict is still computed by the mechanical ADR 0008 sign rule; sub-bar verdicts sit at the instrument's resolution, flip between fresh runs by design (2026-10-10: L1 c=1 TTFT, 0.012 ms) and are recorded as information, never gated. L4: the bar applies to the overhead finding (tracing vs base latency medians) and to the gap finding (client vs span TTFT medians); throughput has no bar (the instrument errors are latency ms) and is information only. A gap cell with coverage < 98% is invalid \u2014 flagged, never gated."
+  },
+  {
+   "finding": "span_client_gap",
+   "metric": "gap_ttft_ms",
+   "cell": 16,
+   "verdict": "indistinguishable",
+   "effect": 4.865,
+   "bar": 18.4,
+   "claimable": false,
+   "conditions": {
+    "a": "client TTFT (loadgen, ms)",
+    "b": "span gen_ai.latency.time_to_first_token (engine, ms)"
+   },
+   "pairing": "by trace id (join key); x-request-id checked for agreement (it is the fixture index, so it collides across runs)",
+   "n_ok": 1280,
+   "n_matched": 1280,
+   "coverage": 1.0,
+   "coverage_floor": 0.98,
+   "valid": true,
+   "duplicate_trace_ids": 0,
+   "rid_mismatch": 0,
+   "gap_ms": {
+    "p50": 4.882227499999999,
+    "min": 0.995,
+    "max": 11.258
+   },
+   "prediction": "client > span for every cell (ADR 0009, declared before data): the client interval strictly contains the span's",
+   "prediction_holds": true,
+   "reading": "indistinguishable at the instrument's resolution \u2014 NOT claimable (|effect| 4.865 < bar 18.4 ms); the paired gap series is still reported per cell below",
+   "claimability_rule": "ADR 0007: a finding is claimable only if |effect| >= 10x the cell's committed instrument p99 error (results/instrument/validation.json). Every verdict is still computed by the mechanical ADR 0008 sign rule; sub-bar verdicts sit at the instrument's resolution, flip between fresh runs by design (2026-10-10: L1 c=1 TTFT, 0.012 ms) and are recorded as information, never gated. L4: the bar applies to the overhead finding (tracing vs base latency medians) and to the gap finding (client vs span TTFT medians); throughput has no bar (the instrument errors are latency ms) and is information only. A gap cell with coverage < 98% is invalid \u2014 flagged, never gated."
+  },
+  {
+   "finding": "span_client_gap",
+   "metric": "gap_ttft_ms",
+   "cell": 64,
+   "verdict": "indistinguishable",
+   "effect": 19.673,
+   "bar": 53.9,
+   "claimable": false,
+   "conditions": {
+    "a": "client TTFT (loadgen, ms)",
+    "b": "span gen_ai.latency.time_to_first_token (engine, ms)"
+   },
+   "pairing": "by trace id (join key); x-request-id checked for agreement (it is the fixture index, so it collides across runs)",
+   "n_ok": 1280,
+   "n_matched": 1280,
+   "coverage": 1.0,
+   "coverage_floor": 0.98,
+   "valid": true,
+   "duplicate_trace_ids": 0,
+   "rid_mismatch": 0,
+   "gap_ms": {
+    "p50": 12.371624499999996,
+    "min": 1.536,
+    "max": 46.616
+   },
+   "prediction": "client > span for every cell (ADR 0009, declared before data): the client interval strictly contains the span's",
+   "prediction_holds": true,
+   "reading": "indistinguishable at the instrument's resolution \u2014 NOT claimable (|effect| 19.673 < bar 53.9 ms); the paired gap series is still reported per cell below",
+   "claimability_rule": "ADR 0007: a finding is claimable only if |effect| >= 10x the cell's committed instrument p99 error (results/instrument/validation.json). Every verdict is still computed by the mechanical ADR 0008 sign rule; sub-bar verdicts sit at the instrument's resolution, flip between fresh runs by design (2026-10-10: L1 c=1 TTFT, 0.012 ms) and are recorded as information, never gated. L4: the bar applies to the overhead finding (tracing vs base latency medians) and to the gap finding (client vs span TTFT medians); throughput has no bar (the instrument errors are latency ms) and is information only. A gap cell with coverage < 98% is invalid \u2014 flagged, never gated."
+  }
+ ],
+ "tolerance_soft_check": {
+  "declared": "2026-10-11T08:36:03-0500 (at measure time, before any fresh-run comparison \u2014 ADR 0008)",
+  "derivation": "the BASE arm's across-run spread (max \u2212 min of its per-run medians), per cell and latency metric. A fresh tracing-arm median outside this band is reported, never fatal.",
+  "tolerance_ms": {
+   "c1/ttft_p50_ms": 0.348,
+   "c1/itl_p50_ms": 0.054,
+   "c1/tpot_p50_ms": 0.19,
+   "c4/ttft_p50_ms": 3.217,
+   "c4/itl_p50_ms": 0.071,
+   "c4/tpot_p50_ms": 0.104,
+   "c16/ttft_p50_ms": 12.636,
+   "c16/itl_p50_ms": 0.072,
+   "c16/tpot_p50_ms": 0.125,
+   "c64/ttft_p50_ms": 269.583,
+   "c64/itl_p50_ms": 0.223,
+   "c64/tpot_p50_ms": 22.354
+  }
+ }
+}

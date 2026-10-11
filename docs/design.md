@@ -1,8 +1,9 @@
 # Design — `full-stack-serving`
 
-Status: **L0 and L1 measured** (2026-10-10; `results/l0-local/`, `results/l1-k8s/` — L1 vs L0
-is parity at the instrument's resolution, nothing directional claimable). L2–L5 are design
-only. Last revised 2026-10-10.
+Status: **L0, L1 and L4 measured** (L0 2026-10-10 `results/l0-local/`; L1 2026-10-10
+`results/l1-k8s/` — parity, nothing claimable; L4 2026-10-11 `results/l4-otel/` — no
+detectable overhead, the span gap grows with load, nothing claimable). L2/L3/L5 are
+design only. Last revised 2026-10-11.
 
 The [`README`](../README.md) owns the pitch, the anti-tutorial test, the level table, the gate and
 the constraints. This document owns the reasoning behind each level, the non-goals, the risks and
@@ -131,7 +132,7 @@ they run:
 | 0006 | Percentile floors on request count; interleaved repeats per cell (accepted) |
 | 0007 | Validate the load generator against a mock server with a logged schedule (accepted — claimability bars fixed) |
 | 0008 | The gate reproduces findings; absolute numbers are a soft check (accepted — gated claimable findings) |
-| 0009 | L4 findings: tracing overhead and the span-to-client TTFT gap |
+| 0009 | L4 findings: tracing overhead and the span-to-client TTFT gap (accepted) |
 | 0010 | k3s for L1 (accepted) |
 | 0011 | Model: Qwen2.5-1.5B-Instruct, bf16, unquantized (accepted) |
 | 0012 | Engine: vLLM (official image, tag pinned) (accepted) |
