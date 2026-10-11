@@ -16,6 +16,7 @@ LEVELS := l0-local l1-k8s l2-routing l3-autoscaling l4-otel l5-multinode
 INVENTORY_SRC ?= $(HOME)/code/ebpf-inference-observability/tools/host-inventory.sh
 INVENTORY_OUT ?= results/l0-local/host-inventory.md
 
+ENDPOINT ?= http://localhost:8000/v1/chat/completions
 L1_ENDPOINT ?= http://localhost:30080/v1/chat/completions
 KUBECTL ?= sudo kubectl
 MODEL ?= Qwen/Qwen2.5-1.5B-Instruct
