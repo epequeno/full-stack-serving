@@ -29,8 +29,12 @@ reasoning. Decisions the stack forced live in `adr/`.
   so the unspanned path (HTTP frontend, event loop, SSE) queues under load — recorded,
   none of it claimable (all sub-bar). Committed pair in `results/l4-otel/trace-example.json`.
 
-ADRs 0001, 0002 and 0005–0012 are accepted. **0003 is still `proposed`** — its cross-check has
-never run (step 2 below). **0004 is `superseded by 0013`**: its open-loop level assignment no
+ADRs 0001–0012 are accepted. **0003 was accepted 2026-10-11** — its cross-check ran (step 2,
+done): `loadgen/` vs `vllm bench serve` v0.23.0 over the same fixture/server/concurrency,
+both committed in `results/instrument/` (`crosscheck.json`, rendered in its README). Per-event
+ITL and throughput agree at every cell (|Δ| ≤ 0.03 ms, ≤ 0.1 req/s); TTFT is bench-higher
+directionally, clearing the ADR 0007 bar at c=16 (−50 ms, −2.7 × bar) — the reported
+disagreement, not tuned away. **0004 is `superseded by 0013`**: its open-loop level assignment no
 longer holds, while its closed-loop assignment for L0/L1 carries forward and is restated in 0013.
 **0013 is `proposed`.** The vendored `tools/host-inventory.sh` is canonically owned by the
 sibling project `epequeno/ebpf-inference-observability` (public, and it runs its serving leg on
@@ -38,17 +42,19 @@ this repo's `make up LEVEL=l0-local`).
 
 ## Next action
 
-**The spine is complete** — container → Kubernetes → measured observability (L0, L1, L4, all
-committed and gated). **L2/L3/L5 are cut, not pending work.** L2/L3 need >1 replica and L5 needs
-a second node plus metered GPU; there is one GPU and no second system is being provisioned.
-`docs/design.md`'s risk mitigation already says to cut them in exactly this situation. The cut
-order (L5 → L3 → L2) now applies to the whole set. One GPU, one owner at a time:
-`make down LEVEL=l4-otel` (already down, verified).
+**The spine is complete and its evidence is committed** — container → Kubernetes → measured
+observability (L0, L1, L4), gate logs committed (step 1, done), and the instrument
+twice-validated (step 2, done: ADR 0007 against the mock server, ADR 0003 against
+`vllm bench serve`, both in `results/instrument/`). **L2/L3/L5 are cut, not pending work.**
+L2/L3 need >1 replica and L5 needs a second node plus metered GPU; there is one GPU and no
+second system is being provisioned. `docs/design.md`'s risk mitigation already says to cut
+them in exactly this situation. The cut order (L5 → L3 → L2) now applies to the whole set.
 
-What remains is single-machine, and it runs on **saturn** (the Linux GPU host). This repo is the
-interface to that work, and this section is the runbook: one GPU, one owner at a time (`make
-status`, then `make down LEVEL=<l>` when you stop), ordered so the repo becomes publishable
-soonest. Nothing below needs a second machine, and nothing below is L2/L3/L5.
+What remains is single-machine, and it runs on **saturn** (the Linux GPU host). This repo is
+the interface to that work, and this section is the runbook: one GPU, one owner at a time
+(`make status`, then `make down LEVEL=<l>` when you stop). Steps 1 and 2 are done (records
+below); step 3's checks are standing and re-run after every push; step 4 is the next
+actionable work. Nothing below needs a second machine, and nothing below is L2/L3/L5.
 
 **A clone made before 2026-10-11 is stale** — history was rewritten that day (step 3). Delete it
 and re-clone: `git clone git@github.com:epequeno/full-stack-serving.git`
@@ -58,66 +64,39 @@ unpushed work, and keep `docs/PRIVATE-context.md` if it is there (it is gitignor
 does not carry it). Docker artifacts are unaffected — the compose projects use explicit `-p`
 names and the Phoenix data volume is a named volume, not a bind mount into the clone.
 
-### 1. Commit the gate evidence (`make gate-log`)
+### 1. Commit the gate evidence (`make gate-log`) — DONE 2026-10-11
 
-Every PASS in this repo is asserted in prose and written down nowhere, because `make verify` is
-read-only by design (ADR 0008). `make gate-log` runs the same gate and commits its output, so the
-central claim becomes checkable from a checkout instead of trusted (ADR 0014).
+`results/l1-k8s/gates/verify-2026-10-11T1802Z.txt` (L1, needs `make up`) and
+`results/l4-otel/gates/verify-2026-10-11T1943Z.txt` (L4, self-contained) — last line
+`result: PASS`, headers naming the commit each ran against (ADR 0014). Two earlier L4 logs
+are committed as results, not mistakes: an invocation FAIL (the `ENDPOINT` Makefile default
+lost in the L1 rename) and an infra FAIL (a docker bind-mount auto-created root-owned spans
+scratch the collector could not write into). Both fixed, L4 gate re-run, PASS.
+`tools/gate-log.sh` now redacts host-identifying literals at write time — the same policy as
+`make inventory`, because the first teed logs put the absolute home path back into history
+(caught by step 3's check, post-generation redaction applied, nothing pushed with it).
 
-    make down LEVEL=l4-otel           # one GPU — confirm nothing else is on it first
-    make up LEVEL=l1-k8s              # the L1 gate measures the live NodePort endpoint
-    make gate-log LEVEL=l1-k8s        # rolls the pod, re-runs the L1 matrix into tmp/verify-l1-k8s
-    make down LEVEL=l1-k8s            # release the GPU before the L4 arms
-    make gate-log LEVEL=l4-otel       # self-contained — measure_l4 composes each arm itself
-    git add results/l1-k8s/gates results/l4-otel/gates
-    git commit -m "gate: commit the verify output for L1 and L4"
+### 2. The ADR 0003 cross-check — DONE 2026-10-11, ADR 0003 accepted
 
-The L1 gate needs `make up`; the L4 gate does not. `measure_l1` measures the Service endpoint
-and only rolls the pod; `measure_l4` runs `docker compose up -d` and `down` per arm itself.
-
-**Accept:** each level has `results/<level>/gates/verify-<timestamp>.txt` whose last line is
-`result: PASS` and whose header names the commit it ran against. **Cost:** a full re-run of that
-level's matrix — budget it exactly like `make measure`; ADR 0006's time cap is the real limit.
-**A FAIL is a result, not a mistake:** commit the log either way. ADR 0008's remedy is more runs
-per cell or a restated finding — never a loosened rule.
-
-### 2. The ADR 0003 cross-check (do this before publishing; ~half a day)
-
-**full-stack-serving ADR 0003** is `proposed` and its one deliverable has never been run: the
-custom client has never been compared against an independent instrument. Every number in this
-repo comes from `loadgen/`, so this is the validation the rest of the repo rests on. It needs one
-GPU, not a second machine. **It closes ADR 0003 to `accepted` when it has run and the
-disagreement is reported.**
-
-Protocol, exactly as ADR 0003 specifies it — do not tune the disagreement away:
-
-- Both tools, the **same fixture** (`loadgen/fixtures/distinct.jsonl`), the **same server** (L0's
-  endpoint), the **same concurrency** (1/4/16/64, matching the L0 matrix), the same `max_tokens`
-  and `ignore_eos`. Seeds recorded.
-- Report the **disagreement** in TTFT and ITL percentiles and throughput. Agreement is evidence
-  the client is sound; a systematic gap is a finding about *where* `vllm bench serve`'s timing
-  boundary costs accuracy — it timestamps after `json.loads()`, this client timestamps at the
-  socket read. Both outcomes are results.
-- `tokens_out` still comes from the server's `usage`, never from counting chunks (ADR 0003).
-
-Evidence to commit:
-
-- `results/instrument/crosscheck.json` — both tools' per-cell TTFT/ITL percentiles and throughput,
-  the deltas, and the exact commands and versions. Same treatment as `validation.json`.
-- Rendered in `results/l0-local/README.md` (which already cites `results/instrument/`) and listed
-  in `measure/README.md`'s table, so the instrument's two validations sit together.
-- Set ADR 0003 to `accepted`.
-
-Known risk, flag it rather than papering over it: `vllm bench serve` expects its own dataset
-format. Getting it to consume *our* fixture (custom dataset path, and matching the tokenizer and
-`ignore_eos`) is the one real implementation unknown. If the fixture cannot be matched exactly,
-say so in the result and report what was compared instead — a stated mismatch beats a silently
-different workload.
+`make crosscheck` (new) drives both tools against the same L0 endpoint, one cell at a time
+(c=1/4/16/64, same fixture, seed 20261010, `max_tokens` 128, `ignore_eos`), and commits
+`results/instrument/crosscheck.json`; `results/instrument/README.md` renders the
+instrument's two validations together (ADR 0007 and ADR 0003). The reading, reported not
+tuned away: per-event ITL and throughput agree at every cell (|Δ| ≤ 0.03 ms, ≤ 0.1 req/s);
+TTFT is bench-higher directionally, clearing the ADR 0007 bar at c=16 (−50 ms, −2.7 × bar) —
+the expected signature of bench's later timing boundary (after `json.loads()`, inside
+aiohttp's stream iterator) vs loadgen's socket read. The one implementation unknown
+resolved as ADR 0003 allowed: the pinned image needs the `bench` extra (`pandas`) to load a
+custom dataset, so the cross-check uses a derived image (`crosscheck-bench:v0.23.0-pandas` —
+pinned base digest + `pip install pandas 3.0.6`), recorded in the JSON's `env` with both
+tools' timing boundaries and the exact per-cell commands.
 
 ### 3. Publish
 
 The repo is **public** as of 2026-10-11 (`github.com/epequeno/full-stack-serving`). Everything
-committed is world-readable from now on. The pre-flight, in order:
+committed is world-readable. The pre-flight checks are **standing** — re-run after every push
+(they caught a real leak on 2026-10-11: the first teed gate logs carried the absolute home
+path; fixed at write time in `tools/gate-log.sh`, see step 1). In order:
 
 1. **History carries no private literals.** History was rewritten on 2026-10-11
    (`git filter-repo --replace-text`, plus a corrected commit message) to strip the host's LAN and
@@ -144,12 +123,12 @@ committed is world-readable from now on. The pre-flight, in order:
 must be re-cloned rather than pulled. No document in this repo cites an internal SHA, so nothing
 internal broke. A pre-rewrite bundle is kept outside this repo, locally, and was never pushed.
 
-### 4. ADR 0013, open loop at L0 — only after steps 1–3
+### 4. ADR 0013, open loop at L0 — the next actionable work
 
 `adr/0013-open-loop-at-l0.md` (proposed) records the decision. The harness already implements open
 loop (`loadgen/client.py --mode open`); no target runs it. It is single-machine and unblocked by
-L2/L3. It is a **new experiment**, not part of wrapping up — do not start it before steps 1–3 are
-done.
+L2/L3. It is a **new experiment**, not part of wrapping up — and steps 1–3 are done, so it is
+unblocked: the next session that takes the GPU starts here.
 
 ## Rules
 

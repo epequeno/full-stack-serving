@@ -3,7 +3,9 @@
 Measured 2026-10-10 by `make measure LEVEL=l0-local` on saturn (the Linux GPU host).
 Environment in [env.md](env.md); assembled matrix in [l0.json](l0.json); raw per-run JSON in
 [runs/](runs/). The instrument's error envelope is in
-[../instrument/validation.json](../instrument/validation.json) (full-stack-serving ADR 0007).
+[../instrument/validation.json](../instrument/validation.json) and its cross-check against
+`vllm bench serve` in [../instrument/crosscheck.json](../instrument/crosscheck.json)
+(full-stack-serving ADRs 0007 and 0003).
 Regenerate with `make measure LEVEL=l0-local` (server first: `make up LEVEL=l0-local`): the
 data is regenerated, never hand-edited — this page only reads it.
 

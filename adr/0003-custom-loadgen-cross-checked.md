@@ -1,7 +1,8 @@
 # 0003 — Build the load generator, and cross-check it against `vllm bench serve`
 
-- **Status:** proposed
-- **Date:** 2026-10-09
+- **Status:** accepted
+- **Date:** 2026-10-09 (accepted 2026-10-11 — the cross-check has run; the disagreement is
+  reported, not tuned away, in `results/instrument/crosscheck.json`)
 
 ## Context
 

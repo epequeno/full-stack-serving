@@ -23,7 +23,7 @@ MODEL ?= Qwen/Qwen2.5-1.5B-Instruct
 CONTINUOUS_USAGE_BODY ?= {"stream_options": {"include_usage": true, "continuous_usage_stats": true}}
 
 .DEFAULT_GOAL := help
-.PHONY: help doctor doctor-check inventory up down measure verify gate-log validate-instrument clean status \
+.PHONY: help doctor doctor-check inventory up down measure verify gate-log validate-instrument crosscheck clean status \
         up-l0-local down-l0-local up-l1-k8s down-l1-k8s measure-l0-local measure-l1-k8s verify-l1-k8s \
         up-l4-otel down-l4-otel measure-l4-otel verify-l4-otel
 
@@ -39,6 +39,7 @@ help:
 	@echo "  make validate-instrument  validate loadgen against the mock server (ADR 0007) → results/instrument/"
 	@echo "  make verify  LEVEL=<l>   re-measure into scratch; fail if a committed finding changes (L1+)"
 	@echo "  make gate-log LEVEL=<l>  run verify and commit its output to results/<l>/gates/ (ADR 0014)"
+	@echo "  make crosscheck          cross-check loadgen against vllm bench serve (ADR 0003) → results/instrument/ (needs the L0 server up)"
 	@echo "  make status              show what is currently built"
 	@echo ""
 	@echo "  levels: $(LEVELS)"
@@ -162,6 +163,17 @@ verify:
 GATE_LOG_DIR ?= gates
 gate-log:
 	@tools/gate-log.sh "$(LEVEL)" "results/$(LEVEL)/$(GATE_LOG_DIR)"
+
+# The instrument's two validations (→ results/instrument/): ADR 0007 against the
+# mock server, then ADR 0003 against `vllm bench serve`. validate needs nothing
+# running; crosscheck needs the L0 server (`make up LEVEL=l0-local`) — same fixture,
+# same endpoint, same concurrency as the L0 matrix, both tools driven per cell.
+INSTRUMENT_OUT ?= results/instrument
+validate-instrument:
+	@uv run python -m measure.validate --out $(INSTRUMENT_OUT)
+
+crosscheck:
+	@uv run python -m measure.crosscheck --out $(INSTRUMENT_OUT)/crosscheck.json
 
 up-l0-local:
 	@docker compose -f stack/l0-local/docker-compose.yaml up -d

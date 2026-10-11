@@ -1,0 +1,256 @@
+{
+ "schema": "instrument-crosscheck/1",
+ "generated": "2026-10-11T16:09:56-05:00",
+ "tool": "python -m measure.crosscheck",
+ "adr": "0003",
+ "env": {
+  "host": "saturn",
+  "kernel": "7.0.0-38-generic",
+  "gpu": {
+   "available": true,
+   "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+   "driver_version": "595.99.02",
+   "sm_clock_mhz": "2805",
+   "temp_c": "55",
+   "power_w": "189.30",
+   "mem_used_mib": "15062"
+  },
+  "server_version": "{\"version\":\"0.23.0\"}",
+  "server_image": "vllm/vllm-openai:v0.23.0",
+  "bench_image": "crosscheck-bench:v0.23.0-pandas",
+  "bench_image_digest": "crosscheck-bench@sha256:0499d81653cfaae40377528996367d7128ae7d97aa0e1f51812d6d4679b74528",
+  "bench_vllm": "vllm/vllm-openai:v0.23.0 (pinned by image tag + digest)",
+  "bench_pandas": "INFO 10-11 20:58:23 [importing.py:46] Triton is installed but 0 active driver(s) found (expected 1). Disabling Triton to prevent runtime errors.",
+  "bench_timing_boundary": "aiohttp stream iterator, time.perf_counter() after json.loads() of each parsed SSE message (ADR 0003, read from v0.23.0 image source)",
+  "loadgen_timing_boundary": "time.monotonic_ns() at the socket read (loadgen/README.md, validated in results/instrument/validation.json)"
+ },
+ "protocol": {
+  "fixture": "loadgen/fixtures/distinct.jsonl",
+  "requests": 256,
+  "seed": 20261010,
+  "max_tokens": 128,
+  "ignore_eos": true,
+  "concurrencies": [
+   1,
+   4,
+   16,
+   64
+  ],
+  "load_model": "closed (both tools)",
+  "bench_flags": [
+   "--backend openai-chat",
+   "--request-rate inf (default)",
+   "--num-prompts 256",
+   "--max-concurrency <c>",
+   "--custom-output-len 128",
+   "--ignore-eos",
+   "--percentile-metrics ttft,itl,tpot --metric-percentiles 50,99"
+  ],
+  "commands": {
+   "c1": {
+    "loadgen": "uv run python -m loadgen.client --endpoint http://localhost:8000/v1/chat/completions --model Qwen/Qwen2.5-1.5B-Instruct --fixture loadgen/fixtures/distinct.jsonl --concurrency 1 --seed 20261010 --level instrument-crosscheck --output tmp/crosscheck/c1_loadgen.json",
+    "bench": "docker run --rm --network host -v <repo>/loadgen/fixtures/distinct.jsonl:/app/fixture.jsonl:ro -v <repo>/tmp/crosscheck:/app/out -w /app --entrypoint vllm crosscheck-bench:v0.23.0-pandas bench serve --backend openai-chat --base-url http://localhost:8000 --endpoint /v1/chat/completions --model Qwen/Qwen2.5-1.5B-Instruct --tokenizer Qwen/Qwen2.5-1.5B-Instruct --dataset-name custom --dataset-path /app/fixture.jsonl --custom-output-len 128 --num-prompts 256 --max-concurrency 1 --ignore-eos --percentile-metrics ttft,itl,tpot --metric-percentiles 50,99 --seed 20261010 --save-result --result-dir /app/out --result-filename c1_bench.json"
+   },
+   "c4": {
+    "loadgen": "uv run python -m loadgen.client --endpoint http://localhost:8000/v1/chat/completions --model Qwen/Qwen2.5-1.5B-Instruct --fixture loadgen/fixtures/distinct.jsonl --concurrency 4 --seed 20261010 --level instrument-crosscheck --output tmp/crosscheck/c4_loadgen.json",
+    "bench": "docker run --rm --network host -v <repo>/loadgen/fixtures/distinct.jsonl:/app/fixture.jsonl:ro -v <repo>/tmp/crosscheck:/app/out -w /app --entrypoint vllm crosscheck-bench:v0.23.0-pandas bench serve --backend openai-chat --base-url http://localhost:8000 --endpoint /v1/chat/completions --model Qwen/Qwen2.5-1.5B-Instruct --tokenizer Qwen/Qwen2.5-1.5B-Instruct --dataset-name custom --dataset-path /app/fixture.jsonl --custom-output-len 128 --num-prompts 256 --max-concurrency 4 --ignore-eos --percentile-metrics ttft,itl,tpot --metric-percentiles 50,99 --seed 20261010 --save-result --result-dir /app/out --result-filename c4_bench.json"
+   },
+   "c16": {
+    "loadgen": "uv run python -m loadgen.client --endpoint http://localhost:8000/v1/chat/completions --model Qwen/Qwen2.5-1.5B-Instruct --fixture loadgen/fixtures/distinct.jsonl --concurrency 16 --seed 20261010 --level instrument-crosscheck --output tmp/crosscheck/c16_loadgen.json",
+    "bench": "docker run --rm --network host -v <repo>/loadgen/fixtures/distinct.jsonl:/app/fixture.jsonl:ro -v <repo>/tmp/crosscheck:/app/out -w /app --entrypoint vllm crosscheck-bench:v0.23.0-pandas bench serve --backend openai-chat --base-url http://localhost:8000 --endpoint /v1/chat/completions --model Qwen/Qwen2.5-1.5B-Instruct --tokenizer Qwen/Qwen2.5-1.5B-Instruct --dataset-name custom --dataset-path /app/fixture.jsonl --custom-output-len 128 --num-prompts 256 --max-concurrency 16 --ignore-eos --percentile-metrics ttft,itl,tpot --metric-percentiles 50,99 --seed 20261010 --save-result --result-dir /app/out --result-filename c16_bench.json"
+   },
+   "c64": {
+    "loadgen": "uv run python -m loadgen.client --endpoint http://localhost:8000/v1/chat/completions --model Qwen/Qwen2.5-1.5B-Instruct --fixture loadgen/fixtures/distinct.jsonl --concurrency 64 --seed 20261010 --level instrument-crosscheck --output tmp/crosscheck/c64_loadgen.json",
+    "bench": "docker run --rm --network host -v <repo>/loadgen/fixtures/distinct.jsonl:/app/fixture.jsonl:ro -v <repo>/tmp/crosscheck:/app/out -w /app --entrypoint vllm crosscheck-bench:v0.23.0-pandas bench serve --backend openai-chat --base-url http://localhost:8000 --endpoint /v1/chat/completions --model Qwen/Qwen2.5-1.5B-Instruct --tokenizer Qwen/Qwen2.5-1.5B-Instruct --dataset-name custom --dataset-path /app/fixture.jsonl --custom-output-len 128 --num-prompts 256 --max-concurrency 64 --ignore-eos --percentile-metrics ttft,itl,tpot --metric-percentiles 50,99 --seed 20261010 --save-result --result-dir /app/out --result-filename c64_bench.json"
+   }
+  }
+ },
+ "asymmetries": [
+  "bench shuffles fixture rows with its own --seed RNG; loadgen reads in file order",
+  "fixture per-row max_tokens/ignore_eos map to bench's global --custom-output-len 128 --ignore-eos (uniform in this fixture)",
+  "bench runs in a container (extra network hop: docker bridge \u2192 host); loadgen runs on the host \u2014 recorded, same direction at every cell"
+ ],
+ "bars_note": "delta_over_instrument_bar scales each p50 delta against the committed ADR 0007 p99 instrument error for that cell (results/instrument/validation.json); reported, never gated",
+ "cells": [
+  {
+   "c": 1,
+   "loadgen": {
+    "wall_s": 209.058,
+    "requests_ok": 256,
+    "requests_error": 0,
+    "ttft_p50_ms": 59.5086655,
+    "ttft_p99_ms": {
+     "n/a (n)": 256
+    },
+    "itl_p50_ms": 5.872618999999986,
+    "itl_p99_ms": {
+     "n/a (n)": 256
+    },
+    "tpot_p50_ms": 5.967318051181103,
+    "tokens_per_s": 156.7,
+    "requests_per_s": 1.22
+   },
+   "bench": {
+    "duration_s": 208.93515966999985,
+    "completed": 256,
+    "failed": 0,
+    "ttft_p50_ms": 59.928930502792355,
+    "ttft_p99_ms": 61.91695605011773,
+    "itl_p50_ms": 5.861793004442006,
+    "itl_p99_ms": 6.540879886597395,
+    "tpot_p50_ms": 5.954599653576467,
+    "tpot_p99_ms": 6.008112858725376,
+    "output_throughput": 156.83334509976697,
+    "request_throughput": 1.2252605085919295,
+    "container_wall_s": 219.619
+   },
+   "delta_loadgen_minus_bench": {
+    "ttft_p50_ms": -0.42,
+    "itl_p50_ms": 0.011,
+    "tpot_p50_ms": 0.013,
+    "tokens_per_s": -0.1
+   },
+   "delta_over_instrument_bar": {
+    "ttft_p50_ms": -0.08,
+    "itl_p50_ms": 0.0,
+    "tpot_p50_ms": 0.0,
+    "tokens_per_s": -0.02
+   }
+  },
+  {
+   "c": 4,
+   "loadgen": {
+    "wall_s": 66.583,
+    "requests_ok": 256,
+    "requests_error": 0,
+    "ttft_p50_ms": 111.24318249999999,
+    "ttft_p99_ms": {
+     "n/a (n)": 256
+    },
+    "itl_p50_ms": 6.505458000000033,
+    "itl_p99_ms": {
+     "n/a (n)": 256
+    },
+    "tpot_p50_ms": 7.30974451968504,
+    "tokens_per_s": 492.1,
+    "requests_per_s": 3.84
+   },
+   "bench": {
+    "duration_s": 66.82707493299677,
+    "completed": 256,
+    "failed": 0,
+    "ttft_p50_ms": 116.66787500143982,
+    "ttft_p99_ms": 209.10686339630044,
+    "itl_p50_ms": 6.514584500109777,
+    "itl_p99_ms": 51.82414436480025,
+    "tpot_p50_ms": 7.30559580317033,
+    "tpot_p99_ms": 7.715511171655513,
+    "output_throughput": 490.34018072546763,
+    "request_throughput": 3.830782661917716,
+    "container_wall_s": 77.814
+   },
+   "delta_loadgen_minus_bench": {
+    "ttft_p50_ms": -5.425,
+    "itl_p50_ms": -0.009,
+    "tpot_p50_ms": 0.004,
+    "tokens_per_s": 1.8
+   },
+   "delta_over_instrument_bar": {
+    "ttft_p50_ms": -0.4,
+    "itl_p50_ms": -0.0,
+    "tpot_p50_ms": 0.0,
+    "tokens_per_s": 0.13
+   }
+  },
+  {
+   "c": 16,
+   "loadgen": {
+    "wall_s": 27.711,
+    "requests_ok": 256,
+    "requests_error": 0,
+    "ttft_p50_ms": 167.85625,
+    "ttft_p99_ms": {
+     "n/a (n)": 256
+    },
+    "itl_p50_ms": 7.375473999999997,
+    "itl_p99_ms": {
+     "n/a (n)": 256
+    },
+    "tpot_p50_ms": 12.173051000000001,
+    "tokens_per_s": 1182.5,
+    "requests_per_s": 9.24
+   },
+   "bench": {
+    "duration_s": 27.572435477006366,
+    "completed": 256,
+    "failed": 0,
+    "ttft_p50_ms": 217.9356645065127,
+    "ttft_p99_ms": 731.7840144125503,
+    "itl_p50_ms": 7.34262300102273,
+    "itl_p99_ms": 78.06110545323462,
+    "tpot_p50_ms": 11.801548177107351,
+    "tpot_p99_ms": 12.993248542109605,
+    "output_throughput": 1188.4332824833846,
+    "request_throughput": 9.284635019401442,
+    "container_wall_s": 38.37
+   },
+   "delta_loadgen_minus_bench": {
+    "ttft_p50_ms": -50.079,
+    "itl_p50_ms": 0.033,
+    "tpot_p50_ms": 0.372,
+    "tokens_per_s": -5.9
+   },
+   "delta_over_instrument_bar": {
+    "ttft_p50_ms": -2.72,
+    "itl_p50_ms": 0.0,
+    "tpot_p50_ms": 0.02,
+    "tokens_per_s": -0.32
+   }
+  },
+  {
+   "c": 64,
+   "loadgen": {
+    "wall_s": 20.474,
+    "requests_ok": 256,
+    "requests_error": 0,
+    "ttft_p50_ms": 371.7158385,
+    "ttft_p99_ms": {
+     "n/a (n)": 256
+    },
+    "itl_p50_ms": 13.000938499999847,
+    "itl_p99_ms": {
+     "n/a (n)": 256
+    },
+    "tpot_p50_ms": 37.72804537007874,
+    "tokens_per_s": 1600.5,
+    "requests_per_s": 12.5
+   },
+   "bench": {
+    "duration_s": 20.404474841998308,
+    "completed": 256,
+    "failed": 0,
+    "ttft_p50_ms": 370.76912849443033,
+    "ttft_p99_ms": 3446.165483443474,
+    "itl_p50_ms": 13.029486501181964,
+    "itl_p99_ms": 96.45745913978317,
+    "tpot_p50_ms": 37.61595673223189,
+    "tpot_p99_ms": 39.31447348705109,
+    "output_throughput": 1605.9222427305006,
+    "request_throughput": 12.546267521332036,
+    "container_wall_s": 31.208
+   },
+   "delta_loadgen_minus_bench": {
+    "ttft_p50_ms": 0.947,
+    "itl_p50_ms": -0.029,
+    "tpot_p50_ms": 0.112,
+    "tokens_per_s": -5.4
+   },
+   "delta_over_instrument_bar": {
+    "ttft_p50_ms": 0.02,
+    "itl_p50_ms": -0.0,
+    "tpot_p50_ms": 0.0,
+    "tokens_per_s": -0.1
+   }
+  }
+ ]
+}

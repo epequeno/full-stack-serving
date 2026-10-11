@@ -1,6 +1,7 @@
 # results — the evidence
 
-**Status: environment record only (`l0-local/host-inventory.md`). No measurement has run yet.**
+**Status: L0, L1 and L4 measured and committed; the instrument is twice-validated
+(ADR 0007, ADR 0003). L2/L3/L5 are cut, not pending.**
 
 This directory is the reason the project exists. Everything else is setup; this is the output.
 
@@ -8,13 +9,14 @@ This directory is the reason the project exists. Everything else is setup; this 
 
 ```
 results/
-  l0-local/        TTFT/ITL at 1/4/16/64 concurrency; env.md; host-inventory.md
-  l1-k8s/          the same, in-cluster; env.md; parity.md (verdict vs L0)
-  l2-routing/      cache hit rate, prefix-aware vs round-robin; env.md
-  l3-autoscaling/  replica-vs-queue-depth trace, scale latency; env.md
-  l4-observability/ a committed gen_ai.* trace; notes on convention stability
-  l5-multinode/    co-located vs disaggregated; cost.md
-  instrument/      loadgen validation vs the mock server; env.md
+  l0-local/        TTFT/ITL/TPOT at 1/4/16/64, closed loop; env.md; host-inventory.md
+  l1-k8s/          the same matrix on k3s; findings.json (parity vs L0); gates/
+  l4-otel/         two tracing arms over the identical engine; findings.json; gates/
+  instrument/      the instrument's two validations: ADR 0007 vs the mock server,
+                   ADR 0003 vs vllm bench serve; env.md; README.md renders both
+  l2-routing/      cut (needs >1 replica; one GPU)
+  l3-autoscaling/  cut (needs >1 replica; one GPU)
+  l5-multinode/    cut (needs a second node + metered GPU; one GPU)
 ```
 
 Each level's output is produced by `make measure LEVEL=<l>`. **Nothing here is hand-edited.**
