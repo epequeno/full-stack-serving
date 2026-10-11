@@ -99,11 +99,15 @@ def cuda_driver_max() -> str:
 
 
 def run_loadgen(*, endpoint: str, model: str, fixture: str, concurrency: int, seed: int,
-                out: Path, extra_body: str | None, requests: int | None = None
+                out: Path, extra_body: str | None, requests: int | None = None,
+                level: str = "l0-local"
                 ) -> tuple[dict | None, int]:
+    """One client pass. ``level`` is recorded in the run file's ``run`` block; each
+    caller must pass its own level (L0 default), or the raw runs mislabel their
+    provenance — see results/l1-k8s/README.md, "Raw-run provenance"."""
     cmd = [sys.executable, "-m", "loadgen.client", "--endpoint", endpoint, "--model", model,
            "--fixture", fixture, "--concurrency", str(concurrency), "--seed", str(seed),
-           "--level", "l0-local", "--output", str(out)]
+           "--level", level, "--output", str(out)]
     if requests:
         cmd += ["--requests", str(requests)]
     if extra_body:

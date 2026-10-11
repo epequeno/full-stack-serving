@@ -7,7 +7,7 @@ observability — in which every layer must produce a **number** rather than an 
 
 **Status: L0 and L1 are measured.** The GPU host ran both levels on 2026-10-10: L0 under
 Docker ([`results/l0-local/`](results/l0-local/README.md)) and the same workload on `k3s`
-([`results/l1-k8s/](results/l1-k8s/README.md)) — 12/12 verdicts `indistinguishable`, no
+([`results/l1-k8s/`](results/l1-k8s/README.md)) — 12/12 verdicts `indistinguishable`, no
 directional finding claimable above the instrument's bars (ADR 0007): the measured
 statement is **parity at the instrument's resolution**, gated by
 `make verify LEVEL=l1-k8s` (ADR 0008). L2–L5 are not started. Reasoning per level:

@@ -334,7 +334,7 @@ def run_level(out_dir: Path, *, endpoint: str, model: str, revision: str, fixtur
     m0 = parse_metrics(http_get(f"{endpoint_root}/metrics"))
     run, rc = run_loadgen(endpoint=endpoint, model=model, fixture=fixture,
                           concurrency=1, seed=seed, out=runs_dir / "prefixcheck.json",
-                          extra_body=None)
+                          extra_body=None, level="l1-k8s")
     m1 = parse_metrics(http_get(f"{endpoint_root}/metrics"))
     delta = {k: m1.get(k, 0) - m0.get(k, 0) for k in set(m0) | set(m1)}
     hits = {k: v for k, v in delta.items() if "prefix_cache" in k}
@@ -361,7 +361,7 @@ def run_level(out_dir: Path, *, endpoint: str, model: str, revision: str, fixtur
     warm_run, rc = run_loadgen(endpoint=endpoint, model=model, fixture=fixture,
                                concurrency=warmup_concurrency, seed=seed,
                                out=runs_dir / "warmup.json", extra_body=None,
-                               requests=warmup_requests)
+                               requests=warmup_requests, level="l1-k8s")
     warmup = ({"requests": warm_run["summary"]["requests_ok"], "wall_s": warm_run["wall_s"],
                "discarded": True} if warm_run
               else {"requests": 0, "discarded": True, "error": f"client exit {rc}"})
@@ -379,7 +379,8 @@ def run_level(out_dir: Path, *, endpoint: str, model: str, revision: str, fixtur
         pre_counters = parse_metrics(http_get(f"{endpoint_root}/metrics"))
         out = runs_dir / f"c{c}_r{r}.json"
         run, rc = run_loadgen(endpoint=endpoint, model=model, fixture=fixture,
-                              concurrency=c, seed=seed, out=out, extra_body=None)
+                              concurrency=c, seed=seed, out=out, extra_body=None,
+                              level="l1-k8s")
         post_counters = parse_metrics(http_get(f"{endpoint_root}/metrics"))
         entry = {"cell": [c, r], "file": f"runs/c{c}_r{r}.json", "client_exit": rc,
                  "gpu_pre": gpu_snapshot(), "gpu_post": gpu_snapshot(),
@@ -408,7 +409,8 @@ def run_level(out_dir: Path, *, endpoint: str, model: str, revision: str, fixtur
     for label, body in (("with_continuous_usage", continuous_usage_body), ("without", None)):
         run, rc = run_loadgen(endpoint=endpoint, model=model, fixture=fixture,
                               concurrency=overhead_concurrency, seed=seed,
-                              out=runs_dir / f"overhead_{label}.json", extra_body=body)
+                              out=runs_dir / f"overhead_{label}.json", extra_body=body,
+                              level="l1-k8s")
         pair[label] = ({"summary": run["summary"], "wall_s": run["wall_s"]} if run
                        else {"error": f"client exit {rc} or no output"})
         if "with_continuous_usage" not in label:

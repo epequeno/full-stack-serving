@@ -73,7 +73,7 @@ p50): the option stays viable as the per-event token source.
 ## Prefix-cache check (fixtures "Not verified")
 
 One c=1 pass over `distinct`, run FIRST on the freshly rolled pod — cold prefix cache, with
-`vllm:*prefix_cache*` counters scraped around it: **hits 6,672 / queries 340,614 = 1.2%**, the
+`vllm:*prefix_cache*` counters scraped around it: **hits 4,080 / queries 340,614 = 1.2%**, the
 chat-template prefix every request shares — matching L0's cold figure and the fixture's
 2-word maximum shared prompt prefix. The check is run-first for a measured reason: on
 2026-10-10 a warm-cache pass read **98.7%** (replay self-hits), and the first L1 measure —
@@ -98,3 +98,18 @@ tolerance; c=4 TTFT moved −0.44 ms against ±0.381 — reported, never fatal, 
 Same conclusion as L0: ITL/event ≈ 5.9 ms at c=1 against a client timing error of 0.4 ms
 p50, and the NodePort/CNI path the verdicts ran over costs nothing detectable at 10 runs.
 The harness is not the bottleneck.
+
+## Raw-run provenance (known defect in the committed runs)
+
+Every file in `runs/` (44/44) records `run.level: "l0-local"` in its `run` block. The runs are
+L1; only the label is wrong. Cause: `loadgen.client --level` defaults to `l0-local`, and
+`measure_l1` reused `measure_l0.run_loadgen`, which hardcoded `--level l0-local`. Fixed by
+threading an explicit `level` parameter through that helper (`measure_l0.py`, L0 keeps the
+default) and passing `level="l1-k8s"` at all four L1 call sites (`measure_l1.py`).
+
+What this does and does not affect. **Not affected:** every number, verdict and claim here —
+the matrix is assembled from the in-memory run objects and the baseline is read from an
+explicit path, so nothing keys off `run.level`. **Affected:** re-deriving findings from
+`runs/` alone, which would compare L0 against L0. The committed raw files were left as
+measured rather than edited in place; a fresh `make measure LEVEL=l1-k8s` writes the correct
+label. The `l1.json`/`findings.json` top-level `level` fields are correct (`l1-k8s`).
