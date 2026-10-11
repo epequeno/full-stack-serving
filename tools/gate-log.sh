@@ -27,7 +27,19 @@ mkdir -p "$out_dir"
   echo
 } > "$out"
 
-( cd "$repo" && make --no-print-directory verify LEVEL="$level" ) 2>&1 | tee -a "$out"
+# The log is committed, and the repo is public: redact host-identifying literals at
+# write time (the same policy as `make inventory` in the Makefile) — the verify stream
+# carries uv's build paths and any traceback, all with the absolute home path in them.
+# A regenerated log must not put the values back.
+redact() {
+  sed -E \
+    -e 's|/home/[A-Za-z0-9._-]+|<home>|g' \
+    -e 's|/Users/[A-Za-z0-9._-]+|<home>|g' \
+    -e 's/(^|[^0-9])((192\.168|172\.(1[6-9]|2[0-9]|3[01]))(\.[0-9]{1,3}){2}|10(\.[0-9]{1,3}){3})/\1<private-ip>/g' \
+    -e 's/dev wl[a-z0-9]*/dev <iface>/g'
+}
+
+( cd "$repo" && make --no-print-directory verify LEVEL="$level" ) 2>&1 | redact | tee -a "$out"
 rc=${PIPESTATUS[0]}
 
 {
