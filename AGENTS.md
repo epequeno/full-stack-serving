@@ -53,6 +53,11 @@ soonest. Nothing below needs a second machine, and nothing below is L2/L3/L5.
 **A clone made before 2026-10-11 is stale** — history was rewritten that day (step 3). Delete it
 and re-clone: `git clone git@github.com:epequeno/full-stack-serving.git`
 
+Before deleting the old clone: check `git status` and `git log @{u}..` **on that machine** for
+unpushed work, and keep `docs/PRIVATE-context.md` if it is there (it is gitignored, so a clone
+does not carry it). Docker artifacts are unaffected — the compose projects use explicit `-p`
+names and the Phoenix data volume is a named volume, not a bind mount into the clone.
+
 ### 1. Commit the gate evidence (`make gate-log`)
 
 Every PASS in this repo is asserted in prose and written down nowhere, because `make verify` is
