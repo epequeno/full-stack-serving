@@ -1,0 +1,472 @@
+{
+ "schema": "l1-findings/1",
+ "generated": "2026-10-10T21:37:49-0500",
+ "level": "l1-k8s",
+ "verdict_rule": "l1>l0 if min(l1) > max(l0); l1<l0 if max(l1) < min(l0); indistinguishable otherwise (ADR 0008, over ALL per-run medians each side \u2014 this run's R and the committed L0 baseline's R, which differ: R=10 vs R=5)",
+ "claimability_rule": "ADR 0007 (fixed before L1): a between-level finding is claimable only if |effect| >= 10x the cell's committed instrument p99 error (results/instrument/validation.json). Every cell x metric verdict is computed and recorded by the mechanical ADR 0008 sign rule; at a sub-bar margin it sits at the instrument's resolution and flips between fresh runs by design (2026-10-10: c=1 TTFT, 0.012 ms). The gate checks the claimable set; the sub-bar set is reported as information. Restricting claims to effects above the instrument's error is the option ADR 0007 sanctions.",
+ "claimable_findings": [],
+ "findings": [
+  {
+   "metric": "ttft_p50_ms",
+   "cell": 1,
+   "conditions": {
+    "a": "l1-k8s (this run)",
+    "b": "l0-local (committed runs/)"
+   },
+   "l1_values": [
+    14.775,
+    14.814,
+    14.907,
+    14.766,
+    14.753,
+    14.849,
+    14.843,
+    14.732,
+    14.789,
+    14.807
+   ],
+   "l0_values": [
+    15.012,
+    14.913,
+    14.962,
+    14.912,
+    14.888
+   ],
+   "verdict": "indistinguishable",
+   "l1_median": 14.798,
+   "l0_median": 14.913,
+   "effect_size_ratio": 0.992,
+   "effect_ms": 0.115,
+   "margin_ms": 0.006,
+   "bar_ms": 5.3,
+   "claimable": false,
+   "finding": "at the instrument's resolution: NOT claimable in either direction (ADR 0007: |effect| 0.115 ms < bar 5.3 ms); the mechanical ADR 0008 verdict is recorded for the trace and is expected to flip between fresh runs",
+   "wording": "Kubernetes deployment vs Docker deployment (ADR 0010) \u2014 never 'Kubernetes overhead'"
+  },
+  {
+   "metric": "itl_p50_ms",
+   "cell": 1,
+   "conditions": {
+    "a": "l1-k8s (this run)",
+    "b": "l0-local (committed runs/)"
+   },
+   "l1_values": [
+    5.855,
+    5.857,
+    5.875,
+    5.852,
+    5.858,
+    5.848,
+    5.856,
+    5.864,
+    5.847,
+    5.856
+   ],
+   "l0_values": [
+    5.861,
+    5.866,
+    5.856,
+    5.855,
+    5.876
+   ],
+   "verdict": "indistinguishable",
+   "l1_median": 5.856,
+   "l0_median": 5.861,
+   "effect_size_ratio": 0.999,
+   "effect_ms": 0.005,
+   "margin_ms": 0.0,
+   "bar_ms": 5.3,
+   "claimable": false,
+   "finding": "at the instrument's resolution: NOT claimable in either direction (ADR 0007: |effect| 0.005 ms < bar 5.3 ms); the mechanical ADR 0008 verdict is recorded for the trace and is expected to flip between fresh runs",
+   "wording": "Kubernetes deployment vs Docker deployment (ADR 0010) \u2014 never 'Kubernetes overhead'"
+  },
+  {
+   "metric": "tpot_p50_ms",
+   "cell": 1,
+   "conditions": {
+    "a": "l1-k8s (this run)",
+    "b": "l0-local (committed runs/)"
+   },
+   "l1_values": [
+    5.953,
+    5.955,
+    6.005,
+    5.946,
+    5.956,
+    5.934,
+    5.955,
+    5.968,
+    5.931,
+    5.951
+   ],
+   "l0_values": [
+    5.962,
+    5.973,
+    5.956,
+    5.958,
+    5.985
+   ],
+   "verdict": "indistinguishable",
+   "l1_median": 5.954,
+   "l0_median": 5.962,
+   "effect_size_ratio": 0.999,
+   "effect_ms": 0.008,
+   "margin_ms": 0.0,
+   "bar_ms": 5.3,
+   "claimable": false,
+   "finding": "at the instrument's resolution: NOT claimable in either direction (ADR 0007: |effect| 0.008 ms < bar 5.3 ms); the mechanical ADR 0008 verdict is recorded for the trace and is expected to flip between fresh runs",
+   "wording": "Kubernetes deployment vs Docker deployment (ADR 0010) \u2014 never 'Kubernetes overhead'"
+  },
+  {
+   "metric": "ttft_p50_ms",
+   "cell": 4,
+   "conditions": {
+    "a": "l1-k8s (this run)",
+    "b": "l0-local (committed runs/)"
+   },
+   "l1_values": [
+    21.141,
+    25.484,
+    22.088,
+    22.54,
+    25.629,
+    22.875,
+    25.753,
+    25.664,
+    25.48,
+    25.183
+   ],
+   "l0_values": [
+    25.87,
+    25.862,
+    25.734,
+    25.814,
+    25.489
+   ],
+   "verdict": "indistinguishable",
+   "l1_median": 25.332,
+   "l0_median": 25.814,
+   "effect_size_ratio": 0.981,
+   "effect_ms": 0.483,
+   "margin_ms": 0.006,
+   "bar_ms": 13.7,
+   "claimable": false,
+   "finding": "at the instrument's resolution: NOT claimable in either direction (ADR 0007: |effect| 0.483 ms < bar 13.7 ms); the mechanical ADR 0008 verdict is recorded for the trace and is expected to flip between fresh runs",
+   "wording": "Kubernetes deployment vs Docker deployment (ADR 0010) \u2014 never 'Kubernetes overhead'"
+  },
+  {
+   "metric": "itl_p50_ms",
+   "cell": 4,
+   "conditions": {
+    "a": "l1-k8s (this run)",
+    "b": "l0-local (committed runs/)"
+   },
+   "l1_values": [
+    6.496,
+    6.49,
+    6.48,
+    6.492,
+    6.501,
+    6.488,
+    6.509,
+    6.501,
+    6.493,
+    6.506
+   ],
+   "l0_values": [
+    6.518,
+    6.509,
+    6.492,
+    6.508,
+    6.474
+   ],
+   "verdict": "indistinguishable",
+   "l1_median": 6.495,
+   "l0_median": 6.508,
+   "effect_size_ratio": 0.998,
+   "effect_ms": 0.013,
+   "margin_ms": 0.0,
+   "bar_ms": 13.7,
+   "claimable": false,
+   "finding": "at the instrument's resolution: NOT claimable in either direction (ADR 0007: |effect| 0.013 ms < bar 13.7 ms); the mechanical ADR 0008 verdict is recorded for the trace and is expected to flip between fresh runs",
+   "wording": "Kubernetes deployment vs Docker deployment (ADR 0010) \u2014 never 'Kubernetes overhead'"
+  },
+  {
+   "metric": "tpot_p50_ms",
+   "cell": 4,
+   "conditions": {
+    "a": "l1-k8s (this run)",
+    "b": "l0-local (committed runs/)"
+   },
+   "l1_values": [
+    6.618,
+    6.596,
+    6.562,
+    6.601,
+    6.607,
+    6.584,
+    6.668,
+    6.613,
+    6.606,
+    6.612
+   ],
+   "l0_values": [
+    6.68,
+    6.654,
+    6.599,
+    6.67,
+    6.559
+   ],
+   "verdict": "indistinguishable",
+   "l1_median": 6.606,
+   "l0_median": 6.654,
+   "effect_size_ratio": 0.993,
+   "effect_ms": 0.048,
+   "margin_ms": 0.002,
+   "bar_ms": 13.7,
+   "claimable": false,
+   "finding": "at the instrument's resolution: NOT claimable in either direction (ADR 0007: |effect| 0.048 ms < bar 13.7 ms); the mechanical ADR 0008 verdict is recorded for the trace and is expected to flip between fresh runs",
+   "wording": "Kubernetes deployment vs Docker deployment (ADR 0010) \u2014 never 'Kubernetes overhead'"
+  },
+  {
+   "metric": "ttft_p50_ms",
+   "cell": 16,
+   "conditions": {
+    "a": "l1-k8s (this run)",
+    "b": "l0-local (committed runs/)"
+   },
+   "l1_values": [
+    44.87,
+    44.62,
+    44.825,
+    119.95,
+    43.696,
+    33.515,
+    38.679,
+    38.675,
+    45.672,
+    36.113
+   ],
+   "l0_values": [
+    45.125,
+    33.009,
+    37.379,
+    39.436,
+    33.305
+   ],
+   "verdict": "indistinguishable",
+   "l1_median": 44.158,
+   "l0_median": 37.379,
+   "effect_size_ratio": 1.181,
+   "effect_ms": 6.779,
+   "margin_ms": 0.21,
+   "bar_ms": 18.4,
+   "claimable": false,
+   "finding": "at the instrument's resolution: NOT claimable in either direction (ADR 0007: |effect| 6.779 ms < bar 18.4 ms); the mechanical ADR 0008 verdict is recorded for the trace and is expected to flip between fresh runs",
+   "wording": "Kubernetes deployment vs Docker deployment (ADR 0010) \u2014 never 'Kubernetes overhead'"
+  },
+  {
+   "metric": "itl_p50_ms",
+   "cell": 16,
+   "conditions": {
+    "a": "l1-k8s (this run)",
+    "b": "l0-local (committed runs/)"
+   },
+   "l1_values": [
+    7.3,
+    7.3,
+    7.299,
+    7.287,
+    7.308,
+    7.32,
+    7.308,
+    7.296,
+    7.306,
+    7.281
+   ],
+   "l0_values": [
+    7.348,
+    7.309,
+    7.329,
+    7.344,
+    7.323
+   ],
+   "verdict": "indistinguishable",
+   "l1_median": 7.3,
+   "l0_median": 7.329,
+   "effect_size_ratio": 0.996,
+   "effect_ms": 0.029,
+   "margin_ms": 0.0,
+   "bar_ms": 18.4,
+   "claimable": false,
+   "finding": "at the instrument's resolution: NOT claimable in either direction (ADR 0007: |effect| 0.029 ms < bar 18.4 ms); the mechanical ADR 0008 verdict is recorded for the trace and is expected to flip between fresh runs",
+   "wording": "Kubernetes deployment vs Docker deployment (ADR 0010) \u2014 never 'Kubernetes overhead'"
+  },
+  {
+   "metric": "tpot_p50_ms",
+   "cell": 16,
+   "conditions": {
+    "a": "l1-k8s (this run)",
+    "b": "l0-local (committed runs/)"
+   },
+   "l1_values": [
+    7.464,
+    7.458,
+    7.432,
+    11.912,
+    7.452,
+    7.503,
+    7.449,
+    7.439,
+    7.443,
+    7.42
+   ],
+   "l0_values": [
+    7.513,
+    7.433,
+    7.475,
+    7.53,
+    7.507
+   ],
+   "verdict": "indistinguishable",
+   "l1_median": 7.45,
+   "l0_median": 7.507,
+   "effect_size_ratio": 0.992,
+   "effect_ms": 0.056,
+   "margin_ms": 0.0,
+   "bar_ms": 18.4,
+   "claimable": false,
+   "finding": "at the instrument's resolution: NOT claimable in either direction (ADR 0007: |effect| 0.056 ms < bar 18.4 ms); the mechanical ADR 0008 verdict is recorded for the trace and is expected to flip between fresh runs",
+   "wording": "Kubernetes deployment vs Docker deployment (ADR 0010) \u2014 never 'Kubernetes overhead'"
+  },
+  {
+   "metric": "ttft_p50_ms",
+   "cell": 64,
+   "conditions": {
+    "a": "l1-k8s (this run)",
+    "b": "l0-local (committed runs/)"
+   },
+   "l1_values": [
+    108.586,
+    97.98,
+    103.233,
+    110.222,
+    111.05,
+    112.712,
+    101.18,
+    106.102,
+    100.098,
+    99.525
+   ],
+   "l0_values": [
+    103.924,
+    96.232,
+    104.719,
+    99.867,
+    282.912
+   ],
+   "verdict": "indistinguishable",
+   "l1_median": 104.668,
+   "l0_median": 103.924,
+   "effect_size_ratio": 1.007,
+   "effect_ms": 0.744,
+   "margin_ms": 0.231,
+   "bar_ms": 53.9,
+   "claimable": false,
+   "finding": "at the instrument's resolution: NOT claimable in either direction (ADR 0007: |effect| 0.744 ms < bar 53.9 ms); the mechanical ADR 0008 verdict is recorded for the trace and is expected to flip between fresh runs",
+   "wording": "Kubernetes deployment vs Docker deployment (ADR 0010) \u2014 never 'Kubernetes overhead'"
+  },
+  {
+   "metric": "itl_p50_ms",
+   "cell": 64,
+   "conditions": {
+    "a": "l1-k8s (this run)",
+    "b": "l0-local (committed runs/)"
+   },
+   "l1_values": [
+    12.678,
+    12.678,
+    12.711,
+    12.692,
+    12.645,
+    12.687,
+    12.647,
+    12.701,
+    12.697,
+    12.719
+   ],
+   "l0_values": [
+    12.666,
+    12.699,
+    12.66,
+    12.723,
+    12.688
+   ],
+   "verdict": "indistinguishable",
+   "l1_median": 12.69,
+   "l0_median": 12.688,
+   "effect_size_ratio": 1.0,
+   "effect_ms": 0.002,
+   "margin_ms": 0.001,
+   "bar_ms": 53.9,
+   "claimable": false,
+   "finding": "at the instrument's resolution: NOT claimable in either direction (ADR 0007: |effect| 0.002 ms < bar 53.9 ms); the mechanical ADR 0008 verdict is recorded for the trace and is expected to flip between fresh runs",
+   "wording": "Kubernetes deployment vs Docker deployment (ADR 0010) \u2014 never 'Kubernetes overhead'"
+  },
+  {
+   "metric": "tpot_p50_ms",
+   "cell": 64,
+   "conditions": {
+    "a": "l1-k8s (this run)",
+    "b": "l0-local (committed runs/)"
+   },
+   "l1_values": [
+    12.741,
+    12.776,
+    12.79,
+    12.898,
+    12.785,
+    12.802,
+    12.754,
+    12.74,
+    12.867,
+    12.831
+   ],
+   "l0_values": [
+    12.811,
+    12.829,
+    12.714,
+    12.766,
+    22.963
+   ],
+   "verdict": "indistinguishable",
+   "l1_median": 12.787,
+   "l0_median": 12.811,
+   "effect_size_ratio": 0.998,
+   "effect_ms": 0.024,
+   "margin_ms": 0.002,
+   "bar_ms": 53.9,
+   "claimable": false,
+   "finding": "at the instrument's resolution: NOT claimable in either direction (ADR 0007: |effect| 0.024 ms < bar 53.9 ms); the mechanical ADR 0008 verdict is recorded for the trace and is expected to flip between fresh runs",
+   "wording": "Kubernetes deployment vs Docker deployment (ADR 0010) \u2014 never 'Kubernetes overhead'"
+  }
+ ],
+ "tolerance_soft_check": {
+  "declared": "2026-10-10T21:37:49-0500 (at measure time, before any fresh-run comparison \u2014 ADR 0008)",
+  "derivation": "L0's committed across-run spread (max \u2212 min of its per-run medians), per cell and metric. A fresh L1 median outside this band is reported, and never fails the gate.",
+  "tolerance_ms": {
+   "c1/ttft_p50_ms": 0.124,
+   "c1/itl_p50_ms": 0.021,
+   "c1/tpot_p50_ms": 0.029,
+   "c4/ttft_p50_ms": 0.381,
+   "c4/itl_p50_ms": 0.044,
+   "c4/tpot_p50_ms": 0.121,
+   "c16/ttft_p50_ms": 12.117,
+   "c16/itl_p50_ms": 0.039,
+   "c16/tpot_p50_ms": 0.097,
+   "c64/ttft_p50_ms": 186.68,
+   "c64/itl_p50_ms": 0.063,
+   "c64/tpot_p50_ms": 10.249
+  }
+ }
+}

@@ -1,0 +1,89 @@
+# L1 — the L0 workload on k3s (full-stack-serving ADR 0010).
+# Same pinned image, model, revision and flags as stack/l0-local/docker-compose.yaml —
+# the only deltas are the orchestrator and the network path (ADR 0010: this is a
+# "Kubernetes deployment vs Docker deployment" comparison, never "Kubernetes overhead").
+#
+# Bring-up: `make up LEVEL=l1-k8s`. Readiness: the pod's `get /health` on the NodePort.
+# The load generator runs on the host against http://localhost:30080 — the network path
+# (kube-proxy NodePort -> CNI -> pod) is part of what L1 measures, and is recorded in env.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: l1-vllm
+  labels:
+    app: l1-vllm
+spec:
+  # First bootstrap on a fresh node pulls ~3.9 GB of image into containerd and ~2.9 GB of
+  # weights into the hostPath (ADR 0010: "two image stores") — that outlives the default
+  # 600s progress deadline, which killed the first rollout. Later rollouts reuse both.
+  # One GPU, one replica: RollingUpdate deadlocks here (surge pod Pending on the GPU the
+  # old pod holds, old pod never dies — caught live at the first measure). Recreate kills
+  # the old pod first, so a rollout restart really produces a fresh pod / cold prefix cache.
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: l1-vllm
+  template:
+    metadata:
+      labels:
+        app: l1-vllm
+    spec:
+      # k3s auto-detects the nvidia runtime at startup (ADR 0010); the default stays runc,
+      # so every GPU pod names the runtime explicitly.
+      runtimeClassName: nvidia
+      containers:
+        - name: vllm
+          image: vllm/vllm-openai:v0.23.0
+          # linux/amd64 digest of this tag, verified by the 2026-10-10 L0 pull on saturn:
+          #   sha256:6d8429e38e3747723ca07ee1b17972e09bb9c51c4032b266f24fb1cc3b22ed8f
+          # measure_l1 records the resolved digest in env.md.
+          args:
+            - --model
+            - Qwen/Qwen2.5-1.5B-Instruct
+            - --revision
+            - 989aa7980e4cf806f80c7fef2b1adb7bc71aa306
+            - --dtype
+            - bfloat16
+            - --max-model-len
+            - "4096"
+            - --gpu-memory-utilization
+            - "0.90"
+          ports:
+            - containerPort: 8000
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+          volumeMounts:
+            # ADR 0010: "weights are fetched separately unless a shared host path is mounted"
+            # — decided: mounted. Host-controlled dir so the first pod bootstraps it and
+            # every later pod (including crash-restarts and re-runs) reuses the download;
+            # L0's own Docker volume stays untouched.
+            - name: hf-cache
+              mountPath: /root/.cache/huggingface
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: hf-cache
+          hostPath:
+            path: /var/cache/full-stack-serving/huggingface
+            type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: l1-vllm
+spec:
+  type: NodePort
+  selector:
+    app: l1-vllm
+  ports:
+    - port: 8000
+      targetPort: 8000
+      nodePort: 30080

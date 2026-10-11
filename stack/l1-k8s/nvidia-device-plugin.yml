@@ -1,0 +1,45 @@
+# Vendored from NVIDIA/k8s-device-plugin v0.20.1 (2026-10-10), the release this repo pins
+# (full-stack-serving ADR 0010: the device plugin vs GPU Operator choice lives in
+# stack/l1-k8s/README.md). Upstream:
+#   https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/v0.20.1/deployments/static/nvidia-device-plugin.yml
+# Local patch (recorded, not hidden): runtimeClassName: nvidia on the plugin pod — k3s's
+# default runtime is runc, and the plugin needs the NVIDIA container runtime for NVML
+# access (ADR 0010: "pods must set runtimeClassName: nvidia").
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nvidia-device-plugin-daemonset
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      name: nvidia-device-plugin-ds
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        name: nvidia-device-plugin-ds
+    spec:
+      runtimeClassName: nvidia
+      priorityClassName: system-node-critical
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+      containers:
+        - image: nvcr.io/nvidia/k8s-device-plugin:v0.20.1
+          imagePullPolicy: IfNotPresent
+          name: nvidia-device-plugin-ctr
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: device-plugin
+              mountPath: /var/lib/kubelet/device-plugins
+      volumes:
+        - name: device-plugin
+          hostPath:
+            path: /var/lib/kubelet/device-plugins

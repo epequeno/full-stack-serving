@@ -1,8 +1,9 @@
 # full-stack-serving — bring-up, measurement, teardown.
 #
-# L0 is implemented: `up`/`down`/`measure`/`validate-instrument` work for LEVEL=l0-local
-# (uv syncs the Python env automatically on first use). L1+ targets fail loudly rather
-# than pretending.
+# L0 (docker compose) and L1 (k3s; root kubeconfig → sudo kubectl) are implemented:
+# `up`/`down`/`measure` for LEVEL=l0-local|l1-k8s, `verify` for LEVEL=l1-k8s (L0 is the
+# baseline and commits no findings — ADR 0008). L2+ targets fail loudly rather than
+# pretending. uv syncs the Python env automatically on first use.
 
 LEVEL ?= l0-local
 LEVELS := l0-local l1-k8s l2-routing l3-autoscaling l4-observability l5-multinode
@@ -10,12 +11,14 @@ LEVELS := l0-local l1-k8s l2-routing l3-autoscaling l4-observability l5-multinod
 INVENTORY_SRC ?= $(HOME)/code/ebpf-inference-observability/tools/host-inventory.sh
 INVENTORY_OUT ?= results/l0-local/host-inventory.md
 
-ENDPOINT ?= http://localhost:8000/v1/chat/completions
+L1_ENDPOINT ?= http://localhost:30080/v1/chat/completions
+KUBECTL ?= sudo kubectl
 MODEL ?= Qwen/Qwen2.5-1.5B-Instruct
 CONTINUOUS_USAGE_BODY ?= {"stream_options": {"include_usage": true, "continuous_usage_stats": true}}
 
 .DEFAULT_GOAL := help
-.PHONY: help doctor doctor-check inventory up down measure verify validate-instrument clean status
+.PHONY: help doctor doctor-check inventory up down measure verify validate-instrument clean status \
+        up-l0-local down-l0-local up-l1-k8s down-l1-k8s measure-l0-local measure-l1-k8s verify-l1-k8s
 
 help:
 	@echo "full-stack-serving"
@@ -97,11 +100,45 @@ status:
 	  printf "  %-18s results/%-18s %s file(s)\n" "$$l" "$$l/" "$$n"; \
 	done
 
-# --- level bring-up, measurement, teardown (l0-local; L1+ fails loudly) ----------------------
+# --- level bring-up, measurement, teardown ------------------------------------------------
+# One target per level, dispatched by LEVEL. Names are load-bearing: LEVEL=l1-k8s maps
+# to stack/l1-k8s/ and writes to results/l1-k8s/ (stack/README.md).
+
+K3S_TIMEOUT ?= 900s
 
 up:
-	@if [ "$(LEVEL)" != l0-local ]; then echo "make up LEVEL=$(LEVEL): not implemented yet (L1+)." >&2; exit 1; fi
-	@docker compose -f stack/$(LEVEL)/docker-compose.yaml up -d
+	@case "$(LEVEL)" in \
+	  l0-local) $(MAKE) --no-print-directory up-l0-local ;; \
+	  l1-k8s) $(MAKE) --no-print-directory up-l1-k8s ;; \
+	  *) echo "make up LEVEL=$(LEVEL): not implemented (L2+)." >&2; exit 1 ;; \
+	esac
+
+down:
+	@case "$(LEVEL)" in \
+	  l0-local) $(MAKE) --no-print-directory down-l0-local ;; \
+	  l1-k8s) $(MAKE) --no-print-directory down-l1-k8s ;; \
+	  *) echo "make down LEVEL=$(LEVEL): not implemented (L2+)." >&2; exit 1 ;; \
+	esac
+
+measure:
+	@case "$(LEVEL)" in \
+	  l0-local) $(MAKE) --no-print-directory measure-l0-local ;; \
+	  l1-k8s) $(MAKE) --no-print-directory measure-l1-k8s ;; \
+	  *) echo "make measure LEVEL=$(LEVEL): not implemented (L2+)." >&2; exit 1 ;; \
+	esac
+
+# ADR 0008: the gate reproduces findings, and findings start at L1 (L0 is the
+# baseline and compares against nothing). `make verify` re-measures into scratch
+# (never over results/) and exits non-zero on a verdict change.
+verify:
+	@case "$(LEVEL)" in \
+	  l1-k8s) $(MAKE) --no-print-directory verify-l1-k8s ;; \
+	  l0-local) echo "make verify LEVEL=l0-local: nothing to verify — L0 is the baseline and commits no findings (ADR 0008)." >&2; exit 1 ;; \
+	  *) echo "make verify LEVEL=$(LEVEL): not implemented (L2+)." >&2; exit 1 ;; \
+	esac
+
+up-l0-local:
+	@docker compose -f stack/l0-local/docker-compose.yaml up -d
 	@sleep 2
 	@img=$$(docker inspect --format '{{.Config.Image}}' l0-vllm 2>/dev/null); \
 	  if [ -n "$$img" ]; then \
@@ -111,26 +148,40 @@ up:
 	    echo "up: container l0-vllm not found yet — still starting; check: docker logs l0-vllm"; \
 	  fi
 
-down:
-	@if [ "$(LEVEL)" != l0-local ]; then echo "make down LEVEL=$(LEVEL): not implemented yet (L1+)." >&2; exit 1; fi
-	@docker compose -f stack/$(LEVEL)/docker-compose.yaml down
+down-l0-local:
+	@docker compose -f stack/l0-local/docker-compose.yaml down
 
-# ADR 0007: run before any level's numbers are trusted, and again whenever loadgen/ or the
-# Python/aiohttp versions change. Committed under results/instrument/ with its environment.
-validate-instrument:
-	@uv run python -m measure.validate --out results/instrument
+# L1: the plugin DaemonSet first (vendored, pinned — stack/l1-k8s/README.md), then the
+# workload. rollout status gates on the pod being Ready; the NodePort path (kube-proxy →
+# CNI → pod) is part of what L1 measures (ADR 0010).
+up-l1-k8s:
+	@$(KUBECTL) apply -f stack/l1-k8s/nvidia-device-plugin.yml
+	@$(KUBECTL) apply -f stack/l1-k8s/vllm.yaml
+	@$(KUBECTL) rollout status deployment/l1-vllm --timeout=$(K3S_TIMEOUT)
+	@$(KUBECTL) get node -o custom-columns='NODE:.metadata.name,GPU:.status.allocatable.nvidia\.com/gpu' 2>/dev/null || true
+	@echo "up: l1-vllm → $(L1_ENDPOINT) (NodePort 30080; the kube-proxy/CNI path is part of what L1 measures)"
 
-measure:
-	@if [ "$(LEVEL)" != l0-local ]; then echo "make measure LEVEL=$(LEVEL): not implemented yet (L1+)." >&2; exit 1; fi
+down-l1-k8s:
+	@$(KUBECTL) delete -f stack/l1-k8s/vllm.yaml --ignore-not-found
+	@$(KUBECTL) delete -f stack/l1-k8s/nvidia-device-plugin.yml --ignore-not-found
+
+measure-l0-local:
 	@uv run python -m measure.measure_l0 --endpoint $(ENDPOINT) --model $(MODEL) \
-	  --out-dir results/$(LEVEL) --continuous-usage-body '$(CONTINUOUS_USAGE_BODY)'
+	  --out-dir results/l0-local --continuous-usage-body '$(CONTINUOUS_USAGE_BODY)'
 
-# ADR 0008: the gate reproduces findings, and findings start existing at L1 (L0 is the
-# baseline and compares against nothing). Keep failing loudly until there is something to gate.
-verify:
-	@echo "make verify: nothing to verify yet — L0 is the baseline and commits no findings." >&2
-	@echo "The gate (findings.json, sign-flip rule over five repeats) starts at L1." >&2
-	@exit 1
+# R=10 for L1 (ADR 0008's remedy): at R=5 the c=1 TTFT and c=16 ITL verdicts sat on
+# 0.003–0.015 ms margins — below the instrument's claimability bars (ADR 0007) — and
+# flipped between identical-protocol runs. R=10 pushes those cells into the stable
+# (indistinguishable) regime so the committed verdicts reproduce at the gate.
+measure-l1-k8s:
+	@uv run python -m measure.measure_l1 --endpoint $(L1_ENDPOINT) --model $(MODEL) \
+	  --out-dir results/l1-k8s --repeats 10 \
+	  --continuous-usage-body '$(CONTINUOUS_USAGE_BODY)'
+
+verify-l1-k8s:
+	@uv run python -m measure.verify_l1 --endpoint $(L1_ENDPOINT) --model $(MODEL) \
+	  --scratch tmp/verify-l1-k8s --findings results/l1-k8s/findings.json \
+	  --continuous-usage-body '$(CONTINUOUS_USAGE_BODY)'
 
 clean:
 	@echo "cleaning scratch (results/ is never touched)"

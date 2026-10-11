@@ -1,16 +1,20 @@
 # measure — regenerating the evidence
 
-**Status: implemented for L0** (`make measure LEVEL=l0-local`).
+**Status: implemented for L0 and L1** (`make measure LEVEL=l0-local|l1-k8s`; the L1 gate:
+`make verify LEVEL=l1-k8s`).
 
 | piece | what |
 |---|---|
 | `measure/mock_sse.py` | the ADR 0007 reference: OpenAI-shaped mock SSE server on a configured schedule, logging the monotonic time of every actual write. Separate process from the client, same host. |
 | `measure/validate.py` | orchestrates mock + client at each concurrency plus one CPU-loaded run; reports per-event error vs the mock's logged writes, the mock's own jitter, and count checks. `make validate-instrument` → `results/instrument/`. Pass criterion fixed from L0's numbers (ADR 0007): a finding is claimable only above 10 × the instrument's p99 error for its cell (5.3–53.9 ms, c=1→64). |
 | `measure/measure_l0.py` | the L0 experiment: warmup pass (discarded, counted), the seeded interleaved 5-repeat × 1/4/16/64 matrix, the continuous-usage overhead pair (ADR 0005), the prefix-cache fixture check, GPU clock/temp and server-counter capture, env.md. → `results/l0-local/`. |
+| `measure/measure_l1.py` | the L1 experiment: **the same protocol as L0** (same fixture, seed, interleaved order, overhead pair, cold-cache prefix check), reusing `measure_l0`'s helpers, plus a k8s env snapshot (runtime class, device plugin, allocatable GPU, network path) and the pod rolled fresh — **verified**, not assumed — so the matrix starts cold. Writes `findings.json` from the committed L0 per-run medians vs this run's, with ADR 0007 claimability (bar = 10× the cell's committed instrument p99 error) computed per finding. → `results/l1-k8s/`. |
+| `measure/verify_l1.py` | the ADR 0008 gate for L1: re-runs `measure_l1.run_level` into scratch (never `results/`), using the *committed* protocol from `l1.json`. HARD: every **claimable** finding (ADR 0007 bar cleared) must reproduce — a missing, changed or newly-claimable verdict fails; sub-bar verdicts sit at the instrument's resolution and flip between fresh runs by design, so they are reported as information, never gated. SOFT: absolute-number deltas vs the tolerance declared at measure time (skipped on environment drift). |
 
 The raw JSON is the artifact; [`results/l0-local/README.md`](../results/l0-local/README.md)
-renders the committed matrix as tables. Four cells don't warrant a chart — the JSON is the
-data, and the tables are its view.
+and [`results/l1-k8s/README.md`](../results/l1-k8s/README.md) render the committed data as
+tables. Four cells per level don't warrant a chart — the JSON is the data, and the tables
+are its view.
 `make verify` (ADR 0008) starts at L1 — L0 is the baseline and commits no findings.
 
 `make measure LEVEL=<l>` regenerates everything under `results/<l>/` from scratch. Nothing in

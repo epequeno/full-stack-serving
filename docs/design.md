@@ -1,7 +1,8 @@
 # Design — `full-stack-serving`
 
-Status: **L0 measured** (2026-10-10; `results/l0-local/`). L1–L5 are design only. Last revised
-2026-10-10.
+Status: **L0 and L1 measured** (2026-10-10; `results/l0-local/`, `results/l1-k8s/` — L1 vs L0
+is parity at the instrument's resolution, nothing directional claimable). L2–L5 are design
+only. Last revised 2026-10-10.
 
 The [`README`](../README.md) owns the pitch, the anti-tutorial test, the level table, the gate and
 the constraints. This document owns the reasoning behind each level, the non-goals, the risks and
@@ -116,23 +117,24 @@ long-lived GPU instance idle over a weekend.
 
 ## Methodology
 
-The measurement choices are decided in ADRs. L0 tested their assumptions, so 0005, 0006 and
-0007 are `accepted` alongside 0001, 0002, 0011 and 0012; 0003's `vllm bench serve` cross-check
-and 0004's open-loop half remain `proposed` until they run:
+The measurement choices are decided in ADRs. L0 tested their assumptions and L1 ran the gate,
+so 0005, 0006, 0007, 0008 and 0010 are `accepted` alongside 0001, 0002, 0011 and 0012;
+0003's `vllm bench serve` cross-check and 0004's open-loop half remain `proposed` until
+they run:
 
 | ADR | Decision |
 |---|---|
 | 0002 | Size the workload for observability, not capability (accepted) |
 | 0003 | Build the load generator; cross-check it against `vllm bench serve` |
 | 0004 | Closed loop for L0/L1, open loop for L2/L3 |
-| 0005 | Record ITL per SSE event, report TPOT separately |
-| 0006 | Percentile floors on request count; 5 interleaved repeats per cell |
-| 0007 | Validate the load generator against a mock server with a logged schedule |
-| 0008 | The gate reproduces findings; absolute numbers are a soft check |
+| 0005 | Record ITL per SSE event, report TPOT separately (accepted) |
+| 0006 | Percentile floors on request count; interleaved repeats per cell (accepted) |
+| 0007 | Validate the load generator against a mock server with a logged schedule (accepted — claimability bars fixed) |
+| 0008 | The gate reproduces findings; absolute numbers are a soft check (accepted — gated claimable findings) |
 | 0009 | L4 findings: tracing overhead and the span-to-client TTFT gap |
-| 0010 | k3s for L1 |
-| 0011 | Model: Qwen2.5-1.5B-Instruct, bf16, unquantized |
-| 0012 | Engine: vLLM (official image, tag pinned) |
+| 0010 | k3s for L1 (accepted) |
+| 0011 | Model: Qwen2.5-1.5B-Instruct, bf16, unquantized (accepted) |
+| 0012 | Engine: vLLM (official image, tag pinned) (accepted) |
 
 `loadgen/` and `measure/` are shared across levels by design: the same measurement applied to each
 layer is what makes the levels comparable. The per-level directory layout is in

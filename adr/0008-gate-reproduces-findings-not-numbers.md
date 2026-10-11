@@ -1,6 +1,6 @@
 # 0008 — The gate reproduces the findings; the numbers are a soft check
 
-- **Status:** proposed
+- **Status:** accepted
 - **Date:** 2026-10-09
 
 ## Context

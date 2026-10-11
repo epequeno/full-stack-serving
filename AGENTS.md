@@ -11,28 +11,37 @@ reasoning. Decisions the stack forced live in `adr/`.
 
 ## Status
 
-**L0 is measured.** The container stack (`stack/l0-local/`), shared client (`loadgen/`) and
-harness (`measure/`) ran on saturn (the Linux GPU host) on 2026-10-10: matrix in
-`results/l0-local/` (TTFT/ITL/TPOT at 1/4/16/64, 5 repeats, 0 errors), instrument validation in
-`results/instrument/` (ADR 0007; 0 count failures). The ADR 0007 pass threshold is fixed, with
-its derivation, in ADR 0007 itself. ADRs 0005/0006/0007 are accepted. The sibling eBPF
-observability project has its live serving stack (`make up LEVEL=l0-local`).
+**L0 and L1 are measured.** On saturn (the Linux GPU host), 2026-10-10:
+
+- **L0** (`results/l0-local/`): TTFT/ITL/TPOT at 1/4/16/64, 5 repeats, 0 errors; instrument
+  validation in `results/instrument/` (ADR 0007; 0 count failures, error bars fixed).
+- **L1** (`results/l1-k8s/`): the same workload on `k3s` v1.37.1+k3s1 (ADR 0010), GPU via the
+  device plugin (v0.20.1) and the `nvidia` runtime class, pod rolled fresh per measure
+  (verified). R=10. 12/12 verdicts vs the committed L0 baseline are `indistinguishable`, and
+  **no directional finding is claimable** — every measured effect is below its ADR 0007 bar
+  (10× the cell's instrument p99 error). The claimable finding: parity at the instrument's
+  resolution. The first gate run failed honestly (c=1 TTFT flip at a 0.012 ms margin); the
+  restatement (gate checks claimable findings, sub-bar flips are recorded information) is the
+  ADR 0007/0008 remedy, applied — see `results/l1-k8s/README.md`.
+
+ADRs 0005/0006/0007/0008/0010 are accepted. The sibling eBPF observability project has its
+live serving stack (`make up LEVEL=l0-local`).
 
 ## Next action
 
-**L1** — the L0 workload on `k3s` (ADR 0010), GPU via the device plugin, numbers re-measured
-in-cluster with the **parity or regression verdict vs L0**. ADR 0008's gate starts here:
-`findings.json` committed by `make measure`, sign-flip rule over five repeats via `make verify`.
+**L4 — measured observability** (design.md's "prioritise if time is short"): OTel `gen_ai.*`
+spans from the pinned vLLM into Arize Phoenix, fed by the same `loadgen/`. Two findings
+(ADR 0009): tracing overhead (client-measured latency, tracing on vs off) and the
+span-to-client TTFT gap (engine span vs load generator, paired per request via the
+`traceparent` the client already sends), plus a committed trace and a conventions-stability
+note. L2/L3 need >1 replica (one GPU — design.md's open dependency); re-check the Gateway API
+Inference Extension's GA status before L2.
 
-Prerequisites: `k3s` + `kubectl` are absent on saturn (`results/l0-local/host-inventory.md`) —
-install them, then `make down LEVEL=l0-local` before bringing up L1. One GPU, one owner at a
-time (ADR 0010).
-
-The L0 runbook is done (bring-up → validate-instrument → measure → commit) and its deferred
-items are closed: pins are in every result's `env`, the per-chunk usage option is
-`stream_options.continuous_usage_stats` (vLLM ignores unknown top-level fields silently), and
-the validation threshold is fixed. The fixtures' "Not verified" items are answered in
-`loadgen/fixtures/README.md`; ADR 0011's criterion 3 (GPU time dominating) holds.
+The L1 prerequisites are closed: k3s v1.37.1+k3s1 + kubectl installed on saturn (ADR 0010),
+nvidia runtime registered in k3s's containerd, `nvidia.com/gpu: 1` allocatable via the
+device plugin, `stack/l1-k8s/` manifests committed (Recreate strategy — RollingUpdate
+deadlocks a 1-GPU single replica), and `make up/down/measure/verify LEVEL=l1-k8s` live.
+One GPU, one owner at a time: `make down LEVEL=l1-k8s` before the next level's bring-up.
 
 ## Rules
 
