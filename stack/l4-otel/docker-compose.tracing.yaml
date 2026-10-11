@@ -1,0 +1,60 @@
+# L4, tracing-ON arm (ADR 0009): vLLM --otlp-traces-endpoint → otel collector → Phoenix,
+# all running for real. The collector also writes every span to a scratch file
+# (tmp/l4-otel/spans/spans.json, bind-mounted) — that file is the pairing source for
+# Finding 2 (span-to-client TTFT gap); Phoenix is the live backend for Finding 1's
+# "all running for real" and the committed example trace is read back from it.
+#
+# One GPU: this arm and docker-compose.base.yaml are mutually exclusive and measure_l4
+# runs them sequentially (base first, then tracing). `make up LEVEL=l4-otel ARM=tracing`.
+services:
+  phoenix:
+    image: arizephoenix/phoenix:latest
+    # Docker Hub, pulled 2026-10-11 on saturn; the linux/amd64 digest verified by that pull:
+    #   sha256:3a2e5a049f706f29c7b13bd82bcd94101bb10701874ce134ec9eb7f0299741aa
+    container_name: l4-phoenix
+    ports:
+      - "6006:6006"  # UI; OTLP gRPC 4317 stays cluster-internal (collector → phoenix)
+    volumes:
+      - phoenix-data:/mnt/data
+    cpuset: "16-23"  # ADR 0009: backend on a separate core set from the engine
+  otelcol:
+    image: otel/opentelemetry-collector-contrib:latest
+    # digest recorded in stack/l4-otel/README.md (pinned at bring-up; see README)
+    container_name: l4-otelcol
+    user: "1000:1000"  # the spans scratch is host-user-owned; the image's 10001 cannot write it
+    volumes:
+      # the contrib image reads /etc/otelcol-contrib/config.yaml (not /etc/otelcol/)
+      - ./otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml:ro
+      - ../../tmp/l4-otel/spans:/var/lib/otelcol  # scratch, gitignored; spans.json lives here
+    cpuset: "24-25"
+    depends_on: [phoenix]
+  vllm:
+    image: vllm/vllm-openai:v0.23.0
+    # sha256:6d8429e38e3747723ca07ee1b17972e09bb9c51c4032b266f24fb1cc3b22ed8f (as L0/L1)
+    container_name: l4-vllm-tracing
+    ports:
+      - "8000:8000"
+    volumes:
+      - hf-cache:/root/.cache/huggingface
+    cpuset: "0-15"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    command: >
+      --model Qwen/Qwen2.5-1.5B-Instruct
+      --revision 989aa7980e4cf806f80c7fef2b1adb7bc71aa306
+      --dtype bfloat16
+      --max-model-len 4096
+      --gpu-memory-utilization 0.90
+      --otlp-traces-endpoint http://otelcol:4317
+    depends_on: [otelcol]
+volumes:
+  hf-cache:
+    name: l0-local_hf-cache
+    external: true
+  phoenix-data:
+    name: l4-phoenix-data

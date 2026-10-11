@@ -43,9 +43,12 @@ Given a target endpoint and a load model (full-stack-serving ADR 0004), it must:
    - `ttft_ms`, `e2e_ms`
    - `tokens_out` and `tokens_in`, from the server's `usage`, never from counting events
    - TPOT is derived: `(e2e − ttft) / (tokens_out − 1)`
-   - `request_id` and `trace_id`: the client sets both (a `traceparent` header is sent on every
-     request, tracing on or off) so a request can be paired with the server's span
-     (full-stack-serving ADR 0009)
+   - `request_id` (the fixture index) and `trace_id`: the client sets both — a `traceparent`
+     header is sent on every request, tracing on or off — so a request can be paired with the
+     server's span by trace id (full-stack-serving ADR 0009). `response_id` is the engine's
+     id (`chatcmpl-…`, from the SSE chunks): vLLM v0.23.0 puts THAT in `gen_ai.request.id`,
+     not the client's `X-Request-Id` (which is response-side only), so the pair is
+     cross-checked engine-id vs engine-id, seen by both sides.
 3. Emit JSON to stdout (or a path), one record per request plus a run summary.
 4. Record the run's configuration alongside the numbers.
 

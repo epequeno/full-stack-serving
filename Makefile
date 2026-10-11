@@ -1,8 +1,9 @@
 # full-stack-serving — bring-up, measurement, teardown.
 #
-# L0 (docker compose) and L1 (k3s; root kubeconfig → sudo kubectl) are implemented:
-# `up`/`down`/`measure` for LEVEL=l0-local|l1-k8s, `verify` for LEVEL=l1-k8s (L0 is the
-# baseline and commits no findings — ADR 0008). L2+ targets fail loudly rather than
+# L0 (docker compose), L1 (k3s; root kubeconfig → sudo kubectl) and L4 (OTel tracing,
+# two compose arms over the identical engine) are implemented: up/down/measure for
+# LEVEL=l0-local|l1-k8s|l4-otel, verify for LEVEL=l1-k8s|l4-otel (L0 is the baseline
+# and commits no findings — ADR 0008). Other levels fail loudly rather than
 # pretending. uv syncs the Python env automatically on first use.
 
 LEVEL ?= l0-local
@@ -18,7 +19,8 @@ CONTINUOUS_USAGE_BODY ?= {"stream_options": {"include_usage": true, "continuous_
 
 .DEFAULT_GOAL := help
 .PHONY: help doctor doctor-check inventory up down measure verify validate-instrument clean status \
-        up-l0-local down-l0-local up-l1-k8s down-l1-k8s measure-l0-local measure-l1-k8s verify-l1-k8s
+        up-l0-local down-l0-local up-l1-k8s down-l1-k8s measure-l0-local measure-l1-k8s verify-l1-k8s \
+        up-l4-otel down-l4-otel measure-l4-otel verify-l4-otel
 
 help:
 	@echo "full-stack-serving"
@@ -110,21 +112,24 @@ up:
 	@case "$(LEVEL)" in \
 	  l0-local) $(MAKE) --no-print-directory up-l0-local ;; \
 	  l1-k8s) $(MAKE) --no-print-directory up-l1-k8s ;; \
-	  *) echo "make up LEVEL=$(LEVEL): not implemented (L2+)." >&2; exit 1 ;; \
+	  l4-otel) $(MAKE) --no-print-directory up-l4-otel ;; \
+	  *) echo "make up LEVEL=$(LEVEL): not implemented (L2, L3, L5)." >&2; exit 1 ;; \
 	esac
 
 down:
 	@case "$(LEVEL)" in \
 	  l0-local) $(MAKE) --no-print-directory down-l0-local ;; \
 	  l1-k8s) $(MAKE) --no-print-directory down-l1-k8s ;; \
-	  *) echo "make down LEVEL=$(LEVEL): not implemented (L2+)." >&2; exit 1 ;; \
+	  l4-otel) $(MAKE) --no-print-directory down-l4-otel ;; \
+	  *) echo "make down LEVEL=$(LEVEL): not implemented (L2, L3, L5)." >&2; exit 1 ;; \
 	esac
 
 measure:
 	@case "$(LEVEL)" in \
 	  l0-local) $(MAKE) --no-print-directory measure-l0-local ;; \
 	  l1-k8s) $(MAKE) --no-print-directory measure-l1-k8s ;; \
-	  *) echo "make measure LEVEL=$(LEVEL): not implemented (L2+)." >&2; exit 1 ;; \
+	  l4-otel) $(MAKE) --no-print-directory measure-l4-otel ;; \
+	  *) echo "make measure LEVEL=$(LEVEL): not implemented (L2, L3, L5)." >&2; exit 1 ;; \
 	esac
 
 # ADR 0008: the gate reproduces findings, and findings start at L1 (L0 is the
@@ -133,8 +138,9 @@ measure:
 verify:
 	@case "$(LEVEL)" in \
 	  l1-k8s) $(MAKE) --no-print-directory verify-l1-k8s ;; \
+	  l4-otel) $(MAKE) --no-print-directory verify-l4-otel ;; \
 	  l0-local) echo "make verify LEVEL=l0-local: nothing to verify — L0 is the baseline and commits no findings (ADR 0008)." >&2; exit 1 ;; \
-	  *) echo "make verify LEVEL=$(LEVEL): not implemented (L2+)." >&2; exit 1 ;; \
+	  *) echo "make verify LEVEL=$(LEVEL): not implemented (L2, L3, L5)." >&2; exit 1 ;; \
 	esac
 
 up-l0-local:
@@ -182,6 +188,33 @@ verify-l1-k8s:
 	@uv run python -m measure.verify_l1 --endpoint $(L1_ENDPOINT) --model $(MODEL) \
 	  --scratch tmp/verify-l1-k8s --findings results/l1-k8s/findings.json \
 	  --continuous-usage-body '$(CONTINUOUS_USAGE_BODY)'
+
+# --- L4: two compose arms over the identical engine (ADR 0009) ---------------------------
+# base = no exporter (the control); tracing = --otlp-traces-endpoint → collector →
+# Phoenix + scratch spans.json. One GPU: the arms are mutually exclusive and
+# measure_l4 runs them sequentially, base first (the order is a recorded confound).
+up-l4-otel:
+	@case "$(ARM)" in base|tracing) ;; *) echo "make up LEVEL=l4-otel ARM=$(ARM): unknown arm (base|tracing)." >&2; exit 1 ;; esac
+	@docker compose -p l4-otel-$(ARM) -f stack/l4-otel/docker-compose.$(ARM).yaml up -d
+	@echo "up: l4-otel $(ARM) arm — waiting for /v1/models (weights are cached from L0)"
+	@i=0; until curl -sf http://localhost:8000/v1/models >/dev/null 2>&1; do \
+	  i=$$((i+1)); if [ $$i -gt 450 ]; then \
+	    echo "up: l4-otel $(ARM) not ready after 900s — docker compose -p l4-otel-$(ARM) logs" >&2; exit 1; \
+	  fi; sleep 2; done
+	@docker inspect --format 'up: l4-vllm-$(ARM) {{.Config.Image}} (digest {{index .RepoDigests 0}})' l4-vllm-$(ARM) 2>/dev/null || true
+
+down-l4-otel:
+	@docker compose -p l4-otel-tracing -f stack/l4-otel/docker-compose.tracing.yaml down >/dev/null 2>&1 || true
+	@docker compose -p l4-otel-base -f stack/l4-otel/docker-compose.base.yaml down >/dev/null 2>&1 || true
+	@echo "down: both l4-otel arms (the l4-phoenix-data volume is kept)"
+
+measure-l4-otel:
+	@uv run python -m measure.measure_l4 --endpoint $(ENDPOINT) --model $(MODEL) \
+	  --out-dir results/l4-otel
+
+verify-l4-otel:
+	@uv run python -m measure.verify_l4 --endpoint $(ENDPOINT) --model $(MODEL) \
+	  --scratch tmp/verify-l4-otel --findings results/l4-otel/findings.json
 
 clean:
 	@echo "cleaning scratch (results/ is never touched)"

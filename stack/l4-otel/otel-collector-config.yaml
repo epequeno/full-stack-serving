@@ -1,0 +1,25 @@
+# The L4 collector: one span per request arrives on OTLP gRPC (vLLM's default protocol,
+# v0.23.0 tracing/otel.py) and leaves two ways —
+#   - otlp/phoenix: the real backend (Arize Phoenix, ADR 0009's "all running for real")
+#   - file: every span also lands in tmp/l4-otel/spans/spans.json (NDJSON
+#     ExportTraceServiceRequest) — the pairing source for Finding 2. Scratch, gitignored;
+#     measure_l4 resets it before the matrix and reads it back after.
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+
+exporters:
+  otlp/phoenix:
+    endpoint: phoenix:4317
+    tls:
+      insecure: true
+  file:
+    path: /var/lib/otelcol/spans.json
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [otlp/phoenix, file]

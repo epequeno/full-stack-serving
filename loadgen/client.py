@@ -69,7 +69,8 @@ class RequestRecord:
     fixture_id: str
     set: str | None = None
     group: int | None = None
-    trace_id: str = ""
+    trace_id: str = ""                      # W3C trace id this request propagates (ADR 0009)
+    response_id: str | None = None          # the engine's id (chatcmpl-…), seen in every SSE chunk
     scheduled_ms: float | None = None   # relative to run start (open loop)
     sent_ms: float | None = None        # relative to run start
     sent_abs_ns: int | None = None
@@ -117,6 +118,8 @@ async def consume_stream(resp, rec: RequestRecord, started_ns: int, abs_times: b
                 continue
             choices = obj.get("choices") or [{}]
             delta = (choices[0] or {}).get("delta") or {}
+            if rec.response_id is None:
+                rec.response_id = obj.get("id")
             content = delta.get("content")
             u = obj.get("usage")
             if isinstance(u, dict):

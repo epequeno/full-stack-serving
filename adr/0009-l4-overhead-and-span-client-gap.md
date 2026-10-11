@@ -27,6 +27,16 @@ What vLLM emits (read 2026-10-09 from `vllm/v1/engine/output_processor.py` and
   semantic conventions", which does not settle it for the latency attributes. Check against the
   convention version in use at L4. The answer feeds the stability note.
 
+> **2026-10-11 addendum (pinned v0.23.0, read from the image):** the pairing premise above is
+> half wrong in the pinned version. `gen_ai.request.id` is the ENGINE's id (`chatcmpl-N`),
+> not the client's `X-Request-Id` — that header is response-side only
+> (`entrypoints/openai/engine/serving.py:392`). The client therefore records the engine id
+> from the SSE chunks (`response_id`, same value, seen by both sides) and pairs **by trace
+> id** — which v0.23.0 propagates from `traceparent` exactly as needed. Smoke 2026-10-11:
+> 16/16 paired, 0 mismatches, 0 duplicate trace ids. The stability note also has its
+> answer: the `gen_ai.latency.*` names are vLLM's own ("added until they are
+> standardized"), NOT part of the OTel GenAI semconv package.
+
 The original framing, "does span TTFT agree with client TTFT", is therefore the wrong question.
 They measure different intervals. The useful question is **how large the difference is, and
 what it is made of.**

@@ -1,0 +1,35 @@
+# L4, tracing-OFF arm — the identical engine to L0 (ADR 0012/0011, same flags as
+# stack/l0-local/docker-compose.yaml) with NO exporter configured. ADR 0009: "off" means
+# no OTLP endpoint; the client still sends traceparent in both arms, so only the server's
+# behaviour differs. This arm exists so the tracing arm's numbers have a same-day control.
+#
+# Bring-up: `make up LEVEL=l4-otel ARM=base` (measure_l4 also orchestrates it directly).
+services:
+  vllm:
+    image: vllm/vllm-openai:v0.23.0
+    # Same tag+digest as L0/L1 (stack/l0-local/docker-compose.yaml):
+    #   sha256:6d8429e38e3747723ca07ee1b17972e09bb9c51c4032b266f24fb1cc3b22ed8f
+    container_name: l4-vllm-base
+    ports:
+      - "8000:8000"
+    volumes:
+      # The L0 weights cache, reused — the model is identical and pinned by revision.
+      - hf-cache:/root/.cache/huggingface
+    cpuset: "0-15"  # ADR 0009: engine on one core set, Phoenix/collector on another
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    command: >
+      --model Qwen/Qwen2.5-1.5B-Instruct
+      --revision 989aa7980e4cf806f80c7fef2b1adb7bc71aa306
+      --dtype bfloat16
+      --max-model-len 4096
+      --gpu-memory-utilization 0.90
+volumes:
+  hf-cache:
+    name: l0-local_hf-cache
+    external: true
