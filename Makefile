@@ -24,7 +24,7 @@ CONTINUOUS_USAGE_BODY ?= {"stream_options": {"include_usage": true, "continuous_
 
 .DEFAULT_GOAL := help
 .PHONY: help doctor doctor-check inventory up down measure verify gate-log validate-instrument crosscheck clean status \
-        up-l0-local down-l0-local up-l1-k8s down-l1-k8s measure-l0-local measure-l1-k8s verify-l1-k8s \
+        up-l0-local down-l0-local up-l1-k8s down-l1-k8s measure-l0-local measure-l1-k8s verify-l1-k8s measure-open-l0 \
         up-l4-otel down-l4-otel measure-l4-otel verify-l4-otel
 
 help:
@@ -39,6 +39,7 @@ help:
 	@echo "  make validate-instrument  validate loadgen against the mock server (ADR 0007) → results/instrument/"
 	@echo "  make verify  LEVEL=<l>   re-measure into scratch; fail if a committed finding changes (L1+)"
 	@echo "  make gate-log LEVEL=<l>  run verify and commit its output to results/<l>/gates/ (ADR 0014)"
+	@echo "  make measure-open-l0     the ADR 0013 open-loop sweep at L0's endpoint → results/l0-local/open/ (needs the L0 server up)"
 	@echo "  make crosscheck          cross-check loadgen against vllm bench serve (ADR 0003) → results/instrument/ (needs the L0 server up)"
 	@echo "  make status              show what is currently built"
 	@echo ""
@@ -206,6 +207,13 @@ down-l1-k8s:
 measure-l0-local:
 	@uv run python -m measure.measure_l0 --endpoint $(ENDPOINT) --model $(MODEL) \
 	  --out-dir results/l0-local --continuous-usage-body '$(CONTINUOUS_USAGE_BODY)'
+
+# ADR 0013: the open-loop half, run at L0's endpoint as a supplementary experiment (NOT a
+# level). Same GPU/host; the committed closed-loop matrix stays the baseline L1 is
+# compared against (ADR 0008); open-loop results are never substituted into it.
+measure-open-l0:
+	@uv run python -m measure.measure_open --endpoint $(ENDPOINT) --model $(MODEL) \
+	  --out-dir results/l0-local/open
 
 # R=10 for L1 (ADR 0008's remedy): at R=5 the c=1 TTFT and c=16 ITL verdicts sat on
 # 0.003–0.015 ms margins — below the instrument's claimability bars (ADR 0007) — and

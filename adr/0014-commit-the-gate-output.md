@@ -1,6 +1,6 @@
 # 0014 — Commit the gate's output
 
-- **Status:** proposed
+- **Status:** accepted
 - **Date:** 2026-10-11
 
 ## Context
@@ -53,6 +53,10 @@ and it is silent about the record of the run itself.
   level is a change to this decision, which takes a new record — not a silent habit.
 - **L0 gets no log.** It is the baseline and commits no findings (ADR 0008), so there is nothing
   to gate; `tools/gate-log.sh` refuses the level rather than writing an empty file.
-- **Status.** This record is `proposed` and the mechanism ships with it, so the runbook can use
-  it. The owner accepts it when the first real log is committed (runbook step 1) — that log is
-  what tests the shape.
+- **Status.** Accepted 2026-10-11: the first real logs are committed
+  (`results/l1-k8s/gates/verify-2026-10-11T1802Z.txt` PASS;
+  `results/l4-otel/gates/verify-2026-10-11T1943Z.txt` PASS, plus two earlier invocation/infra
+  FAILs kept as evidence). The committed logs tested the shape, including the header's
+  uncommitted-path count and the FAIL path. Redaction at write time was added to
+  `tools/gate-log.sh` after the first logs carried absolute home paths (a private literal
+  under this repo's public-history rule).

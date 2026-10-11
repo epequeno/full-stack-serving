@@ -1,0 +1,1852 @@
+{
+ "schema": "l0-open/1",
+ "generated": "2026-10-11T17:33:27-05:00",
+ "tool": "python -m measure.measure_open",
+ "adr": "0013",
+ "note": "open-loop supplementary experiment at L0's endpoint \u2014 NOT a level, NOT comparable to the closed-loop matrix (coordinated omission applies to that matrix, not this); never substituted into the L0 baseline",
+ "protocol": {
+  "fixture": "loadgen/fixtures/distinct.jsonl",
+  "seed": 20261010,
+  "max_tokens": 128,
+  "ignore_eos": true,
+  "load_model": "open (seeded Poisson arrivals)",
+  "inflight_cap": 64,
+  "repeats": 5,
+  "rates_and_durations": [
+   {
+    "rate_req_s": 2.0,
+    "duration_s": 60.0
+   },
+   {
+    "rate_req_s": 4.0,
+    "duration_s": 40.0
+   },
+   {
+    "rate_req_s": 8.0,
+    "duration_s": 30.0
+   },
+   {
+    "rate_req_s": 16.0,
+    "duration_s": 30.0
+   },
+   {
+    "rate_req_s": 24.0,
+    "duration_s": 30.0
+   },
+   {
+    "rate_req_s": 32.0,
+    "duration_s": 30.0
+   }
+  ],
+  "lag_invalidity_rule": {
+   "definition": "lag = sent_ms \u2212 scheduled_ms per sent request; a run is INVALID if lag p50 > 100/\u03bb ms or lag p99 > 1000/\u03bb ms",
+   "bars_p50_ms": {
+    "2.0": 50.0,
+    "4.0": 25.0,
+    "8.0": 12.5,
+    "16.0": 6.25,
+    "24.0": 4.167,
+    "32.0": 3.125
+   },
+   "bars_p99_ms": {
+    "2.0": 500.0,
+    "4.0": 250.0,
+    "8.0": 125.0,
+    "16.0": 62.5,
+    "24.0": 41.667,
+    "32.0": 31.25
+   },
+   "declared": "before any open-loop data was taken (this file's constants, ADR 0013); invalid runs are reported, never re-run"
+  },
+  "expected_to_strain": "\u03bb=32 \u2014 declared in advance as the cell expected to go invalid; exercising the rule is part of validating the mode (ADR 0013)",
+  "interleaved_order": [
+   [
+    8.0,
+    4
+   ],
+   [
+    2.0,
+    3
+   ],
+   [
+    4.0,
+    1
+   ],
+   [
+    2.0,
+    2
+   ],
+   [
+    24.0,
+    0
+   ],
+   [
+    32.0,
+    1
+   ],
+   [
+    16.0,
+    4
+   ],
+   [
+    8.0,
+    3
+   ],
+   [
+    16.0,
+    1
+   ],
+   [
+    2.0,
+    4
+   ],
+   [
+    16.0,
+    3
+   ],
+   [
+    4.0,
+    4
+   ],
+   [
+    2.0,
+    0
+   ],
+   [
+    32.0,
+    3
+   ],
+   [
+    16.0,
+    0
+   ],
+   [
+    32.0,
+    2
+   ],
+   [
+    16.0,
+    2
+   ],
+   [
+    4.0,
+    0
+   ],
+   [
+    24.0,
+    4
+   ],
+   [
+    32.0,
+    4
+   ],
+   [
+    24.0,
+    2
+   ],
+   [
+    8.0,
+    2
+   ],
+   [
+    8.0,
+    0
+   ],
+   [
+    4.0,
+    3
+   ],
+   [
+    24.0,
+    3
+   ],
+   [
+    2.0,
+    1
+   ],
+   [
+    32.0,
+    0
+   ],
+   [
+    24.0,
+    1
+   ],
+   [
+    4.0,
+    2
+   ],
+   [
+    8.0,
+    1
+   ]
+  ],
+  "warmup": {
+   "discarded": true,
+   "rate": 4.0,
+   "duration": 10.0,
+   "summary": {
+    "requests_ok": 47,
+    "requests_error": 0,
+    "requests_refused": 0,
+    "tokens_out_total": 6016,
+    "tokens_per_s": 561.7,
+    "ttft_ms": {
+     "p50": 25.491099,
+     "p99": {
+      "n/a (n)": 47
+     }
+    },
+    "itl_event_ms": {
+     "p50": 6.470837500000016,
+     "p99": {
+      "n/a (n)": 47
+     }
+    },
+    "tpot_ms": {
+     "p50": 6.796319330708662,
+     "p99": {
+      "n/a (n)": 47
+     }
+    }
+   }
+  },
+  "percentile_floors": {
+   "p50": 30,
+   "p90": 100,
+   "p99": 1000,
+   "unit": "requests (ADR 0006)"
+  }
+ },
+ "env": {
+  "host": "saturn",
+  "kernel": "7.0.0-38-generic",
+  "gpu": {
+   "available": true,
+   "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+   "driver_version": "595.99.02",
+   "sm_clock_mhz": "2805",
+   "temp_c": "51",
+   "power_w": "84.51",
+   "mem_used_mib": "15136"
+  },
+  "server_version": "{\"version\":\"0.23.0\"}",
+  "server_image": "vllm/vllm-openai:v0.23.0",
+  "server_image_digest": "vllm/vllm-openai@sha256:6d8429e38e3747723ca07ee1b17972e09bb9c51c4032b266f24fb1cc3b22ed8f",
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "fixture": "loadgen/fixtures/distinct.jsonl",
+  "server_restarted_between_runs": false
+ },
+ "cells": {
+  "2": {
+   "rate_req_s": 2.0,
+   "duration_s": 60.0,
+   "repeats": 5,
+   "requests_arrived": 590,
+   "requests_ok": 590,
+   "requests_refused": 0,
+   "refused_share": 0.0,
+   "achieved_ok_per_s": {
+    "pooled": 1.97,
+    "per_run_min": 1.97,
+    "per_run_max": 1.97
+   },
+   "schedule_lag_pooled": {
+    "p50": 0.6860559304243452,
+    "p99": {
+     "n/a (n)": 590
+    },
+    "bar_p50_ms": 50.0,
+    "bar_p99_ms": 500.0
+   },
+   "verdicts": [
+    "valid",
+    "valid",
+    "valid",
+    "valid",
+    "valid"
+   ],
+   "wall_s_median": 58.883,
+   "requests_error": 0,
+   "pooled": {
+    "ttft_ms": {
+     "p50": 22.813249499999998,
+     "p99": {
+      "n/a (n)": 590
+     }
+    },
+    "itl_event_ms": {
+     "p50": 6.228710499999995,
+     "p99": {
+      "n/a (n)": 590
+     }
+    },
+    "tpot_ms": {
+     "p50": 6.232541614173228,
+     "p99": {
+      "n/a (n)": 590
+     }
+    }
+   },
+   "across_repeats": {
+    "ttft_p50_ms": {
+     "min": 22.305,
+     "median": 22.762,
+     "max": 23.37
+    },
+    "itl_p50_ms": {
+     "min": 6.197,
+     "median": 6.219,
+     "max": 6.26
+    },
+    "tpot_p50_ms": {
+     "min": 6.204,
+     "median": 6.236,
+     "max": 6.253
+    },
+    "tokens_per_s": {
+     "min": 256.5,
+     "median": 256.5,
+     "max": 256.5
+    },
+    "wall_s": {
+     "min": 58.879,
+     "median": 58.883,
+     "max": 58.889
+    }
+   }
+  },
+  "4": {
+   "rate_req_s": 4.0,
+   "duration_s": 40.0,
+   "repeats": 5,
+   "requests_arrived": 790,
+   "requests_ok": 790,
+   "requests_refused": 0,
+   "refused_share": 0.0,
+   "achieved_ok_per_s": {
+    "pooled": 3.95,
+    "per_run_min": 3.95,
+    "per_run_max": 3.95
+   },
+   "schedule_lag_pooled": {
+    "p50": 0.6323177254512302,
+    "p99": {
+     "n/a (n)": 790
+    },
+    "bar_p50_ms": 25.0,
+    "bar_p99_ms": 250.0
+   },
+   "verdicts": [
+    "valid",
+    "valid",
+    "valid",
+    "valid",
+    "valid"
+   ],
+   "wall_s_median": 40.733,
+   "requests_error": 0,
+   "pooled": {
+    "ttft_ms": {
+     "p50": 23.002636000000003,
+     "p99": {
+      "n/a (n)": 790
+     }
+    },
+    "itl_event_ms": {
+     "p50": 6.444678999999951,
+     "p99": {
+      "n/a (n)": 790
+     }
+    },
+    "tpot_ms": {
+     "p50": 6.486235263779529,
+     "p99": {
+      "n/a (n)": 790
+     }
+    }
+   },
+   "across_repeats": {
+    "ttft_p50_ms": {
+     "min": 22.55,
+     "median": 22.874,
+     "max": 23.586
+    },
+    "itl_p50_ms": {
+     "min": 6.421,
+     "median": 6.448,
+     "max": 6.476
+    },
+    "tpot_p50_ms": {
+     "min": 6.445,
+     "median": 6.491,
+     "max": 6.562
+    },
+    "tokens_per_s": {
+     "min": 496.5,
+     "median": 496.5,
+     "max": 496.8
+    },
+    "wall_s": {
+     "min": 40.708,
+     "median": 40.733,
+     "max": 40.737
+    }
+   }
+  },
+  "8": {
+   "rate_req_s": 8.0,
+   "duration_s": 30.0,
+   "repeats": 5,
+   "requests_arrived": 1135,
+   "requests_ok": 1135,
+   "requests_refused": 0,
+   "refused_share": 0.0,
+   "achieved_ok_per_s": {
+    "pooled": 7.57,
+    "per_run_min": 7.57,
+    "per_run_max": 7.57
+   },
+   "schedule_lag_pooled": {
+    "p50": 0.6220017432024179,
+    "p99": 1.2235846252721276,
+    "bar_p50_ms": 12.5,
+    "bar_p99_ms": 125.0
+   },
+   "verdicts": [
+    "valid",
+    "valid",
+    "valid",
+    "valid",
+    "valid"
+   ],
+   "wall_s_median": 30.733,
+   "requests_error": 0,
+   "pooled": {
+    "ttft_ms": {
+     "p50": 25.051458,
+     "p99": 127.07453670000001
+    },
+    "itl_event_ms": {
+     "p50": 6.763753999999992,
+     "p99": 52.14953239000001
+    },
+    "tpot_ms": {
+     "p50": 6.906761803149607,
+     "p99": 11.960219937952756
+    }
+   },
+   "across_repeats": {
+    "ttft_p50_ms": {
+     "min": 24.442,
+     "median": 25.441,
+     "max": 25.94
+    },
+    "itl_p50_ms": {
+     "min": 6.718,
+     "median": 6.767,
+     "max": 6.811
+    },
+    "tpot_p50_ms": {
+     "min": 6.847,
+     "median": 6.919,
+     "max": 6.96
+    },
+    "tokens_per_s": {
+     "min": 944.8,
+     "median": 945.4,
+     "max": 947.7
+    },
+    "wall_s": {
+     "min": 30.66,
+     "median": 30.733,
+     "max": 30.752
+    }
+   }
+  },
+  "16": {
+   "rate_req_s": 16.0,
+   "duration_s": 30.0,
+   "repeats": 5,
+   "requests_arrived": 2290,
+   "requests_ok": 2290,
+   "requests_refused": 0,
+   "refused_share": 0.0,
+   "achieved_ok_per_s": {
+    "pooled": 15.27,
+    "per_run_min": 15.27,
+    "per_run_max": 15.27
+   },
+   "schedule_lag_pooled": {
+    "p50": 0.6186372196876846,
+    "p99": 1.6062756514584726,
+    "bar_p50_ms": 6.25,
+    "bar_p99_ms": 62.5
+   },
+   "verdicts": [
+    "valid",
+    "valid",
+    "valid",
+    "valid",
+    "valid"
+   ],
+   "wall_s_median": 30.824,
+   "requests_error": 0,
+   "pooled": {
+    "ttft_ms": {
+     "p50": 28.994076999999997,
+     "p99": 194.31700503000002
+    },
+    "itl_event_ms": {
+     "p50": 7.633236000000068,
+     "p99": 62.21521285000001
+    },
+    "tpot_ms": {
+     "p50": 8.061338696850395,
+     "p99": 28.14984605283466
+    }
+   },
+   "across_repeats": {
+    "ttft_p50_ms": {
+     "min": 28.551,
+     "median": 28.882,
+     "max": 31.083
+    },
+    "itl_p50_ms": {
+     "min": 7.452,
+     "median": 7.632,
+     "max": 7.866
+    },
+    "tpot_p50_ms": {
+     "min": 7.75,
+     "median": 8.046,
+     "max": 8.425
+    },
+    "tokens_per_s": {
+     "min": 1901.8,
+     "median": 1901.9,
+     "max": 1901.9
+    },
+    "wall_s": {
+     "min": 30.823,
+     "median": 30.824,
+     "max": 30.826
+    }
+   }
+  },
+  "24": {
+   "rate_req_s": 24.0,
+   "duration_s": 30.0,
+   "repeats": 5,
+   "requests_arrived": 3425,
+   "requests_ok": 3301,
+   "requests_refused": 124,
+   "refused_share": 0.0362,
+   "achieved_ok_per_s": {
+    "pooled": 22.01,
+    "per_run_min": 21.23,
+    "per_run_max": 22.43
+   },
+   "schedule_lag_pooled": {
+    "p50": 0.6320099987970025,
+    "p99": 1.933411574240381,
+    "bar_p50_ms": 4.167,
+    "bar_p99_ms": 41.667
+   },
+   "verdicts": [
+    "valid",
+    "valid",
+    "valid",
+    "valid",
+    "valid"
+   ],
+   "wall_s_median": 30.958,
+   "requests_error": 0,
+   "pooled": {
+    "ttft_ms": {
+     "p50": 36.155478,
+     "p99": 395.249424
+    },
+    "itl_event_ms": {
+     "p50": 9.500744000000054,
+     "p99": 81.91543639000004
+    },
+    "tpot_ms": {
+     "p50": 10.493930094488189,
+     "p99": 29.333708370078735
+    }
+   },
+   "across_repeats": {
+    "ttft_p50_ms": {
+     "min": 35.268,
+     "median": 35.544,
+     "max": 39.067
+    },
+    "itl_p50_ms": {
+     "min": 9.115,
+     "median": 9.467,
+     "max": 10.006
+    },
+    "tpot_p50_ms": {
+     "min": 10.032,
+     "median": 10.383,
+     "max": 11.306
+    },
+    "tokens_per_s": {
+     "min": 2633.4,
+     "median": 2759.3,
+     "max": 2781.9
+    },
+    "wall_s": {
+     "min": 30.941,
+     "median": 30.958,
+     "max": 30.966
+    }
+   }
+  },
+  "32": {
+   "rate_req_s": 32.0,
+   "duration_s": 30.0,
+   "repeats": 5,
+   "requests_arrived": 4705,
+   "requests_ok": 3925,
+   "requests_refused": 780,
+   "refused_share": 0.1658,
+   "achieved_ok_per_s": {
+    "pooled": 26.17,
+    "per_run_min": 25.47,
+    "per_run_max": 26.6
+   },
+   "schedule_lag_pooled": {
+    "p50": 0.6529540284803002,
+    "p99": 2.0237482232163893,
+    "bar_p50_ms": 3.125,
+    "bar_p99_ms": 31.25
+   },
+   "verdicts": [
+    "valid",
+    "valid",
+    "valid",
+    "valid",
+    "valid"
+   ],
+   "wall_s_median": 31.238,
+   "requests_error": 0,
+   "pooled": {
+    "ttft_ms": {
+     "p50": 51.97515,
+     "p99": 349.3050398400006
+    },
+    "itl_event_ms": {
+     "p50": 12.06144849999987,
+     "p99": 90.26515582999983
+    },
+    "tpot_ms": {
+     "p50": 15.9496777007874,
+     "p99": 25.29277842362205
+    }
+   },
+   "across_repeats": {
+    "ttft_p50_ms": {
+     "min": 50.811,
+     "median": 51.853,
+     "max": 53.789
+    },
+    "itl_p50_ms": {
+     "min": 12.022,
+     "median": 12.063,
+     "max": 12.12
+    },
+    "tpot_p50_ms": {
+     "min": 15.227,
+     "median": 16.122,
+     "max": 17.305
+    },
+    "tokens_per_s": {
+     "min": 3131.2,
+     "median": 3249.9,
+     "max": 3269.9
+    },
+    "wall_s": {
+     "min": 31.216,
+     "median": 31.238,
+     "max": 31.311
+    }
+   }
+  }
+ },
+ "runs": [
+  {
+   "rate_req_s": 8.0,
+   "repeat": 4,
+   "n_arrived": 227,
+   "n_ok": 227,
+   "n_error": 0,
+   "n_refused": 0,
+   "wall_s": 30.733,
+   "tokens_per_s": 945.4,
+   "ttft_p50": 25.939512,
+   "itl_p50": 6.758320000000026,
+   "schedule_lag": {
+    "p50": 0.5684401087819424,
+    "p99": {
+     "n/a (n)": 227
+    },
+    "bar_p50_ms": 12.5,
+    "bar_p99_ms": 125.0
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "50",
+    "power_w": "193.75",
+    "mem_used_mib": "15141"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "52",
+    "power_w": "202.70",
+    "mem_used_mib": "15141"
+   }
+  },
+  {
+   "rate_req_s": 2.0,
+   "repeat": 3,
+   "n_arrived": 118,
+   "n_ok": 118,
+   "n_error": 0,
+   "n_refused": 0,
+   "wall_s": 58.881,
+   "tokens_per_s": 256.5,
+   "ttft_p50": 22.7381215,
+   "itl_p50": 6.19662350000003,
+   "schedule_lag": {
+    "p50": 0.7497345778829185,
+    "p99": {
+     "n/a (n)": 118
+    },
+    "bar_p50_ms": 50.0,
+    "bar_p99_ms": 500.0
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "52",
+    "power_w": "187.45",
+    "mem_used_mib": "15141"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "52",
+    "power_w": "212.42",
+    "mem_used_mib": "15141"
+   }
+  },
+  {
+   "rate_req_s": 4.0,
+   "repeat": 1,
+   "n_arrived": 158,
+   "n_ok": 158,
+   "n_error": 0,
+   "n_refused": 0,
+   "wall_s": 40.708,
+   "tokens_per_s": 496.8,
+   "ttft_p50": 22.756103500000002,
+   "itl_p50": 6.421137500000043,
+   "schedule_lag": {
+    "p50": 0.617541917071776,
+    "p99": {
+     "n/a (n)": 158
+    },
+    "bar_p50_ms": 25.0,
+    "bar_p99_ms": 250.0
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "52",
+    "power_w": "198.09",
+    "mem_used_mib": "15141"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "54",
+    "power_w": "194.58",
+    "mem_used_mib": "15141"
+   }
+  },
+  {
+   "rate_req_s": 2.0,
+   "repeat": 2,
+   "n_arrived": 118,
+   "n_ok": 118,
+   "n_error": 0,
+   "n_refused": 0,
+   "wall_s": 58.879,
+   "tokens_per_s": 256.5,
+   "ttft_p50": 22.922248500000002,
+   "itl_p50": 6.260022500000005,
+   "schedule_lag": {
+    "p50": 0.6728695990568667,
+    "p99": {
+     "n/a (n)": 118
+    },
+    "bar_p50_ms": 50.0,
+    "bar_p99_ms": 500.0
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "54",
+    "power_w": "185.20",
+    "mem_used_mib": "15141"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "53",
+    "power_w": "213.97",
+    "mem_used_mib": "15137"
+   }
+  },
+  {
+   "rate_req_s": 24.0,
+   "repeat": 0,
+   "n_arrived": 685,
+   "n_ok": 656,
+   "n_error": 0,
+   "n_refused": 29,
+   "wall_s": 30.949,
+   "tokens_per_s": 2713.1,
+   "ttft_p50": 39.0669135,
+   "itl_p50": 10.005892499999959,
+   "schedule_lag": {
+    "p50": 0.6475364601219553,
+    "p99": {
+     "n/a (n)": 656
+    },
+    "bar_p50_ms": 4.167,
+    "bar_p99_ms": 41.667
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "53",
+    "power_w": "213.97",
+    "mem_used_mib": "15137"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "55",
+    "power_w": "210.35",
+    "mem_used_mib": "15137"
+   }
+  },
+  {
+   "rate_req_s": 32.0,
+   "repeat": 1,
+   "n_arrived": 941,
+   "n_ok": 798,
+   "n_error": 0,
+   "n_refused": 143,
+   "wall_s": 31.238,
+   "tokens_per_s": 3269.9,
+   "ttft_p50": 51.8531095,
+   "itl_p50": 12.021796000000023,
+   "schedule_lag": {
+    "p50": 0.6569306455221522,
+    "p99": {
+     "n/a (n)": 798
+    },
+    "bar_p50_ms": 3.125,
+    "bar_p99_ms": 31.25
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "55",
+    "power_w": "194.58",
+    "mem_used_mib": "15137"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "57",
+    "power_w": "217.01",
+    "mem_used_mib": "15137"
+   }
+  },
+  {
+   "rate_req_s": 16.0,
+   "repeat": 4,
+   "n_arrived": 458,
+   "n_ok": 458,
+   "n_error": 0,
+   "n_refused": 0,
+   "wall_s": 30.823,
+   "tokens_per_s": 1901.9,
+   "ttft_p50": 28.88185,
+   "itl_p50": 7.6001944999999935,
+   "schedule_lag": {
+    "p50": 0.636341401403115,
+    "p99": {
+     "n/a (n)": 458
+    },
+    "bar_p50_ms": 6.25,
+    "bar_p99_ms": 62.5
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "57",
+    "power_w": "201.09",
+    "mem_used_mib": "15137"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "55",
+    "power_w": "196.51",
+    "mem_used_mib": "15137"
+   }
+  },
+  {
+   "rate_req_s": 8.0,
+   "repeat": 3,
+   "n_arrived": 227,
+   "n_ok": 227,
+   "n_error": 0,
+   "n_refused": 0,
+   "wall_s": 30.733,
+   "tokens_per_s": 945.4,
+   "ttft_p50": 24.504693,
+   "itl_p50": 6.717634499999974,
+   "schedule_lag": {
+    "p50": 0.636055136228606,
+    "p99": {
+     "n/a (n)": 227
+    },
+    "bar_p50_ms": 12.5,
+    "bar_p99_ms": 125.0
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "55",
+    "power_w": "196.51",
+    "mem_used_mib": "15137"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "55",
+    "power_w": "205.79",
+    "mem_used_mib": "15137"
+   }
+  },
+  {
+   "rate_req_s": 16.0,
+   "repeat": 1,
+   "n_arrived": 458,
+   "n_ok": 458,
+   "n_error": 0,
+   "n_refused": 0,
+   "wall_s": 30.824,
+   "tokens_per_s": 1901.9,
+   "ttft_p50": 28.551343,
+   "itl_p50": 7.452245499999989,
+   "schedule_lag": {
+    "p50": 0.6103467641680709,
+    "p99": {
+     "n/a (n)": 458
+    },
+    "bar_p50_ms": 6.25,
+    "bar_p99_ms": 62.5
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "55",
+    "power_w": "205.79",
+    "mem_used_mib": "15137"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "56",
+    "power_w": "191.62",
+    "mem_used_mib": "15137"
+   }
+  },
+  {
+   "rate_req_s": 2.0,
+   "repeat": 4,
+   "n_arrived": 118,
+   "n_ok": 118,
+   "n_error": 0,
+   "n_refused": 0,
+   "wall_s": 58.885,
+   "tokens_per_s": 256.5,
+   "ttft_p50": 23.3698775,
+   "itl_p50": 6.218865500000021,
+   "schedule_lag": {
+    "p50": 0.7663040461079618,
+    "p99": {
+     "n/a (n)": 118
+    },
+    "bar_p50_ms": 50.0,
+    "bar_p99_ms": 500.0
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "54",
+    "power_w": "191.62",
+    "mem_used_mib": "15137"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "56",
+    "power_w": "213.21",
+    "mem_used_mib": "15136"
+   }
+  },
+  {
+   "rate_req_s": 16.0,
+   "repeat": 3,
+   "n_arrived": 458,
+   "n_ok": 458,
+   "n_error": 0,
+   "n_refused": 0,
+   "wall_s": 30.824,
+   "tokens_per_s": 1901.9,
+   "ttft_p50": 28.7701285,
+   "itl_p50": 7.673350500000012,
+   "schedule_lag": {
+    "p50": 0.6111997012985739,
+    "p99": {
+     "n/a (n)": 458
+    },
+    "bar_p50_ms": 6.25,
+    "bar_p99_ms": 62.5
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "52",
+    "power_w": "205.02",
+    "mem_used_mib": "15136"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "55",
+    "power_w": "198.24",
+    "mem_used_mib": "15136"
+   }
+  },
+  {
+   "rate_req_s": 4.0,
+   "repeat": 4,
+   "n_arrived": 158,
+   "n_ok": 158,
+   "n_error": 0,
+   "n_refused": 0,
+   "wall_s": 40.735,
+   "tokens_per_s": 496.5,
+   "ttft_p50": 23.585504,
+   "itl_p50": 6.475759000000011,
+   "schedule_lag": {
+    "p50": 0.6561044135914926,
+    "p99": {
+     "n/a (n)": 158
+    },
+    "bar_p50_ms": 25.0,
+    "bar_p99_ms": 250.0
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "55",
+    "power_w": "198.24",
+    "mem_used_mib": "15136"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "56",
+    "power_w": "192.87",
+    "mem_used_mib": "15137"
+   }
+  },
+  {
+   "rate_req_s": 2.0,
+   "repeat": 0,
+   "n_arrived": 118,
+   "n_ok": 118,
+   "n_error": 0,
+   "n_refused": 0,
+   "wall_s": 58.889,
+   "tokens_per_s": 256.5,
+   "ttft_p50": 22.762265499999998,
+   "itl_p50": 6.247315499999999,
+   "schedule_lag": {
+    "p50": 0.6031225715451001,
+    "p99": {
+     "n/a (n)": 118
+    },
+    "bar_p50_ms": 50.0,
+    "bar_p99_ms": 500.0
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "56",
+    "power_w": "184.96",
+    "mem_used_mib": "15137"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "55",
+    "power_w": "214.31",
+    "mem_used_mib": "15136"
+   }
+  },
+  {
+   "rate_req_s": 32.0,
+   "repeat": 3,
+   "n_arrived": 941,
+   "n_ok": 793,
+   "n_error": 0,
+   "n_refused": 148,
+   "wall_s": 31.216,
+   "tokens_per_s": 3251.7,
+   "ttft_p50": 51.636416,
+   "itl_p50": 12.066379499999925,
+   "schedule_lag": {
+    "p50": 0.6515129073159187,
+    "p99": {
+     "n/a (n)": 793
+    },
+    "bar_p50_ms": 3.125,
+    "bar_p99_ms": 31.25
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "55",
+    "power_w": "203.26",
+    "mem_used_mib": "15136"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "56",
+    "power_w": "212.25",
+    "mem_used_mib": "15137"
+   }
+  },
+  {
+   "rate_req_s": 16.0,
+   "repeat": 0,
+   "n_arrived": 458,
+   "n_ok": 458,
+   "n_error": 0,
+   "n_refused": 0,
+   "wall_s": 30.826,
+   "tokens_per_s": 1901.8,
+   "ttft_p50": 31.0829245,
+   "itl_p50": 7.865935000000036,
+   "schedule_lag": {
+    "p50": 0.6424017909785107,
+    "p99": {
+     "n/a (n)": 458
+    },
+    "bar_p50_ms": 6.25,
+    "bar_p99_ms": 62.5
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "56",
+    "power_w": "212.25",
+    "mem_used_mib": "15137"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "57",
+    "power_w": "192.61",
+    "mem_used_mib": "15137"
+   }
+  },
+  {
+   "rate_req_s": 32.0,
+   "repeat": 2,
+   "n_arrived": 941,
+   "n_ok": 775,
+   "n_error": 0,
+   "n_refused": 166,
+   "wall_s": 31.249,
+   "tokens_per_s": 3174.5,
+   "ttft_p50": 50.811108,
+   "itl_p50": 12.063117000000148,
+   "schedule_lag": {
+    "p50": 0.6265555414470327,
+    "p99": {
+     "n/a (n)": 775
+    },
+    "bar_p50_ms": 3.125,
+    "bar_p99_ms": 31.25
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "55",
+    "power_w": "192.61",
+    "mem_used_mib": "15137"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "57",
+    "power_w": "209.32",
+    "mem_used_mib": "15137"
+   }
+  },
+  {
+   "rate_req_s": 16.0,
+   "repeat": 2,
+   "n_arrived": 458,
+   "n_ok": 458,
+   "n_error": 0,
+   "n_refused": 0,
+   "wall_s": 30.824,
+   "tokens_per_s": 1901.9,
+   "ttft_p50": 28.929917500000002,
+   "itl_p50": 7.632046500000058,
+   "schedule_lag": {
+    "p50": 0.6075090158083185,
+    "p99": {
+     "n/a (n)": 458
+    },
+    "bar_p50_ms": 6.25,
+    "bar_p99_ms": 62.5
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "56",
+    "power_w": "209.32",
+    "mem_used_mib": "15137"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "56",
+    "power_w": "202.38",
+    "mem_used_mib": "15137"
+   }
+  },
+  {
+   "rate_req_s": 4.0,
+   "repeat": 0,
+   "n_arrived": 158,
+   "n_ok": 158,
+   "n_error": 0,
+   "n_refused": 0,
+   "wall_s": 40.733,
+   "tokens_per_s": 496.5,
+   "ttft_p50": 22.873962,
+   "itl_p50": 6.451933000000025,
+   "schedule_lag": {
+    "p50": 0.6065156412132637,
+    "p99": {
+     "n/a (n)": 158
+    },
+    "bar_p50_ms": 25.0,
+    "bar_p99_ms": 250.0
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "56",
+    "power_w": "186.32",
+    "mem_used_mib": "15137"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "55",
+    "power_w": "192.86",
+    "mem_used_mib": "15136"
+   }
+  },
+  {
+   "rate_req_s": 24.0,
+   "repeat": 4,
+   "n_arrived": 685,
+   "n_ok": 637,
+   "n_error": 0,
+   "n_refused": 48,
+   "wall_s": 30.962,
+   "tokens_per_s": 2633.4,
+   "ttft_p50": 35.543513,
+   "itl_p50": 9.466714999999965,
+   "schedule_lag": {
+    "p50": 0.6289966487165657,
+    "p99": {
+     "n/a (n)": 637
+    },
+    "bar_p50_ms": 4.167,
+    "bar_p99_ms": 41.667
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "52",
+    "power_w": "184.24",
+    "mem_used_mib": "15136"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "57",
+    "power_w": "199.11",
+    "mem_used_mib": "15136"
+   }
+  },
+  {
+   "rate_req_s": 32.0,
+   "repeat": 4,
+   "n_arrived": 941,
+   "n_ok": 795,
+   "n_error": 0,
+   "n_refused": 146,
+   "wall_s": 31.311,
+   "tokens_per_s": 3249.9,
+   "ttft_p50": 52.399099,
+   "itl_p50": 12.051445999999942,
+   "schedule_lag": {
+    "p50": 0.6602091637760168,
+    "p99": {
+     "n/a (n)": 795
+    },
+    "bar_p50_ms": 3.125,
+    "bar_p99_ms": 31.25
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "55",
+    "power_w": "199.11",
+    "mem_used_mib": "15136"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "58",
+    "power_w": "208.01",
+    "mem_used_mib": "15134"
+   }
+  },
+  {
+   "rate_req_s": 24.0,
+   "repeat": 2,
+   "n_arrived": 685,
+   "n_ok": 673,
+   "n_error": 0,
+   "n_refused": 12,
+   "wall_s": 30.966,
+   "tokens_per_s": 2781.9,
+   "ttft_p50": 35.316755,
+   "itl_p50": 9.232867999999996,
+   "schedule_lag": {
+    "p50": 0.65941413618566,
+    "p99": {
+     "n/a (n)": 673
+    },
+    "bar_p50_ms": 4.167,
+    "bar_p99_ms": 41.667
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "57",
+    "power_w": "208.01",
+    "mem_used_mib": "15134"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "58",
+    "power_w": "205.93",
+    "mem_used_mib": "15134"
+   }
+  },
+  {
+   "rate_req_s": 8.0,
+   "repeat": 2,
+   "n_arrived": 227,
+   "n_ok": 227,
+   "n_error": 0,
+   "n_refused": 0,
+   "wall_s": 30.752,
+   "tokens_per_s": 944.8,
+   "ttft_p50": 25.440602,
+   "itl_p50": 6.811464500000014,
+   "schedule_lag": {
+    "p50": 0.6414536202210002,
+    "p99": {
+     "n/a (n)": 227
+    },
+    "bar_p50_ms": 12.5,
+    "bar_p99_ms": 125.0
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "56",
+    "power_w": "205.93",
+    "mem_used_mib": "15134"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "56",
+    "power_w": "204.19",
+    "mem_used_mib": "15136"
+   }
+  },
+  {
+   "rate_req_s": 8.0,
+   "repeat": 0,
+   "n_arrived": 227,
+   "n_ok": 227,
+   "n_error": 0,
+   "n_refused": 0,
+   "wall_s": 30.66,
+   "tokens_per_s": 947.7,
+   "ttft_p50": 24.442081,
+   "itl_p50": 6.775424500000014,
+   "schedule_lag": {
+    "p50": 0.6288817859458504,
+    "p99": {
+     "n/a (n)": 227
+    },
+    "bar_p50_ms": 12.5,
+    "bar_p99_ms": 125.0
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "54",
+    "power_w": "185.81",
+    "mem_used_mib": "15136"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "56",
+    "power_w": "193.61",
+    "mem_used_mib": "15136"
+   }
+  },
+  {
+   "rate_req_s": 4.0,
+   "repeat": 3,
+   "n_arrived": 158,
+   "n_ok": 158,
+   "n_error": 0,
+   "n_refused": 0,
+   "wall_s": 40.712,
+   "tokens_per_s": 496.8,
+   "ttft_p50": 22.549526,
+   "itl_p50": 6.4478969999999975,
+   "schedule_lag": {
+    "p50": 0.6547885628588119,
+    "p99": {
+     "n/a (n)": 158
+    },
+    "bar_p50_ms": 25.0,
+    "bar_p99_ms": 250.0
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "56",
+    "power_w": "185.79",
+    "mem_used_mib": "15136"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "57",
+    "power_w": "194.58",
+    "mem_used_mib": "15140"
+   }
+  },
+  {
+   "rate_req_s": 24.0,
+   "repeat": 3,
+   "n_arrived": 685,
+   "n_ok": 668,
+   "n_error": 0,
+   "n_refused": 17,
+   "wall_s": 30.958,
+   "tokens_per_s": 2762.0,
+   "ttft_p50": 35.2682805,
+   "itl_p50": 9.11507499999999,
+   "schedule_lag": {
+    "p50": 0.6188040810784514,
+    "p99": {
+     "n/a (n)": 668
+    },
+    "bar_p50_ms": 4.167,
+    "bar_p99_ms": 41.667
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "53",
+    "power_w": "187.20",
+    "mem_used_mib": "15140"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "57",
+    "power_w": "202.28",
+    "mem_used_mib": "15140"
+   }
+  },
+  {
+   "rate_req_s": 2.0,
+   "repeat": 1,
+   "n_arrived": 118,
+   "n_ok": 118,
+   "n_error": 0,
+   "n_refused": 0,
+   "wall_s": 58.883,
+   "tokens_per_s": 256.5,
+   "ttft_p50": 22.304650000000002,
+   "itl_p50": 6.2185945000000515,
+   "schedule_lag": {
+    "p50": 0.6462735996969968,
+    "p99": {
+     "n/a (n)": 118
+    },
+    "bar_p50_ms": 50.0,
+    "bar_p99_ms": 500.0
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "55",
+    "power_w": "202.28",
+    "mem_used_mib": "15140"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "57",
+    "power_w": "214.88",
+    "mem_used_mib": "15138"
+   }
+  },
+  {
+   "rate_req_s": 32.0,
+   "repeat": 0,
+   "n_arrived": 941,
+   "n_ok": 764,
+   "n_error": 0,
+   "n_refused": 177,
+   "wall_s": 31.231,
+   "tokens_per_s": 3131.2,
+   "ttft_p50": 53.7891225,
+   "itl_p50": 12.119668000000047,
+   "schedule_lag": {
+    "p50": 0.6656747107260799,
+    "p99": {
+     "n/a (n)": 764
+    },
+    "bar_p50_ms": 3.125,
+    "bar_p99_ms": 31.25
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "57",
+    "power_w": "205.60",
+    "mem_used_mib": "15138"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "57",
+    "power_w": "215.82",
+    "mem_used_mib": "15138"
+   }
+  },
+  {
+   "rate_req_s": 24.0,
+   "repeat": 1,
+   "n_arrived": 685,
+   "n_ok": 667,
+   "n_error": 0,
+   "n_refused": 18,
+   "wall_s": 30.941,
+   "tokens_per_s": 2759.3,
+   "ttft_p50": 36.519198,
+   "itl_p50": 9.488625999999897,
+   "schedule_lag": {
+    "p50": 0.6135790806838486,
+    "p99": {
+     "n/a (n)": 667
+    },
+    "bar_p50_ms": 4.167,
+    "bar_p99_ms": 41.667
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "57",
+    "power_w": "201.64",
+    "mem_used_mib": "15138"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "56",
+    "power_w": "209.04",
+    "mem_used_mib": "15138"
+   }
+  },
+  {
+   "rate_req_s": 4.0,
+   "repeat": 2,
+   "n_arrived": 158,
+   "n_ok": 158,
+   "n_error": 0,
+   "n_refused": 0,
+   "wall_s": 40.737,
+   "tokens_per_s": 496.5,
+   "ttft_p50": 23.232045999999997,
+   "itl_p50": 6.439176000000032,
+   "schedule_lag": {
+    "p50": 0.6333618141926536,
+    "p99": {
+     "n/a (n)": 158
+    },
+    "bar_p50_ms": 25.0,
+    "bar_p99_ms": 250.0
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "56",
+    "power_w": "209.04",
+    "mem_used_mib": "15138"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "55",
+    "power_w": "192.41",
+    "mem_used_mib": "15136"
+   }
+  },
+  {
+   "rate_req_s": 8.0,
+   "repeat": 1,
+   "n_arrived": 227,
+   "n_ok": 227,
+   "n_error": 0,
+   "n_refused": 0,
+   "wall_s": 30.73,
+   "tokens_per_s": 945.5,
+   "ttft_p50": 25.626028,
+   "itl_p50": 6.767143000000033,
+   "schedule_lag": {
+    "p50": 0.6175131802265241,
+    "p99": {
+     "n/a (n)": 227
+    },
+    "bar_p50_ms": 12.5,
+    "bar_p99_ms": 125.0
+   },
+   "verdict": "valid",
+   "gpu_start": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2805",
+    "temp_c": "55",
+    "power_w": "184.23",
+    "mem_used_mib": "15136"
+   },
+   "gpu_end": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "driver_version": "595.99.02",
+    "sm_clock_mhz": "2790",
+    "temp_c": "56",
+    "power_w": "206.29",
+    "mem_used_mib": "15136"
+   }
+  }
+ ],
+ "invalid_runs": [],
+ "failures": []
+}

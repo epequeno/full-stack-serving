@@ -71,3 +71,47 @@ the hits are the chat-template prefix every request shares — consistent with t
 2-word maximum shared prompt prefix. `distinct` defeats cross-prompt prefix caching:
 **verified** (`loadgen/fixtures/README.md`). A warm cache reads 98.7% (replay self-hits) —
 which is why the check runs first.
+
+## The open-loop half (full-stack-serving ADR 0013)
+
+**Not a level, and not comparable to the closed-loop matrix above.** The matrix holds
+concurrency fixed (1/4/16/64 in flight) and can never build a queue deeper than 64 — its
+c=64 cell measures what 64 coordinated requests do, not what offered load does (ADR 0004's
+own "closed-loop tails at saturation are understated"). This sweep holds the *schedule*
+fixed instead — seeded Poisson arrivals (seed 20261010, cap 64 in flight) at
+λ = 2/4/8/16/24/32 req/s, R=5 interleaved, same fixture/max_tokens/ignore_eos — so the
+independent variable is offered load, and saturation shows up in the data instead of being
+structurally unreachable. Data in [open/open.json](open/open.json), raw runs in
+[open/runs/](open/runs/); regenerate with `make measure-open-l0`.
+
+| λ (req/s) | ok | refused (share) | achieved ok/s | TTFT p50 (min/med/max, ms) | TTFT p99 pooled (ms) | ITL p50 (ms) | tok/s (median) | lag p50 (ms) |
+|---|---|---|---|---|---|---|---|---|
+| 2 | 590 | 0 (0%) | 1.97 | 22.31 / 22.76 / 23.37 | n/a (n=590) | 6.23 | 257 | 0.69 |
+| 4 | 790 | 0 (0%) | 3.95 | 22.55 / 22.87 / 23.59 | n/a (n=790) | 6.44 | 497 | 0.63 |
+| 8 | 1,135 | 0 (0%) | 7.57 | 24.44 / 25.44 / 25.94 | 127.07 | 6.76 | 945 | 0.62 |
+| 16 | 2,290 | 0 (0%) | 15.27 | 28.55 / 28.88 / 31.08 | 194.32 | 7.63 | 1,902 | 0.62 |
+| 24 | 3,301 | 124 (3.6%) | 22.01 | 35.27 / 35.54 / 39.07 | 395.25 | 9.50 | 2,759 | 0.63 |
+| 32 | 3,925 | 780 (16.6%) | 26.17 | 50.81 / 51.85 / 53.79 | 349.31 | 12.06 | 3,250 | 0.65 |
+
+Refused = arrivals the client refused rather than exceed the 64 in-flight cap — counted,
+never hidden. n for the floored percentiles is **requests** (ADR 0006: p99 needs 1000, so
+λ=2/4 pooled are n/a at n=590/790 < 1000, and the lag p99 is n/a there too).
+
+**Reading it (measured 2026-10-11, one server session, no restarts, 0 errors):**
+
+- **The server's open-loop ceiling is ≈ 26 ok/s (≈ 3,250 tok/s)**: offered 32 req/s, it
+  completed 26.17/s and the client refused 16.6% of arrivals at the cap. The knee is between
+  λ=16 (15.27 ok/s achieved, 96% of offered, 0 refusals) and λ=24 (22.01, 92%, first
+  refusals).
+- **The queue the closed-loop matrix cannot build is visible**: TTFT p50 rises smoothly
+  22.8 → 52.0 ms across the sweep while ITL p50 only 6.2 → 12.1 ms — arrival queueing lands
+  in TTFT, not decode — and the pooled TTFT p99 swells **127 → 395 ms** from λ=8 to λ=24,
+  the tail-under-offered-load that ADR 0004 said closed loop understates. This is the second
+  view ADR 0013 wanted for L4's span-to-client gap finding: the tail bends exactly where the
+  unspanned path (HTTP frontend, event loop, SSE) was said to queue.
+- **The lag rule never fired — 30/30 runs valid.** Lag p50 is 0.61–0.67 ms at every cell,
+  50–80× under its bar (100/λ ms), because saturation shows as *refusals at the cap*, not
+  schedule lag: the harness kept the schedule everywhere, so the λ=32 numbers are server
+  behaviour, not client behaviour. The pre-declared rule (bars in
+  `open.json`'s protocol block, fixed before the data) is exercised in the code path but
+  never needed on this hardware — recorded, not tuned away (ADR 0013).

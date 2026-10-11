@@ -1,7 +1,8 @@
 # 0013 — Run the open-loop half at L0
 
-- **Status:** proposed
-- **Date:** 2026-10-11
+- **Status:** accepted
+- **Date:** 2026-10-11 (accepted 2026-10-11 — the sweep ran: 30/30 runs valid under the
+  pre-declared lag rule, saturation visible as refusals, not lag; `results/l0-local/open/`)
 
 ## Context
 

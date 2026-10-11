@@ -36,7 +36,12 @@ ITL and throughput agree at every cell (|Δ| ≤ 0.03 ms, ≤ 0.1 req/s); TTFT i
 directionally, clearing the ADR 0007 bar at c=16 (−50 ms, −2.7 × bar) — the reported
 disagreement, not tuned away. **0004 is `superseded by 0013`**: its open-loop level assignment no
 longer holds, while its closed-loop assignment for L0/L1 carries forward and is restated in 0013.
-**0013 is `proposed`.** The vendored `tools/host-inventory.sh` is canonically owned by the
+**0013 was accepted 2026-10-11** — the open-loop sweep ran at L0's endpoint (step 4, done):
+seeded Poisson arrivals at λ = 2/4/8/16/24/32 req/s, R=5 interleaved, 30/30 runs valid under
+the pre-declared lag rule (0 refused hidden numbers: refusals 0 → 780 as λ crosses the
+server's ≈ 26 ok/s ceiling; TTFT p99 swells 127 → 395 ms, the tail ADR 0004 said closed loop
+understates). `results/l0-local/open/`, rendered in the L0 README. The vendored
+`tools/host-inventory.sh` is canonically owned by the
 sibling project `epequeno/ebpf-inference-observability` (public, and it runs its serving leg on
 this repo's `make up LEVEL=l0-local`).
 
@@ -52,9 +57,10 @@ them in exactly this situation. The cut order (L5 → L3 → L2) now applies to 
 
 What remains is single-machine, and it runs on **saturn** (the Linux GPU host). This repo is
 the interface to that work, and this section is the runbook: one GPU, one owner at a time
-(`make status`, then `make down LEVEL=<l>` when you stop). Steps 1 and 2 are done (records
-below); step 3's checks are standing and re-run after every push; step 4 is the next
-actionable work. Nothing below needs a second machine, and nothing below is L2/L3/L5.
+(`make status`, then `make down LEVEL=<l>` when you stop). **All four steps are done** —
+records below; step 3's checks are standing and re-run after every push. The repo is
+public, gated, twice-validated and fully swept: no actionable work remains on the current
+single-GPU plan. New work starts from a new decision, not from this runbook.
 
 **A clone made before 2026-10-11 is stale** — history was rewritten that day (step 3). Delete it
 and re-clone: `git clone git@github.com:epequeno/full-stack-serving.git`
@@ -123,12 +129,20 @@ path; fixed at write time in `tools/gate-log.sh`, see step 1). In order:
 must be re-cloned rather than pulled. No document in this repo cites an internal SHA, so nothing
 internal broke. A pre-rewrite bundle is kept outside this repo, locally, and was never pushed.
 
-### 4. ADR 0013, open loop at L0 — the next actionable work
+### 4. ADR 0013, open loop at L0 — DONE 2026-10-11, ADR 0013 accepted
 
-`adr/0013-open-loop-at-l0.md` (proposed) records the decision. The harness already implements open
-loop (`loadgen/client.py --mode open`); no target runs it. It is single-machine and unblocked by
-L2/L3. It is a **new experiment**, not part of wrapping up — and steps 1–3 are done, so it is
-unblocked: the next session that takes the GPU starts here.
+`make measure-open-l0` (new; `measure/measure_open.py`) ran the sweep at L0's endpoint:
+seeded Poisson arrivals (seed 20261010, cap 64 in flight) at λ = 2/4/8/16/24/32 req/s,
+R=5 interleaved, warmup discarded and counted, GPU/counters captured per run. **30/30
+runs valid** under the lag rule pre-declared in `open.json`'s protocol block (lag p50
+0.61–0.67 ms, 50–80× under its bars — saturation showed as refusals at the cap, never
+schedule lag, so the λ numbers are server behaviour). The consequence ADR 0004 left
+unmeasured is measured: the server's open-loop ceiling is ≈ 26 ok/s (offered 32, refused
+16.6% at the cap), TTFT p50 rises 22.8 → 52.0 ms while ITL p50 only 6.2 → 12.1, and the
+pooled TTFT p99 swells 127 → 395 ms — the tail-under-offered-load that closed loop
+structurally understates, and the second view ADR 0013 wanted for L4's span-gap finding.
+`results/l0-local/open/` (data + raw runs), rendered in the L0 README; never substituted
+into the closed-loop baseline.
 
 ## Rules
 

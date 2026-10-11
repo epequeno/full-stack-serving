@@ -118,16 +118,16 @@ long-lived GPU instance idle over a weekend.
 
 ## Methodology
 
-The measurement choices are decided in ADRs. L0 tested their assumptions and L1 ran the gate,
-so 0005, 0006, 0007, 0008 and 0010 are `accepted` alongside 0001, 0002, 0011 and 0012;
-0003's `vllm bench serve` cross-check and 0004's open-loop half remain `proposed` until
-they run:
+The measurement choices are decided in ADRs. L0 tested their assumptions, L1 ran the gate,
+L4 measured the observability layer, and the instrument is twice-validated (0003's
+`vllm bench serve` cross-check ran 2026-10-11) — so every ADR through 0013 is `accepted`
+except where marked below, and 0004 is `superseded by 0013`:
 
 | ADR | Decision |
 |---|---|
 | 0002 | Size the workload for observability, not capability (accepted) |
-| 0003 | Build the load generator; cross-check it against `vllm bench serve` |
-| 0004 | Closed loop for L0/L1, open loop for L2/L3 |
+| 0003 | Build the load generator; cross-check it against `vllm bench serve` (accepted — cross-check ran 2026-10-11) |
+| 0004 | Closed loop for L0/L1, open loop for L2/L3 (superseded by 0013) |
 | 0005 | Record ITL per SSE event, report TPOT separately (accepted) |
 | 0006 | Percentile floors on request count; interleaved repeats per cell (accepted) |
 | 0007 | Validate the load generator against a mock server with a logged schedule (accepted — claimability bars fixed) |
@@ -136,6 +136,8 @@ they run:
 | 0010 | k3s for L1 (accepted) |
 | 0011 | Model: Qwen2.5-1.5B-Instruct, bf16, unquantized (accepted) |
 | 0012 | Engine: vLLM (official image, tag pinned) (accepted) |
+| 0013 | Run the open-loop half at L0 as a supplementary experiment, not a level (accepted — swept 2026-10-11) |
+| 0014 | Commit the gate's output to results/<level>/gates/ (accepted — logs committed 2026-10-11) |
 
 `loadgen/` and `measure/` are shared across levels by design: the same measurement applied to each
 layer is what makes the levels comparable. The per-level directory layout is in
