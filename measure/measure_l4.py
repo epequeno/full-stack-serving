@@ -192,6 +192,21 @@ def run_arm(arm: str, out_dir: Path, *, endpoint: str, model: str, fixture: str,
             warmup_concurrency: int) -> dict:
     """One arm end-to-end: compose up → warmup → interleaved matrix → compose down."""
     endpoint_root = endpoint.rsplit("/v1/", 1)[0]
+    if arm == "tracing":
+        # The collector runs as host uid 1000 (compose user:) and writes spans.json
+        # through this bind mount. Create it host-owned BEFORE compose up: Docker
+        # auto-creates a missing bind-mount source root:root, which the collector
+        # can never write into — spans.json never appears, and settle_spans dies
+        # on FileNotFoundError after the whole matrix has run.
+        SPAN_FILE.parent.mkdir(parents=True, exist_ok=True)
+        probe = SPAN_FILE.parent / ".write-probe"
+        try:
+            probe.write_text("", encoding="utf-8")
+        except PermissionError:
+            raise SystemExit(f"measure-l4: {SPAN_FILE.parent} exists but is not writable "
+                             "by this user (root-owned from a docker auto-create?). Fix: "
+                             f"sudo chown -R 1000:1000 {SPAN_FILE.parent}, then re-run.")
+        probe.unlink()
     compose(arm, "up", "-d")
     try:
         if not wait_ready(endpoint_root):
