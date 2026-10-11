@@ -1,6 +1,6 @@
 # 0004 — Closed-loop load for L0/L1, open-loop load for L2/L3
 
-- **Status:** proposed
+- **Status:** superseded by [0013](0013-open-loop-at-l0.md)
 - **Date:** 2026-10-09
 
 ## Context

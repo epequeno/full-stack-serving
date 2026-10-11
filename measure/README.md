@@ -1,7 +1,8 @@
 # measure — regenerating the evidence
 
-**Status: implemented for L0 and L1** (`make measure LEVEL=l0-local|l1-k8s`; the L1 gate:
-`make verify LEVEL=l1-k8s`).
+**Status: implemented and measured for L0, L1 and L4** (`make measure
+LEVEL=l0-local|l1-k8s|l4-otel`; gates: `make verify LEVEL=l1-k8s` and `LEVEL=l4-otel`). L2, L3
+and L5 are not implemented — the `Makefile` fails loudly rather than pretending.
 
 | piece | what |
 |---|---|
@@ -13,8 +14,9 @@
 | `measure/measure_l4.py` | the L4 experiment: **two arms over the identical engine** — `base` (no exporter, the control) and `tracing` (`--otlp-traces-endpoint` → collector → Phoenix, all real) — run sequentially (one GPU; base first, the order is a recorded confound), each arm the L0 protocol (same fixture/seed/interleaved order, R=5). Finding 1: tracing-overhead verdicts (ADR 0008 sign rule) with ADR 0007 claimability bars; Finding 2: the span-to-client TTFT gap, paired by trace id (loadgen's `trace_id`) with the engine's `gen_ai.request.id` == the client-recorded `response_id` as the cross-check — v0.23.0 does NOT echo `X-Request-Id` into the span. Coverage per cell vs the committed 98% floor (ADR 0009). → `results/l4-otel/`. |
 | `measure/verify_l4.py` | the ADR 0008 gate for L4: re-runs `measure_l4.run_level` into scratch (never `results/`) with the committed protocol; HARD on claimable findings (ADR 0007 bar), sub-bar flips reported as information, low-coverage gap cells flagged INVALID (never gated), SOFT on absolute medians vs the tolerance declared at measure time, skipped on image-digest or GPU drift (`latest`-tagged Phoenix/collector make digest drift a live possibility). |
 
-The raw JSON is the artifact; [`results/l0-local/README.md`](../results/l0-local/README.md)
-and [`results/l1-k8s/README.md`](../results/l1-k8s/README.md) render the committed data as
+The raw JSON is the artifact; [`results/l0-local/README.md`](../results/l0-local/README.md),
+[`results/l1-k8s/README.md`](../results/l1-k8s/README.md) and
+[`results/l4-otel/README.md`](../results/l4-otel/README.md) render the committed data as
 tables. Four cells per level don't warrant a chart — the JSON is the data, and the tables
 are its view.
 `make verify` (ADR 0008) starts at L1 — L0 is the baseline and commits no findings.
@@ -60,6 +62,12 @@ Keeping them apart means the same instrument is applied to every layer, which is
 - **`make verify` never writes to `results/`.** It measures into scratch and compares against the
   committed `findings.json`; it fails only if a finding's verdict changes (full-stack-serving
   ADR 0008). Regenerating evidence stays an explicit `make measure`.
+- **The gate's own output is committed, by a different target.** `make verify` staying
+  read-only left the repo's central claim uncheckable from a checkout: every PASS was asserted
+  in prose and never written down. `make gate-log LEVEL=<l>` runs the same verify and tees it to
+  `results/<level>/gates/verify-<date>.txt`. That log is an **audit record, not measurement** —
+  nothing reads it, no number is taken from it, and it is the one thing written under `results/`
+  that `make measure` does not regenerate (full-stack-serving ADR 0014).
 
 ## Sampling (full-stack-serving ADR 0006)
 

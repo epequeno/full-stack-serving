@@ -7,7 +7,11 @@
 # pretending. uv syncs the Python env automatically on first use.
 
 LEVEL ?= l0-local
-LEVELS := l0-local l1-k8s l2-routing l3-autoscaling l4-observability l5-multinode
+# Names are load-bearing: LEVEL=<l> maps to stack/<l>/ and results/<l>/ (stack/README.md).
+# l2-routing, l3-autoscaling and l5-multinode are placeholders for the cut levels, listed so
+# `make status` and `make help` show them as empty rather than hiding them. The implemented
+# levels are exactly l0-local, l1-k8s and l4-otel.
+LEVELS := l0-local l1-k8s l2-routing l3-autoscaling l4-otel l5-multinode
 
 INVENTORY_SRC ?= $(HOME)/code/ebpf-inference-observability/tools/host-inventory.sh
 INVENTORY_OUT ?= results/l0-local/host-inventory.md
@@ -18,7 +22,7 @@ MODEL ?= Qwen/Qwen2.5-1.5B-Instruct
 CONTINUOUS_USAGE_BODY ?= {"stream_options": {"include_usage": true, "continuous_usage_stats": true}}
 
 .DEFAULT_GOAL := help
-.PHONY: help doctor doctor-check inventory up down measure verify validate-instrument clean status \
+.PHONY: help doctor doctor-check inventory up down measure verify gate-log validate-instrument clean status \
         up-l0-local down-l0-local up-l1-k8s down-l1-k8s measure-l0-local measure-l1-k8s verify-l1-k8s \
         up-l4-otel down-l4-otel measure-l4-otel verify-l4-otel
 
@@ -33,6 +37,7 @@ help:
 	@echo "  make measure LEVEL=<l>   regenerate results/<l>/ from scratch"
 	@echo "  make validate-instrument  validate loadgen against the mock server (ADR 0007) → results/instrument/"
 	@echo "  make verify  LEVEL=<l>   re-measure into scratch; fail if a committed finding changes (L1+)"
+	@echo "  make gate-log LEVEL=<l>  run verify and commit its output to results/<l>/gates/ (ADR 0014)"
 	@echo "  make status              show what is currently built"
 	@echo ""
 	@echo "  levels: $(LEVELS)"
@@ -149,6 +154,13 @@ verify:
 	  l0-local) echo "make verify LEVEL=l0-local: nothing to verify — L0 is the baseline and commits no findings (ADR 0008)." >&2; exit 1 ;; \
 	  *) echo "make verify LEVEL=$(LEVEL): not implemented (L2, L3, L5)." >&2; exit 1 ;; \
 	esac
+
+# ADR 0014: commit the gate's output. The one thing written under results/ that `make
+# measure` does not regenerate — an audit record, never an input to a number. `make verify`
+# itself stays read-only (ADR 0008); tools/gate-log.sh runs it and tees.
+GATE_LOG_DIR ?= gates
+gate-log:
+	@tools/gate-log.sh "$(LEVEL)" "results/$(LEVEL)/$(GATE_LOG_DIR)"
 
 up-l0-local:
 	@docker compose -f stack/l0-local/docker-compose.yaml up -d

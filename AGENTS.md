@@ -29,9 +29,12 @@ reasoning. Decisions the stack forced live in `adr/`.
   so the unspanned path (HTTP frontend, event loop, SSE) queues under load — recorded,
   none of it claimable (all sub-bar). Committed pair in `results/l4-otel/trace-example.json`.
 
-ADRs 0005–0010 and 0012 are accepted (0003's cross-check and 0004's open-loop half stay
-proposed). The sibling eBPF observability project has its live serving stack
-(`make up LEVEL=l0-local`).
+ADRs 0001, 0002 and 0005–0012 are accepted. **0003 is still `proposed`** — its cross-check has
+never run (step 2 below). **0004 is `superseded by 0013`**: its open-loop level assignment no
+longer holds, while its closed-loop assignment for L0/L1 carries forward and is restated in 0013.
+**0013 is `proposed`.** The vendored `tools/host-inventory.sh` is canonically owned by the
+sibling project `epequeno/ebpf-inference-observability` (public, and it runs its serving leg on
+this repo's `make up LEVEL=l0-local`).
 
 ## Next action
 
@@ -42,9 +45,33 @@ a second node plus metered GPU; there is one GPU and no second system is being p
 order (L5 → L3 → L2) now applies to the whole set. One GPU, one owner at a time:
 `make down LEVEL=l4-otel` (already down, verified).
 
-What remains is single-machine. In order:
+What remains is single-machine, and it runs on **saturn** (the Linux GPU host). This repo is the
+interface to that work, and this section is the runbook: one GPU, one owner at a time (`make
+status`, then `make down LEVEL=<l>` when you stop), ordered so the repo becomes publishable
+soonest. Nothing below needs a second machine, and nothing below is L2/L3/L5.
 
-### 1. The ADR 0003 cross-check (do this first)
+**A clone made before 2026-10-11 is stale** — history was rewritten that day (step 3). Delete it
+and re-clone: `git clone git@github.com:epequeno/full-stack-serving.git`
+
+### 1. Commit the gate evidence (`make gate-log`)
+
+Every PASS in this repo is asserted in prose and written down nowhere, because `make verify` is
+read-only by design (ADR 0008). `make gate-log` runs the same gate and commits its output, so the
+central claim becomes checkable from a checkout instead of trusted (ADR 0014).
+
+    make down LEVEL=l4-otel           # one GPU — confirm nothing else is on it first
+    make gate-log LEVEL=l1-k8s        # re-runs the whole L1 matrix into tmp/verify-l1-k8s
+    make gate-log LEVEL=l4-otel       # re-runs both L4 arms, base then tracing
+    git add results/l1-k8s/gates results/l4-otel/gates
+    git commit -m "gate: commit the verify output for L1 and L4"
+
+**Accept:** each level has `results/<level>/gates/verify-<timestamp>.txt` whose last line is
+`result: PASS` and whose header names the commit it ran against. **Cost:** a full re-run of that
+level's matrix — budget it exactly like `make measure`; ADR 0006's time cap is the real limit.
+**A FAIL is a result, not a mistake:** commit the log either way. ADR 0008's remedy is more runs
+per cell or a restated finding — never a loosened rule.
+
+### 2. The ADR 0003 cross-check (do this before publishing; ~half a day)
 
 **full-stack-serving ADR 0003** is `proposed` and its one deliverable has never been run: the
 custom client has never been compared against an independent instrument. Every number in this
@@ -77,68 +104,42 @@ format. Getting it to consume *our* fixture (custom dataset path, and matching t
 say so in the result and report what was compared instead — a stated mismatch beats a silently
 different workload.
 
-### 2. Fix the framing seams a review found
+### 3. Publish
 
-Four small doc fixes, all of them places where the prose is slightly stronger than the evidence:
+The repo is **public** as of 2026-10-11 (`github.com/epequeno/full-stack-serving`). Everything
+committed is world-readable from now on. The pre-flight, in order:
 
-- **The pitch line.** `README.md` opens *"A complete LLM serving stack — container → Kubernetes →
-  inference-aware routing → autoscaling → observability"* while L2 and L3 are cut. The status
-  line says so; the pitch line reads as a description of the artifact. Soften it so the unbuilt
-  layers are not claimed in the first sentence a reviewer reads.
-- **Declare the aggregation.** `results/l1-k8s/README.md`'s matrix is **pooled across repeats**,
-  while `findings.json` and the verdicts use the **median of per-run medians**. At c=4 TTFT the
-  two differ by 1.2 ms — more than the declared soft tolerance. Label the table and note where
-  the methods diverge. Same for L4's gap column (12.37 pooled vs 19.67 median-of-run-medians at
-  c=64).
-- **L4's `client > span` sentence.** It says the prediction holds "everywhere" directly under a
-  table that reads `indistinguishable` at c=4/16/64. The basis is the per-request minimum gap,
-  which is sound — but the sentence reuses the verdict string. Say which of the two it means.
-- **L4's arm order.** Base ran first, tracing second, and the one separated overhead verdict
-  points the *wrong* way — so the two arms cannot separate tracing cost from drift, and the drift
-  direction favours the tracing arm. State that as a limitation of the overhead finding, not a
-  footnote.
+1. **History carries no private literals.** History was rewritten on 2026-10-11
+   (`git filter-repo --replace-text`, plus a corrected commit message) to strip the host's LAN and
+   gateway addresses, the wireless interface name, and the absolute home paths that earlier commits
+   had committed. Re-verify after any further commit:
 
-### 3. Make the gate auditable
+       git log --all -p | grep -nE '(^|[^0-9])(192\.168\.[0-9]{1,3}\.[0-9]{1,3}|172\.(1[6-9]|2[0-9]|3[01])\.[0-9]{1,3}\.[0-9]{1,3}|10\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})'
+       git log --all -p | grep -nE '/home/[a-z]+|/Users/[a-z]+|dev wl[a-z0-9]+'
 
-Every PASS (`make verify LEVEL=l1-k8s`, `LEVEL=l4-otel`) is asserted and never committed —
-`verify` writes to scratch by design. Commit the verify output for the levels that have been
-gated, so the repo's central claim is checkable from a checkout rather than trusted.
+   Expect nothing. This is also why `make inventory` redacts at generation time (section *Rules*):
+   a regenerated report must not put the values back. The vendored script itself stays
+   byte-identical, so `tools/HOST-INVENTORY.source`'s sha256 still detects real drift.
+2. **Planning context was never committed.** `docs/PRIVATE-context.md` is gitignored, and the
+   2026-10-09 squash removed the commits that had contained it:
 
-### 4. Then, if there is appetite — ADR 0013, open loop at L0
+       git log --all -p -- docs/PRIVATE-context.md                            # expect nothing
+       git grep -n -e 'build seq' -e 'job-search' $(git rev-list --all) -- . ':!AGENTS.md'
 
-`adr/0013-open-loop-at-l0.md` (proposed) records the decision. The harness already implements
-open loop; no target runs it. It is single-machine and unblocked by L2/L3. It is a **new
-experiment**, not part of wrapping up — do not start it before the pre-public checklist below is
+3. **The sibling project is public too**, so naming it is not a disclosure. `Makefile` and
+   `tools/HOST-INVENTORY.source` name `ebpf-inference-observability`, which is public
+   (`github.com/epequeno/ebpf-inference-observability`) and already cross-references this repo.
+
+**What the rewrite cost.** Every commit SHA changed, so any existing clone — saturn's included —
+must be re-cloned rather than pulled. No document in this repo cites an internal SHA, so nothing
+internal broke. A pre-rewrite bundle is kept outside this repo, locally, and was never pushed.
+
+### 4. ADR 0013, open loop at L0 — only after steps 1–3
+
+`adr/0013-open-loop-at-l0.md` (proposed) records the decision. The harness already implements open
+loop (`loadgen/client.py --mode open`); no target runs it. It is single-machine and unblocked by
+L2/L3. It is a **new experiment**, not part of wrapping up — do not start it before steps 1–3 are
 done.
-
-### 5. Before publishing
-
-Run the two checks in the rules above (both currently pass — verified 2026-10-11):
-`git log --all -p -- docs/PRIVATE-context.md` and the `git grep` for `build seq` / `job-search`.
-History was squashed on 2026-10-09 for this reason; re-verify before flipping visibility.
-
-**Working-tree redactions (applied 2026-10-11).** Private IPv4 addresses and the wireless
-interface name are redacted in `results/l0-local/host-inventory.md`, and `make inventory` now
-redacts them at generation time — the vendored script is left byte-identical so
-`tools/HOST-INVENTORY.source`'s sha256 still detects real drift. The absolute host path is gone
-from `results/l1-k8s/l1.json` (`baseline.runs`, now repo-relative) and from
-`tools/HOST-INVENTORY.source`. No MACs, keys, tokens or serials were found anywhere in the tree.
-
-**Still in history, and the redactions do not fix it.** The host's LAN and gateway addresses
-(commit `086634b`) and the absolute `/home/<user>` path (commits `086634b`, `6fe8112`,
-`46616d5`) remain visible in `git log -p`.
-Redacting the working tree does not remove them, and a public repo exposes them through history.
-Two options:
-
-- **Rewrite history** with `git filter-repo` before flipping visibility. Cheap here — no doc in
-  this repo cites an internal commit SHA, so nothing breaks internally. Note that saturn's clone
-  must be re-cloned rather than pulled.
-- **Accept it.** RFC1918 addresses are not routable from the internet and the local username is
-  already public elsewhere. This is a defensible call.
-
-**Owner's decision, not a default.** Also note the sibling project (`ebpf-inference-observability`)
-is named in `tools/host-inventory.sh` and `tools/HOST-INVENTORY.source`; publishing reveals that
-connection, which is a separate choice.
 
 ## Rules
 
@@ -162,13 +163,11 @@ recorded in `results/l5-multinode/cost.md`. No instance idles.
 **`results/` is committed. Scratch is not.** Anything that cannot be regenerated by
 `make measure` should not be in `results/`.
 
-**The repo is private** (`epequeno/full-stack-serving` on GitHub, pushed 2026-10-09). Do not make it
-public without the owner saying so. `docs/PRIVATE-context.md` is gitignored planning material and
-must never be committed. History was squashed on 2026-10-09 to remove earlier commits that
-contained it. Before making the repo public, confirm with
-`git log --all -p -- docs/PRIVATE-context.md` (expect nothing) and
-`git grep -n -e 'build seq' -e 'job-search' $(git rev-list --all) -- . ':!AGENTS.md'` (expect
-nothing).
+**The repo is public** (`epequeno/full-stack-serving`, public since 2026-10-11). Treat every
+commit as published. `docs/PRIVATE-context.md` is gitignored planning material and must never be
+committed; history was squashed on 2026-10-09 to remove the commits that had contained it, and
+rewritten on 2026-10-11 to remove host-identifying literals earlier commits had committed. The
+checks that verify both are in the next-action runbook, step 3.
 
 ## Conventions
 

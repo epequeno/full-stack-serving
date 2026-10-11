@@ -25,6 +25,15 @@ is what proves it.
 floor (1260) is one repeat under desktop background load — kept, not discarded (ADR 0006);
 the other nine sit at 2000–2090.
 
+**Aggregation — this table and the verdicts below do not aggregate the same way.** The matrix is
+**pooled across the 10 repeats** (one distribution over all 2,560 requests per cell);
+`findings.json` and every verdict use the **median of the 10 per-run medians**, which is what
+ADR 0006/0008's five-value rule consumes. The two agree closely where the repeats are tight and
+part company where they are not: **c=4 TTFT reads 24.12 ms pooled vs 25.33 ms
+median-of-run-medians** (1.21 ms apart, against a declared ±0.381 ms soft tolerance for that
+cell), and c=64 TTFT reads 107.58 vs 104.67 (2.91 ms, inside that cell's ±186.68 ms band).
+A figure quoted from one column is not quotable from the other.
+
 ## The L1 vs L0 verdicts (full-stack-serving ADR 0008)
 
 The comparison is **"Kubernetes deployment vs Docker deployment"** — never "Kubernetes

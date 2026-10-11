@@ -2,8 +2,10 @@
 
 **Most serving-stack demos are screenshots. This one is measurements.**
 
-A complete LLM serving stack — container → Kubernetes → inference-aware routing → autoscaling →
-observability — in which every layer must produce a **number** rather than an assertion.
+An LLM serving stack in which every layer must produce a **number** rather than an assertion.
+**Built and measured: container → Kubernetes → observability** (L0, L1, L4). Inference-aware
+routing and autoscaling are **not built** — the level table below is a list of what exists, not
+of what is planned.
 
 **Status: L0, L1 and L4 are measured.** On the GPU host: L0 under Docker (2026-10-10,
 [`results/l0-local/`](results/l0-local/README.md)), the same workload on `k3s`
@@ -51,7 +53,12 @@ stays honest about where it stopped.
 | **L5** | Multi-node / P-D disaggregation | co-located vs disaggregated, plus **measured cost** | not started |
 
 **Cut order if time runs short:** L5 → L3 → L2. **Keep L0, L1, L4.** Container → Kubernetes →
-measured observability is the spine; if only that ships, the project still works.
+measured observability is the spine; if only that ships, the project still works. L2/L3/L5 are
+**cut, not pending**: L2/L3 need a second replica and L5 needs a second node, and there is one
+GPU.
+
+**What is next, in order, for one GPU:** [`AGENTS.md` § Next action](AGENTS.md#next-action) —
+written to be executed on the GPU host.
 
 ## Gate
 

@@ -83,8 +83,12 @@ same endpoint L0 already uses.
   level". A supplementary experiment at L0 therefore lives under the L0 level directory, not as a
   new sibling level directory — the load model is named inside it, and its README states that its
   numbers are not comparable to the closed-loop matrix.
-- **ADR 0004 is not superseded.** It remains valid for the levels it assigns, and its status is
-  untouched by this record. This ADR adds an experiment; it does not reassign a level.
+- **ADR 0004 is superseded by this record** (its status is set to `superseded by 0013`). Its
+  assignment no longer holds where it could not be exercised, and it is restated here so that
+  superseding it does not lose the half that does: **L0 and L1 stay closed-loop** and the
+  closed-loop matrix stays the baseline L1 is compared against (ADR 0008); the open-loop half
+  moves from L2/L3, which are cut, to L0. 0013 introduces no L-number and no new level —
+  `docs/design.md`'s level list and `README.md`'s level table are unchanged.
 - **Cost.** The client must sustain the arrival rate. At high λ the run is expected to go invalid;
   that is a finding about the harness, and it caps the range in which server behaviour is
   observable at all.
