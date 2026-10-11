@@ -1,0 +1,211 @@
+# make verify LEVEL=l4-otel — 2026-10-11T19:43:47Z
+# host: Linux 7.0.0-38-generic x86_64
+# git:  9c034ca — 2 uncommitted path(s)
+
+verify-l4: re-measuring both arms with the committed protocol (seed=20261010, c=[1, 4, 16, 64], repeats=5, arms=['base', 'tracing']) into <home>/code/full-stack-serving/tmp/verify-l4-otel — results/ is never touched
+measure-l4: bringing up the base arm
+
+loadgen: 32 ok, 0 err, 0 refused; wall 8.895s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 18.957s
+measure-l4 [base] [1/20] c=64 r=4: ok=256 err=0 wall=18.957s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 16.349s
+measure-l4 [base] [2/20] c=16 r=2: ok=256 err=0 wall=16.349s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 7.069s
+measure-l4 [base] [3/20] c=64 r=2: ok=256 err=0 wall=7.069s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 7.025s
+measure-l4 [base] [4/20] c=64 r=1: ok=256 err=0 wall=7.025s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 199.555s
+measure-l4 [base] [5/20] c=1 r=0: ok=256 err=0 wall=199.555s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 198.997s
+measure-l4 [base] [6/20] c=1 r=3: ok=256 err=0 wall=198.997s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 7.062s
+measure-l4 [base] [7/20] c=64 r=3: ok=256 err=0 wall=7.062s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 16.348s
+measure-l4 [base] [8/20] c=16 r=4: ok=256 err=0 wall=16.348s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 55.59s
+measure-l4 [base] [9/20] c=4 r=4: ok=256 err=0 wall=55.59s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 198.946s
+measure-l4 [base] [10/20] c=1 r=2: ok=256 err=0 wall=198.946s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 7.118s
+measure-l4 [base] [11/20] c=64 r=0: ok=256 err=0 wall=7.118s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 199.631s
+measure-l4 [base] [12/20] c=1 r=4: ok=256 err=0 wall=199.631s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 16.079s
+measure-l4 [base] [13/20] c=16 r=3: ok=256 err=0 wall=16.079s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 56.141s
+measure-l4 [base] [14/20] c=4 r=0: ok=256 err=0 wall=56.141s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 56.015s
+measure-l4 [base] [15/20] c=4 r=1: ok=256 err=0 wall=56.015s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 15.927s
+measure-l4 [base] [16/20] c=16 r=0: ok=256 err=0 wall=15.927s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 55.99s
+measure-l4 [base] [17/20] c=4 r=3: ok=256 err=0 wall=55.99s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 198.749s
+measure-l4 [base] [18/20] c=1 r=1: ok=256 err=0 wall=198.749s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 55.73s
+measure-l4 [base] [19/20] c=4 r=2: ok=256 err=0 wall=55.73s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 15.958s
+measure-l4 [base] [20/20] c=16 r=1: ok=256 err=0 wall=15.958s
+measure-l4: bringing up the tracing arm
+
+loadgen: 32 ok, 0 err, 0 refused; wall 8.763s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 18.739s
+measure-l4 [tracing] [1/20] c=64 r=4: ok=256 err=0 wall=18.739s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 16.386s
+measure-l4 [tracing] [2/20] c=16 r=2: ok=256 err=0 wall=16.386s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 7.077s
+measure-l4 [tracing] [3/20] c=64 r=2: ok=256 err=0 wall=7.077s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 7.101s
+measure-l4 [tracing] [4/20] c=64 r=1: ok=256 err=0 wall=7.101s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 199.546s
+measure-l4 [tracing] [5/20] c=1 r=0: ok=256 err=0 wall=199.546s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 198.731s
+measure-l4 [tracing] [6/20] c=1 r=3: ok=256 err=0 wall=198.731s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 7.09s
+measure-l4 [tracing] [7/20] c=64 r=3: ok=256 err=0 wall=7.09s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 16.417s
+measure-l4 [tracing] [8/20] c=16 r=4: ok=256 err=0 wall=16.417s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 56.042s
+measure-l4 [tracing] [9/20] c=4 r=4: ok=256 err=0 wall=56.042s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 199.161s
+measure-l4 [tracing] [10/20] c=1 r=2: ok=256 err=0 wall=199.161s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 7.034s
+measure-l4 [tracing] [11/20] c=64 r=0: ok=256 err=0 wall=7.034s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 199.331s
+measure-l4 [tracing] [12/20] c=1 r=4: ok=256 err=0 wall=199.331s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 16.038s
+measure-l4 [tracing] [13/20] c=16 r=3: ok=256 err=0 wall=16.038s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 55.675s
+measure-l4 [tracing] [14/20] c=4 r=0: ok=256 err=0 wall=55.675s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 55.667s
+measure-l4 [tracing] [15/20] c=4 r=1: ok=256 err=0 wall=55.667s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 15.896s
+measure-l4 [tracing] [16/20] c=16 r=0: ok=256 err=0 wall=15.896s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 55.789s
+measure-l4 [tracing] [17/20] c=4 r=3: ok=256 err=0 wall=55.789s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 198.898s
+measure-l4 [tracing] [18/20] c=1 r=1: ok=256 err=0 wall=198.898s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 55.644s
+measure-l4 [tracing] [19/20] c=4 r=2: ok=256 err=0 wall=55.644s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 16.037s
+measure-l4 [tracing] [20/20] c=16 r=1: ok=256 err=0 wall=16.037s
+measure-l4: spans settled at 5152 llm_request spans (expected ≈ 5120, stable reads 5152/5152)
+  c=  1 coverage=100.0% (1280/1280)
+  c=  4 coverage=100.0% (1280/1280)
+  c= 16 coverage=100.0% (1280/1280)
+  c= 64 coverage=100.0% (1280/1280)
+measure-l4: both arms done (0 failures) → <home>/code/full-stack-serving/tmp/verify-l4-otel/l4.json
+  [tracing_overhead] c=  1 ttft_p50_ms  verdict=indistinguishable effect=0.008 bar=5.3 claimable=False
+  [tracing_overhead] c=  1 itl_p50_ms   verdict=indistinguishable effect=0.002 bar=5.3 claimable=False
+  [tracing_overhead] c=  1 tpot_p50_ms  verdict=indistinguishable effect=0.0 bar=5.3 claimable=False
+  [tracing_overhead] c=  1 reqs_per_s   verdict=indistinguishable effect=-0.001 bar=n/a claimable=False
+  [tracing_overhead] c=  4 ttft_p50_ms  verdict=indistinguishable effect=-3.38 bar=13.7 claimable=False
+  [tracing_overhead] c=  4 itl_p50_ms   verdict=indistinguishable effect=0.006 bar=13.7 claimable=False
+  [tracing_overhead] c=  4 tpot_p50_ms  verdict=indistinguishable effect=-0.004 bar=13.7 claimable=False
+  [tracing_overhead] c=  4 reqs_per_s   verdict=indistinguishable effect=0.026 bar=n/a claimable=False
+  [tracing_overhead] c= 16 ttft_p50_ms  verdict=indistinguishable effect=2.92 bar=18.4 claimable=False
+  [tracing_overhead] c= 16 itl_p50_ms   verdict=indistinguishable effect=-0.007 bar=18.4 claimable=False
+  [tracing_overhead] c= 16 tpot_p50_ms  verdict=indistinguishable effect=-0.011 bar=18.4 claimable=False
+  [tracing_overhead] c= 16 reqs_per_s   verdict=indistinguishable effect=0.041 bar=n/a claimable=False
+  [tracing_overhead] c= 64 ttft_p50_ms  verdict=indistinguishable effect=1.82 bar=53.9 claimable=False
+  [tracing_overhead] c= 64 itl_p50_ms   verdict=indistinguishable effect=0.003 bar=53.9 claimable=False
+  [tracing_overhead] c= 64 tpot_p50_ms  verdict=indistinguishable effect=0.024 bar=53.9 claimable=False
+  [tracing_overhead] c= 64 reqs_per_s   verdict=indistinguishable effect=-0.107 bar=n/a claimable=False
+  [span_client_gap] c=  1 gap_ttft_ms  verdict=client>span      effect=1.158 bar=5.3 claimable=False
+  [span_client_gap] c=  4 gap_ttft_ms  verdict=indistinguishable effect=1.325 bar=13.7 claimable=False
+  [span_client_gap] c= 16 gap_ttft_ms  verdict=indistinguishable effect=5.884 bar=18.4 claimable=False
+  [span_client_gap] c= 64 gap_ttft_ms  verdict=indistinguishable effect=14.551 bar=53.9 claimable=False
+
+verify-l4: verdicts (fresh vs committed) — [gated] = claimable (ADR 0007), [info] = sub-bar, at the instrument's resolution:
+  [tracing_overhead] c=  1 ttft_p50_ms  fresh=indistinguishable committed=tracing<base [info(sub-bar FLIP recorded, not gated — ADR 0007/0008)]
+  [tracing_overhead] c=  1 itl_p50_ms   fresh=indistinguishable committed=indistinguishable [ok(sub-bar: flip recorded, not gated — ADR 0007/0008)]
+  [tracing_overhead] c=  1 tpot_p50_ms  fresh=indistinguishable committed=indistinguishable [ok(sub-bar: flip recorded, not gated — ADR 0007/0008)]
+  [tracing_overhead] c=  1 reqs_per_s   fresh=indistinguishable committed=indistinguishable [info(no instrument bar — throughput, recorded, never gated)]
+  [tracing_overhead] c=  4 ttft_p50_ms  fresh=indistinguishable committed=indistinguishable [ok(sub-bar: flip recorded, not gated — ADR 0007/0008)]
+  [tracing_overhead] c=  4 itl_p50_ms   fresh=indistinguishable committed=indistinguishable [ok(sub-bar: flip recorded, not gated — ADR 0007/0008)]
+  [tracing_overhead] c=  4 tpot_p50_ms  fresh=indistinguishable committed=indistinguishable [ok(sub-bar: flip recorded, not gated — ADR 0007/0008)]
+  [tracing_overhead] c=  4 reqs_per_s   fresh=indistinguishable committed=indistinguishable [info(no instrument bar — throughput, recorded, never gated)]
+  [tracing_overhead] c= 16 ttft_p50_ms  fresh=indistinguishable committed=indistinguishable [ok(sub-bar: flip recorded, not gated — ADR 0007/0008)]
+  [tracing_overhead] c= 16 itl_p50_ms   fresh=indistinguishable committed=indistinguishable [ok(sub-bar: flip recorded, not gated — ADR 0007/0008)]
+  [tracing_overhead] c= 16 tpot_p50_ms  fresh=indistinguishable committed=indistinguishable [ok(sub-bar: flip recorded, not gated — ADR 0007/0008)]
+  [tracing_overhead] c= 16 reqs_per_s   fresh=indistinguishable committed=indistinguishable [info(no instrument bar — throughput, recorded, never gated)]
+  [tracing_overhead] c= 64 ttft_p50_ms  fresh=indistinguishable committed=indistinguishable [ok(sub-bar: flip recorded, not gated — ADR 0007/0008)]
+  [tracing_overhead] c= 64 itl_p50_ms   fresh=indistinguishable committed=indistinguishable [ok(sub-bar: flip recorded, not gated — ADR 0007/0008)]
+  [tracing_overhead] c= 64 tpot_p50_ms  fresh=indistinguishable committed=indistinguishable [ok(sub-bar: flip recorded, not gated — ADR 0007/0008)]
+  [tracing_overhead] c= 64 reqs_per_s   fresh=indistinguishable committed=indistinguishable [info(no instrument bar — throughput, recorded, never gated)]
+  [span_client_gap] c=  1 gap_ttft_ms  fresh=client>span      committed=client>span [ok(sub-bar: flip recorded, not gated — ADR 0007/0008)]
+  [span_client_gap] c=  4 gap_ttft_ms  fresh=indistinguishable committed=indistinguishable [ok(sub-bar: flip recorded, not gated — ADR 0007/0008)]
+  [span_client_gap] c= 16 gap_ttft_ms  fresh=indistinguishable committed=indistinguishable [ok(sub-bar: flip recorded, not gated — ADR 0007/0008)]
+  [span_client_gap] c= 64 gap_ttft_ms  fresh=indistinguishable committed=indistinguishable [ok(sub-bar: flip recorded, not gated — ADR 0007/0008)]
+
+verify-l4: soft check (absolute numbers vs declared tolerance — reported, never fatal):
+  base     c=  1 ttft_p50_ms  committed=    14.42 fresh=    14.61 Δ=   +0.19 tol=±0.348 [within]
+  base     c=  1 itl_p50_ms   committed=     5.81 fresh=     5.87 Δ=   +0.06 tol=±0.054 [OUTSIDE tolerance]
+  base     c=  1 tpot_p50_ms  committed=     5.87 fresh=     6.01 Δ=   +0.13 tol=±0.19 [within]
+  base     c=  4 ttft_p50_ms  committed=    22.76 fresh=    25.50 Δ=   +2.74 tol=±3.217 [within]
+  base     c=  4 itl_p50_ms   committed=     6.47 fresh=     6.51 Δ=   +0.04 tol=±0.071 [within]
+  base     c=  4 tpot_p50_ms  committed=     6.53 fresh=     6.68 Δ=   +0.15 tol=±0.104 [OUTSIDE tolerance]
+  base     c= 16 ttft_p50_ms  committed=    39.07 fresh=    45.62 Δ=   +6.54 tol=±12.636 [within]
+  base     c= 16 itl_p50_ms   committed=     7.25 fresh=     7.34 Δ=   +0.09 tol=±0.072 [OUTSIDE tolerance]
+  base     c= 16 tpot_p50_ms  committed=     7.28 fresh=     7.51 Δ=   +0.23 tol=±0.125 [OUTSIDE tolerance]
+  base     c= 64 ttft_p50_ms  committed=   112.33 fresh=   115.54 Δ=   +3.21 tol=±269.583 [within]
+  base     c= 64 itl_p50_ms   committed=    12.50 fresh=    12.89 Δ=   +0.38 tol=±0.223 [OUTSIDE tolerance]
+  base     c= 64 tpot_p50_ms  committed=    12.68 fresh=    13.03 Δ=   +0.35 tol=±22.354 [within]
+  tracing  c=  1 ttft_p50_ms  committed=    14.15 fresh=    14.62 Δ=   +0.47 tol=±0.348 [OUTSIDE tolerance]
+  tracing  c=  1 itl_p50_ms   committed=     5.79 fresh=     5.87 Δ=   +0.08 tol=±0.054 [OUTSIDE tolerance]
+  tracing  c=  1 tpot_p50_ms  committed=     5.80 fresh=     6.01 Δ=   +0.21 tol=±0.19 [OUTSIDE tolerance]
+  tracing  c=  4 ttft_p50_ms  committed=    24.56 fresh=    22.58 Δ=   -1.98 tol=±3.217 [within]
+  tracing  c=  4 itl_p50_ms   committed=     6.45 fresh=     6.51 Δ=   +0.06 tol=±0.071 [within]
+  tracing  c=  4 tpot_p50_ms  committed=     6.45 fresh=     6.67 Δ=   +0.22 tol=±0.104 [OUTSIDE tolerance]
+  tracing  c= 16 ttft_p50_ms  committed=    44.54 fresh=    45.36 Δ=   +0.82 tol=±12.636 [within]
+  tracing  c= 16 itl_p50_ms   committed=     7.24 fresh=     7.34 Δ=   +0.10 tol=±0.072 [OUTSIDE tolerance]
+  tracing  c= 16 tpot_p50_ms  committed=     7.26 fresh=     7.52 Δ=   +0.27 tol=±0.125 [OUTSIDE tolerance]
+  tracing  c= 64 ttft_p50_ms  committed=   106.20 fresh=   109.34 Δ=   +3.15 tol=±269.583 [within]
+  tracing  c= 64 itl_p50_ms   committed=    12.48 fresh=    12.86 Δ=   +0.39 tol=±0.223 [OUTSIDE tolerance]
+  tracing  c= 64 tpot_p50_ms  committed=    12.60 fresh=    13.06 Δ=   +0.46 tol=±22.354 [within]
+
+verify-l4: gate PASS — every committed claimable finding reproduced on a fresh run.
+Numbers are environment-bound; the conclusions are what hold (ADR 0008).
+
+result: PASS
+# written 2026-10-11T20:32:22Z

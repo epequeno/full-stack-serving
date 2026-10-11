@@ -1,0 +1,170 @@
+# make verify LEVEL=l4-otel — 2026-10-11T18:53:41Z
+# host: Linux 7.0.0-38-generic x86_64
+# git:  99f5bd0 — 2 uncommitted path(s)
+
+verify-l4: re-measuring both arms with the committed protocol (seed=20261010, c=[1, 4, 16, 64], repeats=5, arms=['base', 'tracing']) into <home>/code/full-stack-serving/tmp/verify-l4-otel — results/ is never touched
+measure-l4: bringing up the base arm
+
+loadgen: 32 ok, 0 err, 0 refused; wall 8.705s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 18.542s
+measure-l4 [base] [1/20] c=64 r=4: ok=256 err=0 wall=18.542s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 16.054s
+measure-l4 [base] [2/20] c=16 r=2: ok=256 err=0 wall=16.054s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 6.98s
+measure-l4 [base] [3/20] c=64 r=2: ok=256 err=0 wall=6.98s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 7.032s
+measure-l4 [base] [4/20] c=64 r=1: ok=256 err=0 wall=7.032s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 196.428s
+measure-l4 [base] [5/20] c=1 r=0: ok=256 err=0 wall=196.428s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 195.894s
+measure-l4 [base] [6/20] c=1 r=3: ok=256 err=0 wall=195.894s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 6.93s
+measure-l4 [base] [7/20] c=64 r=3: ok=256 err=0 wall=6.93s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 16.035s
+measure-l4 [base] [8/20] c=16 r=4: ok=256 err=0 wall=16.035s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 55.129s
+measure-l4 [base] [9/20] c=4 r=4: ok=256 err=0 wall=55.129s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 195.944s
+measure-l4 [base] [10/20] c=1 r=2: ok=256 err=0 wall=195.944s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 6.899s
+measure-l4 [base] [11/20] c=64 r=0: ok=256 err=0 wall=6.899s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 196.612s
+measure-l4 [base] [12/20] c=1 r=4: ok=256 err=0 wall=196.612s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 15.702s
+measure-l4 [base] [13/20] c=16 r=3: ok=256 err=0 wall=15.702s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 54.993s
+measure-l4 [base] [14/20] c=4 r=0: ok=256 err=0 wall=54.993s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 54.623s
+measure-l4 [base] [15/20] c=4 r=1: ok=256 err=0 wall=54.623s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 15.751s
+measure-l4 [base] [16/20] c=16 r=0: ok=256 err=0 wall=15.751s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 54.984s
+measure-l4 [base] [17/20] c=4 r=3: ok=256 err=0 wall=54.984s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 195.899s
+measure-l4 [base] [18/20] c=1 r=1: ok=256 err=0 wall=195.899s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 55.015s
+measure-l4 [base] [19/20] c=4 r=2: ok=256 err=0 wall=55.015s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 15.598s
+measure-l4 [base] [20/20] c=16 r=1: ok=256 err=0 wall=15.598s
+measure-l4: bringing up the tracing arm
+
+loadgen: 32 ok, 0 err, 0 refused; wall 8.667s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 18.417s
+measure-l4 [tracing] [1/20] c=64 r=4: ok=256 err=0 wall=18.417s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 16.147s
+measure-l4 [tracing] [2/20] c=16 r=2: ok=256 err=0 wall=16.147s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 6.933s
+measure-l4 [tracing] [3/20] c=64 r=2: ok=256 err=0 wall=6.933s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 6.929s
+measure-l4 [tracing] [4/20] c=64 r=1: ok=256 err=0 wall=6.929s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 198.104s
+measure-l4 [tracing] [5/20] c=1 r=0: ok=256 err=0 wall=198.104s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 198.815s
+measure-l4 [tracing] [6/20] c=1 r=3: ok=256 err=0 wall=198.815s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 7.075s
+measure-l4 [tracing] [7/20] c=64 r=3: ok=256 err=0 wall=7.075s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 16.368s
+measure-l4 [tracing] [8/20] c=16 r=4: ok=256 err=0 wall=16.368s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 56.083s
+measure-l4 [tracing] [9/20] c=4 r=4: ok=256 err=0 wall=56.083s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 199.233s
+measure-l4 [tracing] [10/20] c=1 r=2: ok=256 err=0 wall=199.233s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 7.114s
+measure-l4 [tracing] [11/20] c=64 r=0: ok=256 err=0 wall=7.114s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 199.627s
+measure-l4 [tracing] [12/20] c=1 r=4: ok=256 err=0 wall=199.627s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 15.943s
+measure-l4 [tracing] [13/20] c=16 r=3: ok=256 err=0 wall=15.943s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 56.08s
+measure-l4 [tracing] [14/20] c=4 r=0: ok=256 err=0 wall=56.08s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 55.671s
+measure-l4 [tracing] [15/20] c=4 r=1: ok=256 err=0 wall=55.671s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 15.936s
+measure-l4 [tracing] [16/20] c=16 r=0: ok=256 err=0 wall=15.936s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 55.788s
+measure-l4 [tracing] [17/20] c=4 r=3: ok=256 err=0 wall=55.788s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 198.799s
+measure-l4 [tracing] [18/20] c=1 r=1: ok=256 err=0 wall=198.799s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 55.925s
+measure-l4 [tracing] [19/20] c=4 r=2: ok=256 err=0 wall=55.925s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 15.927s
+measure-l4 [tracing] [20/20] c=16 r=1: ok=256 err=0 wall=15.927s
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "<home>/code/full-stack-serving/measure/verify_l4.py", line 157, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "<home>/code/full-stack-serving/measure/verify_l4.py", line 67, in main
+    fresh = run_level(scratch, endpoint=cfg.endpoint, model=cfg.model,
+                      revision=cfg.revision, fixture=proto["fixture"],
+    ...<2 lines>...
+                      warmup_concurrency=proto["warmup_concurrency"],
+                      baseline_bars=(REPO / cfg.bars).resolve())
+  File "<home>/code/full-stack-serving/measure/measure_l4.py", line 487, in run_level
+    n, prev = settle_spans(SPAN_FILE, expected)
+              ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "<home>/code/full-stack-serving/measure/measure_l4.py", line 166, in settle_spans
+    n, prev = span_count(path), -1
+              ~~~~~~~~~~^^^^^^
+  File "<home>/code/full-stack-serving/measure/measure_l4.py", line 161, in span_count
+    return len(parse_spans(path))
+               ~~~~~~~~~~~^^^^^^
+  File "<home>/code/full-stack-serving/measure/measure_l4.py", line 127, in parse_spans
+    for line in path.read_text(encoding="utf-8").splitlines():
+                ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "<home>/.local/share/uv/python/cpython-3.13.16-linux-x86_64-gnu/lib/python3.13/pathlib/_local.py", line 546, in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<home>/.local/share/uv/python/cpython-3.13.16-linux-x86_64-gnu/lib/python3.13/pathlib/_abc.py", line 632, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<home>/.local/share/uv/python/cpython-3.13.16-linux-x86_64-gnu/lib/python3.13/pathlib/_local.py", line 537, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '<home>/code/full-stack-serving/tmp/l4-otel/spans/spans.json'
+make[2]: *** [Makefile:236: verify-l4-otel] Error 1
+make[1]: *** [Makefile:152: verify] Error 2
+
+result: FAIL (exit 2)
+# written 2026-10-11T19:41:57Z

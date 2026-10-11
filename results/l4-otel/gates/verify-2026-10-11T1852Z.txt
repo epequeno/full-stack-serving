@@ -1,0 +1,13 @@
+# make verify LEVEL=l4-otel — 2026-10-11T18:52:57Z
+# host: Linux 7.0.0-38-generic x86_64
+# git:  14eb6c4 — 2 uncommitted path(s)
+
+usage: verify-l4 [-h] [--endpoint ENDPOINT] [--model MODEL]
+                 [--revision REVISION] [--scratch SCRATCH]
+                 [--findings FINDINGS] [--bars BARS]
+verify-l4: error: argument --endpoint: expected one argument
+make[2]: *** [Makefile:235: verify-l4-otel] Error 2
+make[1]: *** [Makefile:151: verify] Error 2
+
+result: FAIL (exit 2)
+# written 2026-10-11T18:52:58Z

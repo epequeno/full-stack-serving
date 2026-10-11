@@ -1,0 +1,187 @@
+# make verify LEVEL=l1-k8s — 2026-10-11T18:02:52Z
+# host: Linux 7.0.0-38-generic x86_64
+# git:  14eb6c4 — 1 uncommitted path(s)
+
+Using CPython 3.13.16
+Creating virtual environment at: .venv
+   Building full-stack-serving @ file://<home>/code/full-stack-serving
+      Built full-stack-serving @ file://<home>/code/full-stack-serving
+Installed 10 packages in 2ms
+verify-l1: re-measuring with the committed protocol (seed=20261010, c=[1, 4, 16, 64], repeats=10) into <home>/code/full-stack-serving/tmp/verify-l1-k8s — results/ is never touched
+measure-l1: rolling deployment l1-vllm fresh (cold prefix cache, as at L0)
+measure-l1: rolled l1-vllm-6688bf688d-74nl8 → l1-vllm-74f5bd6576-8xt52
+
+loadgen: 256 ok, 0 err, 0 refused; wall 204.026s
+
+loadgen: 32 ok, 0 err, 0 refused; wall 6.751s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 25.532s
+[1/40] c=16 r=3: ok=256 err=0 wall=25.532s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 192.416s
+[2/40] c=1 r=7: ok=256 err=0 wall=192.416s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 191.906s
+[3/40] c=1 r=8: ok=256 err=0 wall=191.906s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 53.748s
+[4/40] c=4 r=5: ok=256 err=0 wall=53.748s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 53.695s
+[5/40] c=4 r=7: ok=256 err=0 wall=53.695s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 191.704s
+[6/40] c=1 r=3: ok=256 err=0 wall=191.704s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 6.818s
+[7/40] c=64 r=7: ok=256 err=0 wall=6.818s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 54.021s
+[8/40] c=4 r=9: ok=256 err=0 wall=54.021s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 6.772s
+[9/40] c=64 r=2: ok=256 err=0 wall=6.772s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 15.744s
+[10/40] c=16 r=6: ok=256 err=0 wall=15.744s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 6.819s
+[11/40] c=64 r=0: ok=256 err=0 wall=6.819s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 54.04s
+[12/40] c=4 r=3: ok=256 err=0 wall=54.04s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 15.286s
+[13/40] c=16 r=7: ok=256 err=0 wall=15.286s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 191.805s
+[14/40] c=1 r=1: ok=256 err=0 wall=191.805s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 191.718s
+[15/40] c=1 r=4: ok=256 err=0 wall=191.718s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 6.851s
+[16/40] c=64 r=5: ok=256 err=0 wall=6.851s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 53.943s
+[17/40] c=4 r=1: ok=256 err=0 wall=53.943s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 191.687s
+[18/40] c=1 r=6: ok=256 err=0 wall=191.687s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 15.272s
+[19/40] c=16 r=8: ok=256 err=0 wall=15.272s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 6.752s
+[20/40] c=64 r=4: ok=256 err=0 wall=6.752s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 54.213s
+[21/40] c=4 r=0: ok=256 err=0 wall=54.213s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 191.696s
+[22/40] c=1 r=9: ok=256 err=0 wall=191.696s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 6.788s
+[23/40] c=64 r=1: ok=256 err=0 wall=6.788s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 54.091s
+[24/40] c=4 r=8: ok=256 err=0 wall=54.091s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 191.705s
+[25/40] c=1 r=0: ok=256 err=0 wall=191.705s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 6.784s
+[26/40] c=64 r=8: ok=256 err=0 wall=6.784s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 15.558s
+[27/40] c=16 r=4: ok=256 err=0 wall=15.558s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 53.685s
+[28/40] c=4 r=2: ok=256 err=0 wall=53.685s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 15.307s
+[29/40] c=16 r=9: ok=256 err=0 wall=15.307s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 191.807s
+[30/40] c=1 r=5: ok=256 err=0 wall=191.807s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 6.746s
+[31/40] c=64 r=3: ok=256 err=0 wall=6.746s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 6.766s
+[32/40] c=64 r=6: ok=256 err=0 wall=6.766s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 6.76s
+[33/40] c=64 r=9: ok=256 err=0 wall=6.76s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 15.694s
+[34/40] c=16 r=0: ok=256 err=0 wall=15.694s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 15.268s
+[35/40] c=16 r=5: ok=256 err=0 wall=15.268s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 15.312s
+[36/40] c=16 r=1: ok=256 err=0 wall=15.312s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 53.759s
+[37/40] c=4 r=6: ok=256 err=0 wall=53.759s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 191.703s
+[38/40] c=1 r=2: ok=256 err=0 wall=191.703s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 53.761s
+[39/40] c=4 r=4: ok=256 err=0 wall=53.761s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 15.188s
+[40/40] c=16 r=2: ok=256 err=0 wall=15.188s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 15.282s
+
+loadgen: 256 ok, 0 err, 0 refused; wall 15.29s
+measure-l1: 40/40 runs ok → <home>/code/full-stack-serving/tmp/verify-l1-k8s/l1.json
+  c=  1 ttft_p50_ms  verdict=l1<l0            ratio=0.975 margin=0.248ms
+  c=  1 itl_p50_ms   verdict=l1<l0            ratio=0.987 margin=0.059ms
+  c=  1 tpot_p50_ms  verdict=l1<l0            ratio=0.97 margin=0.156ms
+  c=  4 ttft_p50_ms  verdict=l1<l0            ratio=0.864 margin=0.507ms
+  c=  4 itl_p50_ms   verdict=l1<l0            ratio=0.986 margin=0.05ms
+  c=  4 tpot_p50_ms  verdict=l1<l0            ratio=0.964 margin=0.124ms
+  c= 16 ttft_p50_ms  verdict=indistinguishable ratio=1.165 margin=0.326ms
+  c= 16 itl_p50_ms   verdict=l1<l0            ratio=0.978 margin=0.058ms
+  c= 16 tpot_p50_ms  verdict=indistinguishable ratio=0.957 margin=0.223ms
+  c= 64 ttft_p50_ms  verdict=indistinguishable ratio=0.938 margin=0.076ms
+  c= 64 itl_p50_ms   verdict=l1<l0            ratio=0.978 margin=0.237ms
+  c= 64 tpot_p50_ms  verdict=l1<l0            ratio=0.97 margin=0.192ms
+
+verify-l1: verdicts (fresh vs committed) — [gated] = claimable (ADR 0007), [info] = sub-bar, at the instrument's resolution:
+  c=  1 ttft_p50_ms  fresh=l1<l0            committed=indistinguishable [info(sub-bar FLIP recorded, not gated — ADR 0007/0008)]
+  c=  1 itl_p50_ms   fresh=l1<l0            committed=indistinguishable [info(sub-bar FLIP recorded, not gated — ADR 0007/0008)]
+  c=  1 tpot_p50_ms  fresh=l1<l0            committed=indistinguishable [info(sub-bar FLIP recorded, not gated — ADR 0007/0008)]
+  c=  4 ttft_p50_ms  fresh=l1<l0            committed=indistinguishable [info(sub-bar FLIP recorded, not gated — ADR 0007/0008)]
+  c=  4 itl_p50_ms   fresh=l1<l0            committed=indistinguishable [info(sub-bar FLIP recorded, not gated — ADR 0007/0008)]
+  c=  4 tpot_p50_ms  fresh=l1<l0            committed=indistinguishable [info(sub-bar FLIP recorded, not gated — ADR 0007/0008)]
+  c= 16 ttft_p50_ms  fresh=indistinguishable committed=indistinguishable [ok(sub-bar: flip recorded, not gated — ADR 0007/0008)]
+  c= 16 itl_p50_ms   fresh=l1<l0            committed=indistinguishable [info(sub-bar FLIP recorded, not gated — ADR 0007/0008)]
+  c= 16 tpot_p50_ms  fresh=indistinguishable committed=indistinguishable [ok(sub-bar: flip recorded, not gated — ADR 0007/0008)]
+  c= 64 ttft_p50_ms  fresh=indistinguishable committed=indistinguishable [ok(sub-bar: flip recorded, not gated — ADR 0007/0008)]
+  c= 64 itl_p50_ms   fresh=l1<l0            committed=indistinguishable [info(sub-bar FLIP recorded, not gated — ADR 0007/0008)]
+  c= 64 tpot_p50_ms  fresh=l1<l0            committed=indistinguishable [info(sub-bar FLIP recorded, not gated — ADR 0007/0008)]
+
+verify-l1: soft check (absolute numbers vs declared tolerance — reported, never fatal):
+  c=  1 ttft_p50_ms  committed=    14.81 fresh=    14.56 Δ=   -0.25 tol=±0.124 [OUTSIDE tolerance]
+  c=  1 itl_p50_ms   committed=     5.86 fresh=     5.79 Δ=   -0.07 tol=±0.021 [OUTSIDE tolerance]
+  c=  1 tpot_p50_ms  committed=     5.96 fresh=     5.78 Δ=   -0.17 tol=±0.029 [OUTSIDE tolerance]
+  c=  4 ttft_p50_ms  committed=    24.12 fresh=    21.93 Δ=   -2.19 tol=±0.381 [OUTSIDE tolerance]
+  c=  4 itl_p50_ms   committed=     6.49 fresh=     6.42 Δ=   -0.08 tol=±0.044 [OUTSIDE tolerance]
+  c=  4 tpot_p50_ms  committed=     6.61 fresh=     6.42 Δ=   -0.19 tol=±0.121 [OUTSIDE tolerance]
+  c= 16 ttft_p50_ms  committed=    43.58 fresh=    43.41 Δ=   -0.16 tol=±12.117 [within]
+  c= 16 itl_p50_ms   committed=     7.30 fresh=     7.17 Δ=   -0.13 tol=±0.039 [OUTSIDE tolerance]
+  c= 16 tpot_p50_ms  committed=     7.45 fresh=     7.18 Δ=   -0.27 tol=±0.097 [OUTSIDE tolerance]
+  c= 64 ttft_p50_ms  committed=   107.58 fresh=    99.02 Δ=   -8.56 tol=±186.68 [within]
+  c= 64 itl_p50_ms   committed=    12.69 fresh=    12.41 Δ=   -0.28 tol=±0.063 [OUTSIDE tolerance]
+  c= 64 tpot_p50_ms  committed=    12.81 fresh=    12.43 Δ=   -0.37 tol=±10.249 [within]
+
+verify-l1: gate PASS — every committed verdict reproduced on a fresh run.
+Numbers are environment-bound; the conclusions are what hold (ADR 0008).
+
+result: PASS
+# written 2026-10-11T18:52:36Z
