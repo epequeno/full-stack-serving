@@ -35,13 +35,12 @@ proposed). The sibling eBPF observability project has its live serving stack
 
 ## Next action
 
-**The gate for L4** — `make verify LEVEL=l4-otel`: both arms re-measured into scratch with
-the committed protocol, gated on the claimable set (ADR 0008 restricted by ADR 0007), then
-commit `results/l4-otel/`. After that: **L2/L3 are the remaining design-only levels**, both
-blocked on >1 replica (one GPU — design.md's open dependency); re-check the Gateway API
-Inference Extension's GA status before L2. One GPU, one owner at a time:
-`make down LEVEL=l4-otel` frees it.
-
+**L4 is measured and gated** (`make verify LEVEL=l4-otel` PASS, 2026-10-11, committed) —
+the spine is complete: container → Kubernetes → measured observability. **L2/L3/L5
+remain.** L2/L3 need >1 replica (one GPU — design.md's open dependency; re-check the
+Gateway API Inference Extension's GA status before L2); L5 needs a second node and a
+budget. Cut order if time runs short (design.md): L5 → L3 → L2. One GPU, one owner at a
+time: `make down LEVEL=l4-otel` (already down, verified).
 
 ## Rules
 

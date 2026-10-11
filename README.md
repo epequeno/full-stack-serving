@@ -5,12 +5,14 @@
 A complete LLM serving stack — container → Kubernetes → inference-aware routing → autoscaling →
 observability — in which every layer must produce a **number** rather than an assertion.
 
-**Status: L0 and L1 are measured.** The GPU host ran both levels on 2026-10-10: L0 under
-Docker ([`results/l0-local/`](results/l0-local/README.md)) and the same workload on `k3s`
-([`results/l1-k8s/`](results/l1-k8s/README.md)) — 12/12 verdicts `indistinguishable`, no
-directional finding claimable above the instrument's bars (ADR 0007): the measured
-statement is **parity at the instrument's resolution**, gated by
-`make verify LEVEL=l1-k8s` (ADR 0008). L2–L5 are not started. Reasoning per level:
+**Status: L0, L1 and L4 are measured.** On the GPU host: L0 under Docker (2026-10-10,
+[`results/l0-local/`](results/l0-local/README.md)), the same workload on `k3s`
+(2026-10-10, [`results/l1-k8s/`](results/l1-k8s/README.md)) — parity at the instrument's
+resolution, nothing claimable, gated — and OTel `gen_ai.*` tracing into Arize Phoenix
+(2026-10-11, [`results/l4-otel/`](results/l4-otel/README.md)): **no detectable tracing
+overhead** and a **span-to-client TTFT gap that grows ~an order of magnitude from c=1 to
+c=64** (the unspanned path queues under load), gated by `make verify LEVEL=l4-otel`
+(ADRs 0007/0008/0009). L2/L3/L5 are not started. Reasoning per level:
 [`docs/design.md`](docs/design.md). Decisions: [`adr/`](adr/).
 
 ## Why this exists
