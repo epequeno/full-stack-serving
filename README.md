@@ -17,6 +17,26 @@ c=64** (the unspanned path queues under load), gated by `make verify LEVEL=l4-ot
 (ADRs 0007/0008/0009). L2/L3/L5 are not started. Reasoning per level:
 [`docs/design.md`](docs/design.md). Decisions: [`adr/`](adr/).
 
+## Verify this
+
+Nothing here needs to be taken on trust: every committed number has a command that re-derives it.
+
+```bash
+make doctor                  # what this host has; installs nothing, writes nothing
+make status                  # what is currently built, and what explicitly is not
+make verify LEVEL=l1-k8s     # re-measure into scratch; exit 1 if a committed finding changed
+make gate-log LEVEL=l4-otel  # run verify and commit its output to results/<l>/gates/ (ADR 0014)
+```
+
+`verify` is the part that matters: it re-runs the measurement and **fails if a published finding
+moves**. The numbers live in `results/<level>/README.md`, with the raw runs beside them and the gate
+logs under `results/<level>/gates/`.
+
+Two constraints come from the runbook, not from the code: `LEVEL=l1-k8s` needs `make up LEVEL=l1-k8s`
+first (the L4 gate does not), and the GPU host serves **one owner at a time** — `make down LEVEL=<l>`
+before bringing the next level up. Levels `l2-routing`, `l3-autoscaling` and `l5-multinode` have no
+verify target because they are not built; the runner says so rather than pretending.
+
 ## Why this exists
 
 Anyone can follow llm-d's quickstart and post a `kubectl get pods`. That shows you can follow
