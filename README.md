@@ -37,31 +37,12 @@ first (the L4 gate does not), and the GPU host serves **one owner at a time** �
 before bringing the next level up. Levels `l2-routing`, `l3-autoscaling` and `l5-multinode` have no
 verify target because they are not built; the runner says so rather than pretending.
 
-## Why this exists
-
-Anyone can follow llm-d's quickstart and post a `kubectl get pods`. That shows you can follow
-instructions. It does not show you know *why* the stack is shaped that way, what it costs, or what
-each layer changes when you turn it on.
-
-This repo is the same stack, instrumented so every level yields evidence.
-
-## The anti-tutorial test
-
-The failure mode is a re-typed quickstart. Three pass conditions:
-
-1. **It produces numbers upstream docs don't.** Upstream tells you how to install. It does not
-   tell you what TTFT looked like on *your* hardware at *your* concurrency levels.
-2. **It makes decisions upstream deliberately doesn't.** llm-d supports vLLM *and* SGLang;
-   something has to choose, and the reasoning is the artifact.
-3. **It documents constraints upstream doesn't have.** A single GPU on a home LAN is nobody's
-   target environment.
-
-If a section here could be replaced by a link to upstream docs, it should be.
-
 ## Levels
 
 Each level is independently demonstrable and produces its own evidence. Stop anywhere — the repo
-stays honest about where it stopped.
+stays honest about where it stopped. The bar for a level is that it yields **numbers upstream docs
+do not**: how the stack behaves on this hardware, at these concurrency levels, for this cost. Where
+a section could be replaced by a link to upstream documentation, it should be a link.
 
 | Level | What | Evidence it must produce | Status |
 |---|---|---|---|
@@ -102,9 +83,8 @@ results/         committed evidence, one directory per level
 ## Prerequisites
 
 Inventoried 2026-10-10 — see
-[`results/l0-local/host-inventory.md`](results/l0-local/host-inventory.md): **saturn**, RTX
-4070 Ti SUPER (16 376 MiB, compute 8.9), driver 595.99.02 / CUDA 13.2, Docker 29.1.3 with the
-NVIDIA container toolkit (GPU-in-container verified), Python 3.14.4. Model:
+[`results/l0-local/host-inventory.md`](results/l0-local/host-inventory.md): a single **NVIDIA RTX
+4070 Ti SUPER** (16 GiB) on Linux, with the GPU reachable from inside a container. Model:
 **Qwen2.5-1.5B-Instruct, bf16** — [ADR 0011](adr/0011-qwen2.5-1.5b-instruct-bf16.md). Absent and
 needed later: `k3s` + `kubectl` (L1), `helm` (L2/L3), an IaC tool (L5).
 
