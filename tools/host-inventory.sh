@@ -322,6 +322,7 @@ else
 fi
 
 echo
+intable=0
 echo '**Serving-stack readiness** (full-stack-serving levels):'
 crt=no; { have docker || have containerd || have podman; } && crt=yes
 gpu=no; have nvidia-smi && gpu=yes

@@ -268,6 +268,8 @@ _not run — set `PROBE_IMAGE=<image already present locally>` to start one shor
 | largest weights that fit, per GPU | FP16 ~6B · FP8/INT8 ~13B · 4-bit ~26B params (80% of 16376 MiB, before KV cache and activations — a ceiling, not a recommendation) |
 
 **Serving-stack readiness** (full-stack-serving levels):
+| field | value |
+|---|---|
 | L0 (container + engine) | ready |
 | L1 (k3s + kubectl) | ready |
 | L2 (routing / Gateway API) | needs kubectl + helm |
